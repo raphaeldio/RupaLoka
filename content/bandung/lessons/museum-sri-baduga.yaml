@@ -1,0 +1,19 @@
+id: museum-sri-baduga
+title: "Museum Sri Baduga"
+narrative: |
+  [PERLU DIISI] narasi 100-200 kata.
+key_facts:
+  - text: "Museum Sri Baduga berada di Jl. BKR No.185, Bandung."   # dari PRD §9; sumber [PERLU DIISI]
+    chunk: museum-sri-baduga-001
+images:
+  - src: assets/images/museum-sri-baduga-1.webp
+    alt: "[PERLU DIISI] deskripsi gambar"
+    license: "[PERLU DIISI]"
+location:
+  name: "Museum Sri Baduga"
+  address: "Jl. BKR No.185, Bandung"   # verifikasi ulang + jam buka (T-034, T-035)
+  lat: null                            # [PERLU DIISI] dari sumber peta, jangan ditebak
+  lng: null
+suggested_questions:
+  - "Koleksi apa saja yang ada di Museum Sri Baduga?"
+  - "Di mana Museum Sri Baduga berada?"

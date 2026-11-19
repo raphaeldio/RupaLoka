@@ -1,0 +1,37 @@
+# Kuis dasar 5 soal (F-020). Ditulis dan diverifikasi tim (T-033), BUKAN oleh AI.
+# correct = indeks opsi yang benar, mulai dari 0. chunk = id chunk di knowledge/ yang menjadi sumbernya.
+# Jawaban benar diperiksa dua orang.
+intro:
+  - id: q1
+    question: "[PERLU DIISI]"
+    options: ["[PERLU DIISI]", "[PERLU DIISI]", "[PERLU DIISI]", "[PERLU DIISI]"]
+    correct: 0
+    explanation: "[PERLU DIISI]"
+    chunk: angklung-001
+  - id: q2
+    question: "[PERLU DIISI]"
+    options: ["[PERLU DIISI]", "[PERLU DIISI]", "[PERLU DIISI]", "[PERLU DIISI]"]
+    correct: 0
+    explanation: "[PERLU DIISI]"
+    chunk: angklung-002
+  - id: q3
+    question: "[PERLU DIISI]"
+    options: ["[PERLU DIISI]", "[PERLU DIISI]", "[PERLU DIISI]", "[PERLU DIISI]"]
+    correct: 0
+    explanation: "[PERLU DIISI]"
+    chunk: wayang-golek-001
+  - id: q4
+    question: "[PERLU DIISI]"
+    options: ["[PERLU DIISI]", "[PERLU DIISI]", "[PERLU DIISI]", "[PERLU DIISI]"]
+    correct: 0
+    explanation: "[PERLU DIISI]"
+    chunk: wayang-golek-002
+  - id: q5
+    question: "[PERLU DIISI]"
+    options: ["[PERLU DIISI]", "[PERLU DIISI]", "[PERLU DIISI]", "[PERLU DIISI]"]
+    correct: 0
+    explanation: "[PERLU DIISI]"
+    chunk: museum-sri-baduga-001
+
+# Kuis penutup (P1, F-023). Kosongkan dulu.
+outro: []

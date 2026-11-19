@@ -1,0 +1,64 @@
+@import '@fontsource-variable/nunito-sans';
+@import 'tailwindcss';
+
+/*
+ * Token warna mengikuti SDD §3 (teal, amber, pasir, tinta). Nuansa netral dan
+ * warna kepulauan diambil dari referensi Figma (node 191:2).
+ */
+@theme {
+  --font-sans: 'Nunito Sans Variable', ui-sans-serif, system-ui, sans-serif;
+
+  --color-teal: #0f4c5c;
+  --color-teal-600: #1a6475;
+  --color-teal-50: #e7f0f1;
+  --color-amber: #c8841a;
+  --color-amber-50: #fbf1e1;
+  --color-pasir: #f3ecdd;
+  --color-tinta: #1f2933;
+
+  --color-kertas: #faf8f2; /* latar halaman dari referensi */
+  --color-laut: #eff1e6;
+  --color-redup: #6d796e; /* teks sekunder */
+  --color-samar: #85907f; /* label peta */
+  --color-garis: #e6e2d6;
+
+  --shadow-kartu: 0 1px 2px rgb(31 41 51 / 0.06), 0 8px 24px -8px rgb(31 41 51 / 0.14);
+  --shadow-melayang: 0 12px 32px -12px rgb(15 76 92 / 0.35);
+}
+
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    @apply bg-kertas font-sans text-tinta antialiased;
+  }
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-amber;
+  }
+}
+
+/* --- Peta: provinsi datar, timbul saat disorot ------------------------- */
+
+.province-surface svg {
+  pointer-events: none;
+}
+.province-surface path {
+  pointer-events: visiblePainted;
+  cursor: pointer;
+  transition: filter 220ms ease;
+}
+.province[data-state='dim'] .province-surface path {
+  filter: saturate(0.55) brightness(1.04);
+}
+.province[data-state='lifted'] .province-surface path {
+  filter: saturate(1.15);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .province,
+  .province * {
+    transition-duration: 0ms !important;
+    animation: none !important;
+  }
+}

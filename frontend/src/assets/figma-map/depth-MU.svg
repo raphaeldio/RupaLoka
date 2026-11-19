@@ -1,0 +1,16 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="139" height="148" viewBox="0 0 139 148" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Ketebalan Maluku Utara" filter="url(#filter0_d_0_70)">
+<path d="M99 88L89 82L96 78L99 88ZM121 2L125 6L120 17L112 11L121 2ZM106 13L107 25L112 34L124 29L125 43L116 46L115 53L124 55V61L106 57L99 67L95 56L98 48L92 39L96 25L106 13ZM94 107L105 106L111 113L94 114V107ZM14 113L20 111L38 114L15 122L14 113Z" fill="#8B8098"/>
+</g>
+<defs>
+<filter id="filter0_d_0_70" x="0" y="0" width="139" height="148" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="12"/>
+<feGaussianBlur stdDeviation="7"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0.18 0 0 0 0 0.25 0 0 0 0 0.19 0 0 0 0.13 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_0_70"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_0_70" result="shape"/>
+</filter>
+</defs>
+</svg>

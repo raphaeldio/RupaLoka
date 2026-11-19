@@ -1,0 +1,16 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="88" height="103" viewBox="0 0 88 103" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Ketebalan Sulawesi Tenggara" filter="url(#filter0_d_0_67)">
+<path d="M19 2L27 8L33 5H34L50 14L47 23L53 27L59 37L57 43L45 47L42 56L29 50L32 37L14 21L18 12L19 2ZM60 49L59 66L49 69L50 54L60 49ZM69 43L73 52L67 57L74 66L67 69L63 77L57 71L62 61L66 45L69 43Z" fill="#738998"/>
+</g>
+<defs>
+<filter id="filter0_d_0_67" x="0" y="0" width="88" height="103" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="12"/>
+<feGaussianBlur stdDeviation="7"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0.18 0 0 0 0 0.25 0 0 0 0 0.19 0 0 0 0.13 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_0_67"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_0_67" result="shape"/>
+</filter>
+</defs>
+</svg>

@@ -1,0 +1,7 @@
+# Kalimat pemandu per fase (F-010). Tanpa fakta budaya; hanya arahan. Draf, silakan disunting.
+# item_unlocked hanya boleh memakai {item} dan {short_explanation}.
+quiz_intro: "Halo! Selamat datang di Bandung. Sebelum mulai, coba jawab beberapa pertanyaan dulu, ya. Tidak apa-apa kalau belum tahu jawabannya."
+lessons_start: "Sekarang kita kenalan dengan beberapa budaya Bandung. Kalau ada yang bikin penasaran, tanya aku saja."
+game_start: "Siap keliling kota? Ketuk layar atau tekan spasi untuk melompat. Setiap 100 poin, ada budaya yang bisa kamu temukan!"
+item_unlocked: "Kamu menemukan {item}! {short_explanation}"
+summary: "Perjalanan selesai! Lihat koleksi yang kamu temukan, dan kunjungi lokasi aslinya kalau sempat."

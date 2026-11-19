@@ -1,0 +1,37 @@
+# Blueprint Render untuk API Rupaloka (FastAPI).
+# Tanpa rootDir: berkas di luar rootDir tidak tersedia di Render, padahal API membaca content/.
+services:
+  - type: web
+    name: rupaloka-api
+    runtime: python
+    plan: free                      # tidur setelah idle; lihat SDD §15 soal cold start
+    region: singapore
+    buildCommand: pip install -r backend/requirements.txt && python backend/scripts/validate_content.py
+    startCommand: cd backend && uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/health
+    buildFilter:
+      paths:
+        - backend/**
+        - content/**
+        - render.yaml
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: CONTENT_STRICT
+        value: "false"              # ubah ke "true" untuk rilis lomba (T-067)
+      - key: ALLOWED_ORIGINS
+        sync: false                 # mis. https://rupaloka.vercel.app,http://localhost:5173
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_MODEL
+        value: gemini-3.5-flash-lite
+      - key: MIN_SCORE
+        value: "1.0"                # kalibrasi di T-062
+      - key: RATE_LIMIT_PER_MIN
+        value: "20"
+      - key: MASCOT_NAME
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false

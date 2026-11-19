@@ -1,0 +1,16 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="132" height="146" viewBox="0 0 132 146" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Ketebalan Sulawesi Tengah" filter="url(#filter0_d_0_36)">
+<path d="M84 10L60 16L62 25L51 27L46 24L37 25L32 31L28 44L30 53L36 61L41 62L45 73L56 74L66 60L82 61L83 58H98L100 53L112 52L116 57L100 61L96 68L85 78L74 81L72 93L84 110L87 120L71 111L72 101L56 95L47 94L38 85L25 88V83L14 71L18 67L17 58L21 53L25 37L26 25L30 18L43 17L52 2L67 9L84 10ZM109 66L118 74L103 78L100 69L109 66Z" fill="#738998"/>
+</g>
+<defs>
+<filter id="filter0_d_0_36" x="0" y="0" width="132" height="146" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="12"/>
+<feGaussianBlur stdDeviation="7"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0.18 0 0 0 0 0.25 0 0 0 0 0.19 0 0 0 0.13 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_0_36"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_0_36" result="shape"/>
+</filter>
+</defs>
+</svg>

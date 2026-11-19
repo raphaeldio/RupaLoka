@@ -1,0 +1,17 @@
+# Daftar kota di peta beranda (F-001, F-002).
+# status: active (membuka alur, wajib punya folder <id>/city.yaml) | coming_soon (label "segera hadir").
+# lat/lng: posisi titik di peta. Ambil dari sumber peta yang dapat diperiksa, JANGAN ditebak (PRD §9).
+
+- id: bandung
+  name: Bandung
+  province: Jawa Barat
+  status: active
+  lat: null            # [PERLU DIISI] sumber koordinat dicatat di docs/decisions.md
+  lng: null
+  summary: "[PERLU DIISI] ringkasan kota untuk kartu kota, 1-2 kalimat"
+
+# Kota lain (contoh dari SDD §5.1). Tambah/hapus sesuai rencana tim.
+- id: yogyakarta
+  name: Yogyakarta
+  province: DI Yogyakarta
+  status: coming_soon

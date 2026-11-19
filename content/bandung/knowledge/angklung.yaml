@@ -1,0 +1,38 @@
+# Chunk pengetahuan untuk agen AI (RAG). Target minimal 8 chunk per materi (T-031).
+# Satu chunk = satu gagasan, 1-3 kalimat. Setiap chunk wajib punya sumber dan diverifikasi.
+# source.type: web (wajib url) | buku | jurnal | wawancara | museum
+
+- id: angklung-001
+  lesson_id: angklung
+  text: "Angklung tercatat UNESCO pada 2010."
+  source:
+    title: "[PERLU DIISI]"
+    url: null
+    type: "[PERLU DIISI]"
+    accessed: null          # tanggal akses, format 2026-11-19
+  verified_by: null         # nama pemeriksa (KH)
+  verified_at: null
+
+- id: angklung-002
+  lesson_id: angklung
+  text: "[PERLU DIISI]"
+  source:
+    title: "[PERLU DIISI]"
+    url: null
+    type: "[PERLU DIISI]"
+    accessed: null          # tanggal akses, format 2026-11-19
+  verified_by: null         # nama pemeriksa (KH)
+  verified_at: null
+
+- id: angklung-003
+  lesson_id: angklung
+  text: "[PERLU DIISI]"
+  source:
+    title: "[PERLU DIISI]"
+    url: null
+    type: "[PERLU DIISI]"
+    accessed: null          # tanggal akses, format 2026-11-19
+  verified_by: null         # nama pemeriksa (KH)
+  verified_at: null
+
+# Tambahkan angklung-004 dan seterusnya sampai minimal 8 chunk.

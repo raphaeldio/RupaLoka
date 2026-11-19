@@ -1,0 +1,50 @@
+# Sumber kebenaran untuk lisensi aset dan objek game (SDD §5, §12).
+
+# Setiap gambar/sprite/audio yang dipakai konten WAJIB tercatat di sini (path relatif ke content/).
+assets:
+  - path: assets/images/angklung-1.webp
+    license: "[PERLU DIISI]"      # mis. milik sendiri, CC-BY-4.0, CC0
+    author: "[PERLU DIISI]"
+    url: null                     # tautan asal bila bukan milik sendiri
+    note: "Izin foto di lokasi: [PERLU DIISI]"
+  - path: assets/images/wayang-golek-1.webp
+    license: "[PERLU DIISI]"
+    author: "[PERLU DIISI]"
+  - path: assets/images/museum-sri-baduga-1.webp
+    license: "[PERLU DIISI]"
+    author: "[PERLU DIISI]"
+  - path: assets/images/item-angklung.webp
+    license: "[PERLU DIISI]"
+    author: "[PERLU DIISI]"
+  - path: assets/images/item-wayang.webp
+    license: "[PERLU DIISI]"
+    author: "[PERLU DIISI]"
+  - path: assets/images/item-sri-baduga.webp
+    license: "[PERLU DIISI]"
+    author: "[PERLU DIISI]"
+
+# Objek game. Rintangan di city.yaml harus terdaftar di sini dan disetujui KH (approved_by).
+# sensitive: true = objek budaya/sakral/dihormati; validator MENOLAK bila dipakai sebagai rintangan
+# (PRD §7: objek budaya adalah hadiah, bukan sesuatu yang ditabrak).
+objects:
+  - id: batu
+    name: Batu
+    sensitive: false
+    approved_by: null             # [PERLU DIISI] nama penyetuju (KH)
+  - id: pagar
+    name: Pagar
+    sensitive: false
+    approved_by: null
+  - id: becak
+    name: Becak
+    sensitive: false
+    approved_by: null
+    note: "Kandidat dari SDD; KH memastikan tidak menyinggung pengemudi/komunitas"
+  - id: angklung
+    name: Angklung
+    sensitive: true
+    note: "Objek budaya; hanya sebagai item hadiah"
+  - id: wayang-golek
+    name: Wayang golek
+    sensitive: true
+    note: "Objek budaya; hanya sebagai item hadiah"

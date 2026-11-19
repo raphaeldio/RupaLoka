@@ -1,0 +1,16 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="106" height="116" viewBox="0 0 106 116" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Ketebalan Aceh" filter="url(#filter0_d_0_59)">
+<path d="M92 36L81 51L85 59L84 72L88 74L89 90L77 84L75 72L72 71L61 55L48 50L20 22L14 4L25 2L40 11H56L65 14L73 11L84 21L92 36Z" fill="#A37A5D"/>
+</g>
+<defs>
+<filter id="filter0_d_0_59" x="0" y="0" width="106" height="116" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="12"/>
+<feGaussianBlur stdDeviation="7"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0.18 0 0 0 0 0.25 0 0 0 0 0.19 0 0 0 0.13 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_0_59"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_0_59" result="shape"/>
+</filter>
+</defs>
+</svg>

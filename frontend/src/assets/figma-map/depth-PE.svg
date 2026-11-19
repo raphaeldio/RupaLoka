@@ -1,0 +1,16 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="110" height="82" viewBox="0 0 110 82" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Ketebalan Papua Pegunungan" filter="url(#filter0_d_0_86)">
+<path d="M96 22V55L86 56L77 51H58L44 43L23 42L14 39L19 27L25 20L20 14L21 4V2L32 7L38 3L48 9L96 22Z" fill="#7B8B6A"/>
+</g>
+<defs>
+<filter id="filter0_d_0_86" x="0" y="0" width="110" height="82" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="12"/>
+<feGaussianBlur stdDeviation="7"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0.18 0 0 0 0 0.25 0 0 0 0 0.19 0 0 0 0.13 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_0_86"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_0_86" result="shape"/>
+</filter>
+</defs>
+</svg>

@@ -1,0 +1,16 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="110" height="71" viewBox="0 0 110 71" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Ketebalan Kepulauan Bangka Belitung" filter="url(#filter0_d_0_53)">
+<path d="M14 15L23 4L34 2L41 12L46 27L58 30L47 40L36 36L31 19H19L14 15ZM79 29L90 30L96 37L93 45L78 44L79 29Z" fill="#A37A5D"/>
+</g>
+<defs>
+<filter id="filter0_d_0_53" x="0" y="0" width="110" height="71" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="12"/>
+<feGaussianBlur stdDeviation="7"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0.18 0 0 0 0 0.25 0 0 0 0 0.19 0 0 0 0.13 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_0_53"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_0_53" result="shape"/>
+</filter>
+</defs>
+</svg>

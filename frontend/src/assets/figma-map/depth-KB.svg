@@ -1,0 +1,16 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="165" height="155" viewBox="0 0 165 155" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Ketebalan Kalimantan Barat" filter="url(#filter0_d_0_74)">
+<path d="M151 17L145 24L141 35V36L131 50L127 64L112 70L101 69L85 78L83 84L69 91L67 100L73 122L63 128L51 129L45 110L43 96L45 88L36 74L20 66L22 51L15 44L14 32L19 14L31 2L34 11L54 29L61 30L75 25L83 28L98 24L100 15L107 12L122 13L137 21L145 16L151 17Z" fill="#708C77"/>
+</g>
+<defs>
+<filter id="filter0_d_0_74" x="0" y="0" width="165" height="155" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="12"/>
+<feGaussianBlur stdDeviation="7"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0.18 0 0 0 0 0.25 0 0 0 0 0.19 0 0 0 0.13 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_0_74"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_0_74" result="shape"/>
+</filter>
+</defs>
+</svg>

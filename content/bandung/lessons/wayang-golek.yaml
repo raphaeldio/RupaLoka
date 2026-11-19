@@ -1,0 +1,16 @@
+id: wayang-golek
+title: "Wayang Golek"
+narrative: |
+  [PERLU DIISI] narasi 100-200 kata.
+key_facts:
+  # PRD §9: wayang tercantum UNESCO 2008. Kaitan wayang golek dengan Bandung HARUS diverifikasi (T-035).
+  - text: "Wayang tercantum dalam daftar UNESCO pada 2008."
+    chunk: wayang-golek-001
+images:
+  - src: assets/images/wayang-golek-1.webp
+    alt: "[PERLU DIISI] deskripsi gambar"
+    license: "[PERLU DIISI]"
+location: null      # [PERLU DIISI] isi bila ada lokasi yang terverifikasi
+suggested_questions:
+  - "Apa itu wayang golek?"
+  - "Bagaimana wayang golek dimainkan?"
