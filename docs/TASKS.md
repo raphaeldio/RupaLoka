@@ -20,7 +20,7 @@ Fitur P1 (kuis penutup, rekor, analitik) tidak dikerjakan sebelum semua P0 seles
 
 - [ ] **T-001 (HW)** Cek juknis/tanya panitia: tanggal-jam batas baru, apakah purwarupa wajib berfungsi saat pendaftaran, format bukti. *DoD:* jawaban tertulis di `docs/decisions.md`.
 - [ ] **T-002 (KH)** Tetapkan materi Bandung final (3–4), 5 soal kuis (draf), ≥3 item koleksi, dan **daftar rintangan** bertema kota yang aman secara budaya (PRD §7). *DoD:* daftar disetujui KH + satu anggota lain.
-- [ ] **T-003 (HR)** Buat repo + struktur (SDD §4). `CLAUDE.md` dan `docs/` (PRD, SDD, TASKS) sudah ada; tinggal `git init` dan folder lainnya. *DoD:* kerangka ada.
+- [x] **T-003 (HR)** Buat repo + struktur (SDD §4). Repo git `main` dibuat 19 Nov 2026; `eval/` menyusul di T-060. *DoD:* kerangka ada.
 - [ ] **T-004 (HR)** Siapkan kunci Gemini API (Google AI Studio), proyek Render (dari `render.yaml`), proyek Vercel, proyek Supabase, subdomain. *DoD:* `curl https://<render>/api/health` berhasil.
 - [ ] **T-005 (HW)** Nama maskot, karakter pelari, tagline baru, gaya visual (orisinal). *DoD:* deskripsi + arahan aset SVG/sprite.
 
