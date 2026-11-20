@@ -8,15 +8,21 @@
 @theme {
   --font-sans: 'Nunito Sans Variable', ui-sans-serif, system-ui, sans-serif;
 
-  --color-teal: #0f4c5c;
-  --color-teal-600: #1a6475;
-  --color-teal-50: #e7f0f1;
-  --color-amber: #c8841a;
-  --color-amber-50: #fbf1e1;
-  --color-pasir: #f3ecdd;
-  --color-tinta: #1f2933;
+  /* Palet landing page (referensi tim, Nov 2026) */
+  --color-teal: #146b68; /* hijau teal */
+  --color-teal-600: #1d7f7b;
+  --color-teal-800: #0e4d4b;
+  --color-teal-50: #e3efec;
+  --color-emas: #e8b64c; /* emas: isian tombol/aksen, jangan untuk teks di latar terang */
+  --color-emas-100: #f8e9c4;
+  --color-amber: #a8761a; /* emas gelap untuk teks (kontras ≥4.5:1 di latar terang) */
+  --color-amber-50: #fbf1dc;
+  --color-daun: #8bb9a0; /* hijau daun */
+  --color-daun-100: #dcebe2;
+  --color-pasir: #ede6d6;
+  --color-tinta: #1d2a2a;
 
-  --color-kertas: #faf8f2; /* latar halaman dari referensi */
+  --color-kertas: #f5f1e8; /* putih hangat */
   --color-laut: #eff1e6;
   --color-redup: #6d796e; /* teks sekunder */
   --color-samar: #85907f; /* label peta */
@@ -24,6 +30,86 @@
 
   --shadow-kartu: 0 1px 2px rgb(31 41 51 / 0.06), 0 8px 24px -8px rgb(31 41 51 / 0.14);
   --shadow-melayang: 0 12px 32px -12px rgb(15 76 92 / 0.35);
+}
+
+@keyframes tooltip-in {
+  from {
+    opacity: 0;
+    margin-top: 6px;
+  }
+  to {
+    opacity: 1;
+    margin-top: 0;
+  }
+}
+@keyframes card-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* --- Landing page --------------------------------------------------- */
+
+@keyframes awan {
+  from {
+    transform: translateX(-6%);
+  }
+  to {
+    transform: translateX(6%);
+  }
+}
+@keyframes melayang {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+@keyframes sinar {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity 600ms ease,
+    transform 600ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.reveal[data-shown='true'] {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .anim-awan,
+  .anim-melayang,
+  .anim-sinar {
+    animation: none !important;
+  }
+  .parallax {
+    transform: none !important;
+  }
 }
 
 @layer base {
