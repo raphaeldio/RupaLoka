@@ -1,37 +1,38 @@
 # Chunk pengetahuan untuk agen AI (RAG). Target minimal 8 chunk per materi (T-031).
 # Satu chunk = satu gagasan, 1-3 kalimat. Setiap chunk wajib punya sumber dan diverifikasi.
 # source.type: web (wajib url) | buku | jurnal | wawancara | museum
+# Chunk 001-003 diambil dari draf "Materi dan Item Game Rupaloka: Edisi Bandung" (tim budaya).
 
 - id: museum-sri-baduga-001
   lesson_id: museum-sri-baduga
-  text: "Museum Sri Baduga berada di Jl. BKR No.185, Bandung."
+  text: "Museum Sri Baduga adalah Museum Negeri Provinsi Jawa Barat yang berada di Jl. BKR No.185, Bandung."
   source:
-    title: "[PERLU DIISI]"
-    url: null
-    type: "[PERLU DIISI]"
-    accessed: null          # tanggal akses, format 2026-11-19
+    title: "detikJabar (2023, 12 Oktober). Memahami sejarah dan budaya Sunda di Museum Sri Baduga Bandung"
+    url: https://www.detik.com/jabar/wisata/d-6976393/memahami-sejarah-dan-budaya-sunda-di-museum-sri-baduga-bandung
+    type: web
+    accessed: 2026-11-20
   verified_by: null         # nama pemeriksa (KH)
   verified_at: null
 
 - id: museum-sri-baduga-002
   lesson_id: museum-sri-baduga
-  text: "[PERLU DIISI]"
+  text: "Museum Sri Baduga diresmikan pada 5 Juni 1980 dan memakai nama Sri Baduga sejak 1990."
   source:
-    title: "[PERLU DIISI]"
-    url: null
-    type: "[PERLU DIISI]"
-    accessed: null          # tanggal akses, format 2026-11-19
+    title: "detikJabar (2023, 12 Oktober). Memahami sejarah dan budaya Sunda di Museum Sri Baduga Bandung"
+    url: https://www.detik.com/jabar/wisata/d-6976393/memahami-sejarah-dan-budaya-sunda-di-museum-sri-baduga-bandung
+    type: web
+    accessed: 2026-11-20
   verified_by: null         # nama pemeriksa (KH)
   verified_at: null
 
 - id: museum-sri-baduga-003
   lesson_id: museum-sri-baduga
-  text: "[PERLU DIISI]"
+  text: "Koleksi Museum Sri Baduga berjumlah 6.979 (data 2017) dan disusun sebagai alur sejarah alam dan budaya Jawa Barat dari masa prasejarah hingga masa kolonial."
   source:
-    title: "[PERLU DIISI]"
-    url: null
-    type: "[PERLU DIISI]"
-    accessed: null          # tanggal akses, format 2026-11-19
+    title: "detikJabar (2023, 12 Oktober). Memahami sejarah dan budaya Sunda di Museum Sri Baduga Bandung"
+    url: https://www.detik.com/jabar/wisata/d-6976393/memahami-sejarah-dan-budaya-sunda-di-museum-sri-baduga-bandung
+    type: web
+    accessed: 2026-11-20
   verified_by: null         # nama pemeriksa (KH)
   verified_at: null
 

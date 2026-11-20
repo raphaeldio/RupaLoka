@@ -1,38 +1,40 @@
 # Chunk pengetahuan untuk agen AI (RAG). Target minimal 8 chunk per materi (T-031).
 # Satu chunk = satu gagasan, 1-3 kalimat. Setiap chunk wajib punya sumber dan diverifikasi.
 # source.type: web (wajib url) | buku | jurnal | wawancara | museum
+# Chunk 001-003 diambil dari draf "Materi dan Item Game Rupaloka: Edisi Bandung" (tim budaya),
+# menunggu pemeriksaan KH (verified_by).
 
 - id: angklung-001
   lesson_id: angklung
-  text: "Angklung tercatat UNESCO pada 2010."
+  text: "Angklung adalah alat musik dari bambu yang dimainkan dengan cara digoyangkan. Pada 2010, angklung tercatat dalam Daftar Representatif Warisan Budaya Takbenda UNESCO. Pengetahuannya diwariskan secara lisan dan kini semakin diajarkan di lembaga pendidikan."
   source:
-    title: "[PERLU DIISI]"
-    url: null
-    type: "[PERLU DIISI]"
-    accessed: null          # tanggal akses, format 2026-11-19
+    title: "UNESCO (2010). Angklung (Indonesia)"
+    url: https://ich.unesco.org/en/RL/00393
+    type: web
+    accessed: 2026-11-20
   verified_by: null         # nama pemeriksa (KH)
   verified_at: null
 
 - id: angklung-002
   lesson_id: angklung
-  text: "[PERLU DIISI]"
+  text: "Pada 1938, Daeng Soetigna memperkenalkan angklung diatonis (angklung padaeng) yang dapat memainkan tangga nada Barat."
   source:
-    title: "[PERLU DIISI]"
-    url: null
-    type: "[PERLU DIISI]"
-    accessed: null          # tanggal akses, format 2026-11-19
+    title: "UNESCO (2010). Angklung (Indonesia)"
+    url: https://ich.unesco.org/en/RL/00393
+    type: web
+    accessed: 2026-11-20
   verified_by: null         # nama pemeriksa (KH)
   verified_at: null
 
 - id: angklung-003
   lesson_id: angklung
-  text: "[PERLU DIISI]"
+  text: "Saung Angklung Udjo didirikan pada 1966 di Padasuka, Bandung, oleh Mang Udjo Ngalagena dan istrinya, Uum Sumiati. Tempat ini menampilkan pertunjukan angklung dan menjadi pusat belajar budaya Sunda dan angklung bagi anak-anak."
   source:
-    title: "[PERLU DIISI]"
-    url: null
-    type: "[PERLU DIISI]"
-    accessed: null          # tanggal akses, format 2026-11-19
-  verified_by: null         # nama pemeriksa (KH)
+    title: "Saung Angklung Udjo. Sejarah"
+    url: https://angklung-udjo.co.id/heritage/history
+    type: web
+    accessed: 2026-11-20
+  verified_by: null         # nama pemeriksa (KH); CLAUDE.md: peran Saung Angklung Udjo wajib diverifikasi
   verified_at: null
 
 # Tambahkan angklung-004 dan seterusnya sampai minimal 8 chunk.

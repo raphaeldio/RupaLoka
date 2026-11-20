@@ -1,26 +1,28 @@
 # Chunk pengetahuan untuk agen AI (RAG). Target minimal 8 chunk per materi (T-031).
 # Satu chunk = satu gagasan, 1-3 kalimat. Setiap chunk wajib punya sumber dan diverifikasi.
 # source.type: web (wajib url) | buku | jurnal | wawancara | museum
+# Chunk 001-002 diambil dari draf "Materi dan Item Game Rupaloka: Edisi Bandung" (tim budaya).
+# [VERIFIKASI] kaitan wayang golek dengan tradisi Sunda/Bandung belum boleh ditulis sebelum dicek narasumber.
 
 - id: wayang-golek-001
   lesson_id: wayang-golek
-  text: "Wayang tercantum dalam daftar UNESCO pada 2008."
+  text: "Wayang secara umum tercatat dalam Daftar Representatif Warisan Budaya Takbenda UNESCO pada 2008."
   source:
-    title: "[PERLU DIISI]"
-    url: null
-    type: "[PERLU DIISI]"
-    accessed: null          # tanggal akses, format 2026-11-19
+    title: "UNESCO (2008). Wayang puppet theatre (Indonesia)"
+    url: https://ich.unesco.org/en/RL/wayang-puppet-theatre-00063?RL=00063
+    type: web
+    accessed: 2026-11-20
   verified_by: null         # nama pemeriksa (KH)
   verified_at: null
 
 - id: wayang-golek-002
   lesson_id: wayang-golek
-  text: "[PERLU DIISI]"
+  text: "Wayang golek adalah wayang berupa boneka kayu tiga dimensi."
   source:
-    title: "[PERLU DIISI]"
-    url: null
-    type: "[PERLU DIISI]"
-    accessed: null          # tanggal akses, format 2026-11-19
+    title: "UNESCO (2008). Wayang puppet theatre (Indonesia)"
+    url: https://ich.unesco.org/en/RL/wayang-puppet-theatre-00063?RL=00063
+    type: web
+    accessed: 2026-11-20
   verified_by: null         # nama pemeriksa (KH)
   verified_at: null
 

@@ -1,36 +1,64 @@
-# Kuis dasar 5 soal (F-020). Ditulis dan diverifikasi tim (T-033), BUKAN oleh AI.
-# correct = indeks opsi yang benar, mulai dari 0. chunk = id chunk di knowledge/ yang menjadi sumbernya.
-# Jawaban benar diperiksa dua orang.
+# Kuis per titik path (F-020). Ditulis tim, BUKAN oleh AI saat runtime (T-033).
+# Disusun dari draf "Materi dan Item Game Rupaloka: Edisi Bandung" (tim budaya, 20 Nov 2026).
+# correct = indeks opsi yang benar, mulai dari 0. chunk = id chunk di knowledge/ yang menjadi sumbernya;
+# soal tampil di titik path milik lesson_id chunk tersebut.
+# Jawaban benar WAJIB diperiksa dua orang (KH) sebelum rilis.
+# [VERIFIKASI] q1-q2 (Gedung Sate/Merdeka) baru bersumber satu halaman; q4 (Saung Angklung Udjo) perlu dicek KH.
 intro:
+  # --- Titik 1: Pengenalan Bandung ---
   - id: q1
-    question: "[PERLU DIISI]"
-    options: ["[PERLU DIISI]", "[PERLU DIISI]", "[PERLU DIISI]", "[PERLU DIISI]"]
+    question: "Hiasan di puncak Gedung Sate bentuknya mirip apa?"
+    options: ["Tusuk sate", "Payung", "Mahkota", "Kujang"]
     correct: 0
-    explanation: "[PERLU DIISI]"
-    chunk: angklung-001
+    explanation: "Hiasan di puncak Gedung Sate mirip tusuk sate dengan enam bulatan. Enam bulatan itu dipercaya melambangkan enam juta gulden biaya pembangunannya."
+    chunk: pengenalan-bandung-003
   - id: q2
-    question: "[PERLU DIISI]"
-    options: ["[PERLU DIISI]", "[PERLU DIISI]", "[PERLU DIISI]", "[PERLU DIISI]"]
-    correct: 0
-    explanation: "[PERLU DIISI]"
-    chunk: angklung-002
+    question: "Konferensi Asia-Afrika tahun 1955 berlangsung di gedung apa di Bandung?"
+    options: ["Gedung Sate", "Gedung Merdeka", "Museum Sri Baduga", "Saung Angklung Udjo"]
+    correct: 1
+    explanation: "Konferensi Asia-Afrika 1955 berlangsung di Gedung Merdeka. Kini gedung itu menjadi museum yang menyimpan koleksi dan foto konferensi tersebut."
+    chunk: pengenalan-bandung-004
+
+  # --- Titik 2: Angklung ---
   - id: q3
-    question: "[PERLU DIISI]"
-    options: ["[PERLU DIISI]", "[PERLU DIISI]", "[PERLU DIISI]", "[PERLU DIISI]"]
-    correct: 0
-    explanation: "[PERLU DIISI]"
-    chunk: wayang-golek-001
+    question: "Angklung tercatat dalam daftar Warisan Budaya Takbenda UNESCO pada tahun berapa?"
+    options: ["2008", "2009", "2010", "2012"]
+    correct: 2
+    explanation: "Angklung, alat musik bambu yang dimainkan dengan cara digoyangkan, tercatat dalam Daftar Representatif Warisan Budaya Takbenda UNESCO pada 2010."
+    chunk: angklung-001
   - id: q4
-    question: "[PERLU DIISI]"
-    options: ["[PERLU DIISI]", "[PERLU DIISI]", "[PERLU DIISI]", "[PERLU DIISI]"]
-    correct: 0
-    explanation: "[PERLU DIISI]"
-    chunk: wayang-golek-002
+    question: "Di wilayah mana di Bandung Saung Angklung Udjo berada?"
+    options: ["Dago", "Padasuka", "Braga", "Cihampelas"]
+    correct: 1
+    explanation: "Saung Angklung Udjo didirikan pada 1966 di Padasuka, Bandung, oleh Mang Udjo Ngalagena dan istrinya, Uum Sumiati."
+    chunk: angklung-003
+
+  # --- Titik 3: Wayang golek ---
   - id: q5
-    question: "[PERLU DIISI]"
-    options: ["[PERLU DIISI]", "[PERLU DIISI]", "[PERLU DIISI]", "[PERLU DIISI]"]
-    correct: 0
-    explanation: "[PERLU DIISI]"
+    question: "Tokoh wayang golek berupa apa?"
+    options: ["Boneka kulit pipih", "Boneka kayu tiga dimensi", "Lukisan di atas kain", "Topeng kayu"]
+    correct: 1
+    explanation: "Wayang golek adalah wayang berupa boneka kayu tiga dimensi."
+    chunk: wayang-golek-002
+  - id: q6
+    question: "Wayang tercatat dalam daftar Warisan Budaya Takbenda UNESCO pada tahun berapa?"
+    options: ["2003", "2008", "2010", "2015"]
+    correct: 1
+    explanation: "Wayang secara umum tercatat dalam Daftar Representatif Warisan Budaya Takbenda UNESCO pada 2008."
+    chunk: wayang-golek-001
+
+  # --- Titik 4: Museum Sri Baduga ---
+  - id: q7
+    question: "Koleksi Museum Sri Baduga disusun sebagai alur sejarah apa?"
+    options: ["Sejarah kereta api Indonesia", "Alam dan budaya Jawa Barat", "Perang kemerdekaan saja", "Kerajaan-kerajaan di Bali"]
+    correct: 1
+    explanation: "Koleksi Museum Sri Baduga disusun sebagai alur sejarah alam dan budaya Jawa Barat, dari masa prasejarah hingga masa kolonial."
+    chunk: museum-sri-baduga-003
+  - id: q8
+    question: "Museum Sri Baduga adalah museum negeri milik provinsi mana?"
+    options: ["Jawa Tengah", "Banten", "Jawa Barat", "DKI Jakarta"]
+    correct: 2
+    explanation: "Museum Sri Baduga adalah Museum Negeri Provinsi Jawa Barat, berada di Jl. BKR No.185, Bandung."
     chunk: museum-sri-baduga-001
 
 # Kuis penutup (P1, F-023). Kosongkan dulu.
