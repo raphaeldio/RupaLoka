@@ -34,6 +34,7 @@ class SourceRef(Source):
     """Sumber satu chunk, tanpa teks chunk. Dipakai untuk menampilkan rujukan kuis/fakta/item."""
 
     chunk_id: str
+    lesson_id: str  # materi asal chunk; dipakai untuk saran materi setelah kuis (F-022)
 
 
 class CityDetail(BaseModel):

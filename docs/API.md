@@ -33,7 +33,7 @@ Respons konten di-cache 5 menit (`Cache-Control: public, max-age=300`). Muat `Ci
 | `lessons` | Kartu materi, sudah berurutan. `key_facts[].chunk` → `sources`. `location` boleh `null`; tombol "Lihat lokasi asli" hanya bila `lat` dan `lng` tidak `null` |
 | `items` | Sudah berurutan sesuai `game.items_order`: ambang ke-k (`k × game.unlock_every`) membuka `items[k-1]`. Setelah item habis, game lanjut tanpa jeda |
 | `game` | `unlock_every`, `obstacles` (id sprite), `background`, `speed {start, max, ramp_per_100}` dalam piksel/detik |
-| `sources` | Peta `chunk_id → SourceRef` untuk menampilkan rujukan kuis, fakta, dan item. Teks chunk tidak pernah dikirim |
+| `sources` | Peta `chunk_id → SourceRef` untuk menampilkan rujukan kuis, fakta, dan item; `lesson_id` = materi asal chunk (saran materi F-022). Teks chunk tidak pernah dikirim |
 
 Gambar: `lesson.images[].src` dan `item.image.src` relatif ke `content/`. URL = `assetUrl(src)` → `/api/assets/...`. Selalu pakai `alt`; bila gambar gagal dimuat, tampilkan placeholder (berkas mungkin belum ada selama konten belum lengkap).
 

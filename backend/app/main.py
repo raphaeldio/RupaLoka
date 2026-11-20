@@ -186,7 +186,11 @@ def _city_detail(city: City, cc: CityContent) -> CityDetail:
         lessons=[cc.lessons[i] for i in cc.config.lessons if i in cc.lessons],
         items=[cc.items[i] for i in cc.config.game.items_order if i in cc.items],
         sources={
-            cid: SourceRef(chunk_id=cid, **cc.chunks[cid].source.model_dump())
+            cid: SourceRef(
+                chunk_id=cid,
+                lesson_id=cc.chunks[cid].lesson_id,
+                **cc.chunks[cid].source.model_dump(),
+            )
             for cid in sorted(referenced)
             if cid in cc.chunks
         },

@@ -164,6 +164,7 @@ export interface SourceRef {
   type: string
   accessed: string | null
   chunk_id: string
+  lesson_id: string
 }
 
 export interface SourcesResponse {
