@@ -1,0 +1,72 @@
+import type { CityDetail } from '../lib/api.types'
+
+const ref = (chunk_id: string, lesson_id: string) => ({
+  chunk_id,
+  lesson_id,
+  title: `Sumber ${chunk_id}`,
+  url: `https://contoh.test/${chunk_id}`,
+  type: 'web',
+  accessed: '2026-11-19',
+})
+
+/** CityDetail fiktif untuk uji komponen (bukan konten budaya nyata). */
+export const detailFixture: CityDetail = {
+  city: { id: 'kota-a', name: 'Kota A', province: 'Provinsi A', status: 'active', lat: 0, lng: 0, summary: 'Ringkasan A.' },
+  phases: ['quiz_intro', 'lessons', 'game', 'summary'],
+  game: {
+    unlock_every: 100,
+    items_order: ['item-x'],
+    obstacles: ['batu'],
+    background: 'bg',
+    speed: { start: 240, max: 520, ramp_per_100: 25 },
+  },
+  agent_script: {
+    quiz_intro: 'Skrip kuis.',
+    lessons_start: 'Skrip materi.',
+    game_start: 'Skrip game.',
+    item_unlocked: 'Kamu menemukan {item}! {short_explanation}',
+    summary: 'Skrip ringkasan.',
+  },
+  quiz: {
+    intro: [
+      { id: 'q1', question: 'Soal satu?', options: ['Benar', 'Salah'], correct: 0, explanation: 'Penjelasan satu.', chunk: 'a-001' },
+      { id: 'q2', question: 'Soal dua?', options: ['Salah', 'Benar'], correct: 1, explanation: 'Penjelasan dua.', chunk: 'b-001' },
+    ],
+    outro: [],
+  },
+  lessons: [
+    {
+      id: 'a',
+      title: 'Materi A',
+      narrative: 'Narasi A.',
+      key_facts: [{ text: 'Fakta A.', chunk: 'a-001' }],
+      images: [],
+      location: { name: 'Situs A', address: 'Jalan A', lat: -6.9, lng: 107.6 },
+      suggested_questions: ['Apa itu A?'],
+      tier: 'free',
+    },
+    {
+      id: 'b',
+      title: 'Materi B',
+      narrative: 'Narasi B.',
+      key_facts: [],
+      images: [],
+      location: null,
+      suggested_questions: [],
+      tier: 'free',
+    },
+  ],
+  items: [
+    {
+      id: 'item-x',
+      name: 'Item X',
+      rarity: 'umum',
+      short_explanation: 'Penjelasan X.',
+      image: { src: 'assets/images/x.webp', alt: 'Gambar X', license: 'CC0' },
+      chunk: 'a-001',
+      lesson: 'a',
+      tier: 'free',
+    },
+  ],
+  sources: { 'a-001': ref('a-001', 'a'), 'b-001': ref('b-001', 'b') },
+}

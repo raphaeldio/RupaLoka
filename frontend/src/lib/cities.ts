@@ -23,6 +23,10 @@ export function isPlaceholder(text: string | null | undefined): boolean {
   return !text || /\[PERLU DIISI\]|\bTODO\b/i.test(text)
 }
 
+/** Label pendek (nama item/judul materi); placeholder diganti teks netral. */
+export const labelOr = (text: string | null | undefined, fallback: string): string =>
+  isPlaceholder(text) ? fallback : (text as string)
+
 function toCity(raw: Record<string, unknown>): City | null {
   if (typeof raw.id !== 'string' || typeof raw.name !== 'string') return null
   const num = (v: unknown) => (typeof v === 'number' && Number.isFinite(v) ? v : null)
