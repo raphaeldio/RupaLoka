@@ -56,6 +56,7 @@ uvicorn app.main:app --reload --port 8000
 pytest -q
 python scripts/validate_content.py
 python scripts/eval_rag.py
+python scripts/gen_ts_types.py         # setelah mengubah skema API; pytest gagal bila tertinggal
 
 # Frontend
 cd frontend && npm install

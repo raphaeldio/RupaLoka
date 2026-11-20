@@ -12,6 +12,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from app.api_schemas import (
     CityDetail,
@@ -83,6 +84,13 @@ def create_app(settings: Settings | None = None, llm: LLM | None = None) -> Fast
         yield
 
     app = FastAPI(title="Rupaloka API", version="0.1.0", lifespan=lifespan)
+    # Gambar konten (content/assets). `src` di konten relatif ke content/, jadi URL-nya
+    # adalah "/api/" + src, mis. assets/images/x.webp -> /api/assets/images/x.webp.
+    app.mount(
+        "/api/assets",
+        StaticFiles(directory=settings.content_dir / "assets", check_dir=False),
+        name="assets",
+    )
     if settings.allowed_origins:
         app.add_middleware(
             CORSMiddleware,

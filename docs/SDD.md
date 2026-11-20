@@ -225,7 +225,7 @@ Unit: kolisi, spawner (jarak minimum), ambang unlock tepat-satu-kali, resume tid
 
 ## 8. API
 
-Semua JSON, awalan `/api`.
+Semua JSON, awalan `/api`. Kontrak untuk frontend: `docs/API.md`; tipe TypeScript dibuat otomatis (`backend/scripts/gen_ts_types.py` → `frontend/src/lib/api.types.ts`, dijaga pytest).
 
 | Metode | Path | Fungsi | PRD |
 |---|---|---|---|
@@ -233,6 +233,7 @@ Semua JSON, awalan `/api`.
 | GET | `/content/cities` | Daftar kota | F-001–F-003 |
 | GET | `/content/cities/{id}` | `city.yaml` + kuis + materi + item + skrip agen (tanpa chunk mentah) | F-010–F-045 |
 | GET | `/content/sources` | Sumber dan lisensi | F-052 |
+| GET | `/assets/{path}` | Berkas `content/assets` (gambar materi/item); URL = `/api/` + `src` | F-030, F-043 |
 | POST | `/chat` | Tanya-jawab bersumber | F-011 |
 | POST | `/events` (P1) | Analitik anonim | F-053 |
 

@@ -128,3 +128,11 @@ def test_env_settings(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     assert s.content_dir == tmp_path.resolve()
     assert s.content_strict is True
     assert s.allowed_origins == ["https://a.example", "http://localhost:5173"]
+
+
+def test_assets_are_served(client: TestClient) -> None:
+    res = client.get("/api/assets/images/item-a.webp")
+    assert res.status_code == 200
+    assert res.content == b"dummy"
+    assert client.get("/api/assets/images/tidak-ada.webp").status_code == 404
+    assert client.get("/api/assets/../cities.yaml").status_code == 404
