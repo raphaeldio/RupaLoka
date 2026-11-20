@@ -9,17 +9,25 @@ export type CityDetailState =
 
 type Result = Exclude<CityDetailState, { status: 'loading' }> & { key: string }
 
-/** Muat `CityDetail` sekali per kota (docs/API.md). Galat → pesan + coba lagi. */
+/** Cache per sesi agar berpindah titik path tidak mengunduh ulang (docs/API.md). */
+const cache = new Map<string, CityDetail>()
+export const clearCityCache = () => cache.clear()
+
+/** Muat `CityDetail` sekali per kota. Galat → pesan + coba lagi. */
 export function useCityDetail(cityId: string | undefined): CityDetailState & { retry: () => void } {
   const [attempt, setAttempt] = useState(0)
   const [result, setResult] = useState<Result | null>(null)
   const key = `${cityId}#${attempt}`
+  const cached = cityId ? cache.get(cityId) : undefined
 
   useEffect(() => {
-    if (!cityId) return
+    if (!cityId || cache.has(cityId)) return
     const ctrl = new AbortController()
     getCity(cityId, ctrl.signal)
-      .then((data) => setResult({ key, status: 'ready', data }))
+      .then((data) => {
+        cache.set(cityId, data)
+        setResult({ key, status: 'ready', data })
+      })
       .catch((err: unknown) => {
         if (ctrl.signal.aborted) return
         const notFound = err instanceof ApiError && err.status === 404
@@ -36,6 +44,7 @@ export function useCityDetail(cityId: string | undefined): CityDetailState & { r
   }, [cityId, key])
 
   const retry = useCallback(() => setAttempt((n) => n + 1), [])
+  if (cached) return { status: 'ready', data: cached, retry }
   // Hasil untuk kota/percobaan lama dianggap masih memuat.
   if (!result || result.key !== key) return { status: 'loading', retry }
   return { ...result, retry }

@@ -1,8 +1,11 @@
 import { Link } from 'react-router-dom'
 import { labelOr } from '../lib/cities'
-import type { CityDetail } from '../lib/api.types'
+import type { Badge, CityDetail } from '../lib/api.types'
+import BadgeIcon from './BadgeIcon'
 import LocationButton from './LocationButton'
-import { Button, Card, SafeImage } from './ui'
+import { Pop } from './motion'
+import CountUp from './reactbits/CountUp'
+import { Button, Card, SafeImage } from './primitives'
 
 /** Ringkasan setelah game over (F-045): skor, rekor, item terbuka, main lagi, lokasi asli. */
 export default function Summary({
@@ -12,7 +15,10 @@ export default function Summary({
   unlockedIds,
   collectedIds,
   onReplay,
-  onReview,
+  onBack,
+  pointsGained,
+  badges,
+  badgeTier,
 }: {
   detail: CityDetail
   score: number
@@ -20,7 +26,12 @@ export default function Summary({
   unlockedIds: string[]
   collectedIds: string[]
   onReplay: () => void
-  onReview: () => void
+  onBack: () => void
+  /** Poin path yang didapat dari menamatkan game (0 bila sudah pernah). */
+  pointsGained: number
+  /** Lencana baru dari poin tersebut. */
+  badges: Badge[]
+  badgeTier: (b: Badge) => number
 }) {
   const unlocked = detail.items.filter((i) => unlockedIds.includes(i.id))
   const allCollected = detail.items.length > 0 && detail.items.every((i) => collectedIds.includes(i.id))
@@ -34,7 +45,9 @@ export default function Summary({
       <dl className="mt-4 grid grid-cols-3 gap-2 text-center">
         <div className="rounded-2xl bg-teal-50 p-3">
           <dt className="text-[11px] font-semibold text-redup">Skor</dt>
-          <dd className="text-2xl font-extrabold tabular-nums text-teal">{score}</dd>
+          <dd className="text-2xl font-extrabold tabular-nums text-teal" aria-label={String(score)}>
+            <CountUp to={score} duration={1.4} separator="." trigger="load" />
+          </dd>
         </div>
         <div className="rounded-2xl bg-kertas p-3">
           <dt className="text-[11px] font-semibold text-redup">Rekor</dt>
@@ -42,9 +55,30 @@ export default function Summary({
         </div>
         <div className="rounded-2xl bg-amber-50 p-3">
           <dt className="text-[11px] font-semibold text-redup">Item baru</dt>
-          <dd className="text-2xl font-extrabold tabular-nums text-amber">{unlocked.length}</dd>
+          <dd className="text-2xl font-extrabold tabular-nums text-amber" aria-label={String(unlocked.length)}>
+            <CountUp to={unlocked.length} duration={1} trigger="load" />
+          </dd>
         </div>
       </dl>
+
+      {pointsGained > 0 && (
+        <p className="mt-4 rounded-2xl bg-teal-50 p-3 text-sm font-bold text-teal">
+          Titik game selesai: +{pointsGained} poin path!
+        </p>
+      )}
+      {badges.length > 0 && (
+        <div className="mt-3 rounded-2xl bg-emas-100 p-3" role="status">
+          <p className="text-sm font-extrabold text-amber">Lencana baru!</p>
+          <ul className="mt-2 flex flex-wrap gap-3">
+            {badges.map((b) => (
+              <li key={b.id} className="flex items-center gap-2">
+                <BadgeIcon tier={badgeTier(b)} earned className="h-12 w-10" />
+                <span className="text-sm font-extrabold">{b.name}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {allCollected && (
         <p className="mt-4 rounded-2xl bg-emas-100 p-3 text-sm font-bold">
@@ -62,7 +96,9 @@ export default function Summary({
           <ul className="mt-2 grid grid-cols-3 gap-2">
             {unlocked.map((i) => (
               <li key={i.id} className="rounded-2xl border border-garis p-2 text-center">
-                <SafeImage image={i.image} className="aspect-square w-full rounded-xl" />
+                <Pop delay={0.3}>
+                  <SafeImage image={i.image} className="aspect-square w-full rounded-xl" />
+                </Pop>
                 <p className="mt-1 text-xs font-bold">{labelOr(i.name, 'Item budaya')}</p>
               </li>
             ))}
@@ -83,8 +119,8 @@ export default function Summary({
         <Button onClick={onReplay} autoFocus>
           Main lagi
         </Button>
-        <Button variant="secondary" onClick={onReview}>
-          Ulas materi
+        <Button variant="secondary" onClick={onBack}>
+          Kembali ke path
         </Button>
         <Link to="/koleksi" className="inline-flex items-center rounded-2xl px-4 py-3 text-sm font-extrabold text-teal hover:underline">
           Lihat koleksi

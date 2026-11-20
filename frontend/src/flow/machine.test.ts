@@ -1,49 +1,30 @@
 import { describe, expect, it } from 'vitest'
 import type { QuizQuestion, SourceRef } from '../lib/api.types'
-import { flowReducer, initialFlow, quizScore, suggestLessons, type FlowEvent, type FlowState } from './machine'
+import { initialNode, nodeReducer, questionsFor, quizScore, type NodeEvent, type NodeState } from './machine'
 
-const cfg = { questionCount: 2, lessonCount: 2 }
-const reduce = flowReducer(cfg)
-const run = (events: FlowEvent[], from: FlowState = initialFlow(cfg)) => events.reduce(reduce, from)
+const reduce = nodeReducer(2)
+const run = (events: NodeEvent[], from: NodeState = initialNode(2)) => events.reduce(reduce, from)
 
-describe('flowReducer', () => {
-  it('alur penuh: kuis → hasil → materi → game → ringkasan', () => {
-    let s = run([{ type: 'START' }])
-    expect(s.stage).toBe('quiz')
-    s = run([{ type: 'NEXT' }], s)
-    expect(s.index).toBe(0) // belum dijawab, tidak maju
-    s = run([{ type: 'ANSWER', choice: 1 }, { type: 'ANSWER', choice: 2 }], s)
-    expect(s.answers).toEqual([1, null]) // jawaban terkunci
+describe('nodeReducer', () => {
+  it('kuis → materi → selesai; jawaban terkunci', () => {
+    let s = run([{ type: 'NEXT' }])
+    expect(s).toMatchObject({ stage: 'quiz', index: 0 }) // belum dijawab
+    s = run([{ type: 'ANSWER', choice: 1 }, { type: 'ANSWER', choice: 0 }], s)
+    expect(s.answers).toEqual([1, null])
     s = run([{ type: 'NEXT' }, { type: 'ANSWER', choice: 0 }, { type: 'NEXT' }], s)
-    expect(s.stage).toBe('quiz_result')
-    s = run([{ type: 'NEXT' }], s)
-    expect(s).toMatchObject({ stage: 'lessons', index: 0 })
-    s = run([{ type: 'NEXT' }, { type: 'BACK' }, { type: 'NEXT' }, { type: 'NEXT' }], s)
-    expect(s.stage).toBe('game')
-    s = run([{ type: 'FINISH_GAME', score: 230, unlocked: ['a', 'b'] }], s)
-    expect(s).toMatchObject({ stage: 'summary', lastScore: 230, lastUnlocked: ['a', 'b'] })
-    expect(run([{ type: 'REPLAY' }], s).stage).toBe('game')
-    expect(run([{ type: 'REVIEW_LESSONS' }], s)).toMatchObject({ stage: 'lessons', index: 0 })
+    expect(s.stage).toBe('lesson')
+    expect(run([{ type: 'FINISH_LESSON' }], s).stage).toBe('done')
   })
 
-  it('SKIP melewati kuis dan materi', () => {
-    const s = run([{ type: 'START' }, { type: 'SKIP' }])
-    expect(s.stage).toBe('quiz_result')
-    expect(run([{ type: 'SKIP' }, { type: 'SKIP' }], s).stage).toBe('game')
+  it('lewati kuis; titik tanpa soal mulai di materi', () => {
+    expect(run([{ type: 'SKIP_QUIZ' }]).stage).toBe('lesson')
+    expect(initialNode(0).stage).toBe('lesson')
   })
 
-  it('kejadian yang tidak relevan diabaikan', () => {
-    const s0 = initialFlow(cfg)
-    expect(run([{ type: 'NEXT' }, { type: 'FINISH_GAME', score: 1, unlocked: [] }], s0)).toBe(s0)
-  })
-
-  it('tanpa soal/materi langsung ke tahap berikutnya', () => {
-    const r = flowReducer({ questionCount: 0, lessonCount: 0 })
-    expect(r(initialFlow({ questionCount: 0, lessonCount: 0 }), { type: 'START' }).stage).toBe('game')
-  })
-
-  it('RESET kembali ke awal', () => {
-    expect(run([{ type: 'START' }, { type: 'RESET' }])).toEqual(initialFlow(cfg))
+  it('kejadian tidak relevan diabaikan; RESET ke awal', () => {
+    const s0 = initialNode(2)
+    expect(run([{ type: 'FINISH_LESSON' }], s0)).toBe(s0)
+    expect(run([{ type: 'ANSWER', choice: 0 }, { type: 'RESET' }])).toEqual(s0)
   })
 })
 
@@ -64,18 +45,17 @@ const ref = (chunk_id: string, lesson_id: string): SourceRef => ({
   accessed: null,
 })
 
-describe('kuis', () => {
+describe('kuis per titik', () => {
   const questions = [q('q1', 'b-1'), q('q2', 'a-1', 1), q('q3', 'b-2')]
   const sources = { 'a-1': ref('a-1', 'a'), 'b-1': ref('b-1', 'b'), 'b-2': ref('b-2', 'b') }
+
+  it('memilih soal milik materi', () => {
+    expect(questionsFor('b', questions, sources).map((x) => x.id)).toEqual(['q1', 'q3'])
+    expect(questionsFor('c', questions, sources)).toEqual([])
+  })
 
   it('menghitung skor', () => {
     expect(quizScore(questions, [0, 1, 1])).toBe(2)
     expect(quizScore(questions, [null, null, null])).toBe(0)
-  })
-
-  it('menyarankan materi dari soal salah, unik dan berurutan (F-022)', () => {
-    expect(suggestLessons(questions, [1, 0, 1], sources, ['a', 'b', 'c'])).toEqual(['a', 'b'])
-    expect(suggestLessons(questions, [0, 1, 0], sources, ['a', 'b'])).toEqual([])
-    expect(suggestLessons([q('x', 'tidak-ada')], [1], sources, ['a'])).toEqual([])
   })
 })

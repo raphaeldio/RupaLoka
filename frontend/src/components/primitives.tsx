@@ -1,6 +1,8 @@
 /** Komponen kecil bersama: gambar aman, teks konten, chip sumber, tombol. */
-import { forwardRef, useState, type ButtonHTMLAttributes, type ReactNode } from 'react'
+import { forwardRef, useState, type ButtonHTMLAttributes, type HTMLAttributes, type ReactNode } from 'react'
 import { assetUrl } from '../lib/api'
+import SpotlightCard from './reactbits/SpotlightCard'
+import { Button as UIButton } from './ui/button'
 import type { ImageRef, SourceRef } from '../lib/api.types'
 import { isPlaceholder } from '../lib/cities'
 
@@ -53,29 +55,34 @@ export function SourceChip({ source, label }: { source: SourceRef | undefined; l
   return <span className={cls}>{body}</span>
 }
 
-type Variant = 'primary' | 'secondary' | 'ghost'
-const VARIANTS: Record<Variant, string> = {
-  primary: 'bg-teal text-white shadow-melayang hover:bg-teal-600',
-  secondary: 'border border-garis bg-white text-teal hover:border-teal',
-  ghost: 'text-redup hover:text-teal',
-}
+type Variant = 'primary' | 'secondary' | 'ghost' | 'emas'
+const VARIANTS = { primary: 'default', secondary: 'outline', ghost: 'ghost', emas: 'emas' } as const
 
+/** Tombol Rupaloka = Button shadcn/ui dengan varian palet sendiri. */
 export const Button = forwardRef<
   HTMLButtonElement,
   ButtonHTMLAttributes<HTMLButtonElement> & { variant?: Variant; children: ReactNode }
->(function Button({ variant = 'primary', className, children, ...rest }, ref) {
-  return (
-    <button
-      ref={ref}
-      type="button"
-      {...rest}
-      className={`inline-flex items-center justify-center gap-2 rounded-2xl px-5 py-3 text-sm font-extrabold transition active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 ${VARIANTS[variant]} ${className ?? ''}`}
-    >
-      {children}
-    </button>
-  )
+>(function Button({ variant = 'primary', ...rest }, ref) {
+  return <UIButton ref={ref} type="button" variant={VARIANTS[variant]} {...rest} />
 })
 
 export function Card({ children, className }: { children: ReactNode; className?: string }) {
   return <div className={`rounded-3xl border border-garis bg-white p-5 shadow-kartu sm:p-6 ${className ?? ''}`}>{children}</div>
+}
+
+/** Kartu dengan sorotan cahaya mengikuti kursor (React Bits SpotlightCard, palet Rupaloka). */
+export function GlowCard({ children, className, ...rest }: { children: ReactNode; className?: string } & HTMLAttributes<HTMLDivElement>) {
+  return (
+    <SpotlightCard
+      theme="light"
+      spotlightColor="#e8b64c"
+      intensity={0.22}
+      spotlightSize={260}
+      borderGlow={0.8}
+      className={`border border-garis !p-5 shadow-kartu sm:!p-6 ${className ?? ''}`}
+      {...rest}
+    >
+      {children}
+    </SpotlightCard>
+  )
 }

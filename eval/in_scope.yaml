@@ -1,0 +1,18 @@
+# Set evaluasi DALAM CAKUPAN untuk agen Rupaloka (T-060, bagian KH). Dijalankan oleh
+# backend/scripts/eval_rag.py. Target ±30 pertanyaan, tersebar di semua materi Bandung.
+#
+# Setiap entri WAJIB menyebut `expected_chunks`: id chunk di content/<kota>/knowledge/ yang
+# memuat jawabannya. Pertanyaan ditulis manual oleh KH dari chunk yang sudah diverifikasi,
+# jangan dari pengetahuan umum (CLAUDE.md prinsip 1). Variasikan gaya bertanya: singkat,
+# kalimat panjang, salah ketik ringan, bahasa campur Sunda.
+#
+# Format:
+# - id: ins-01
+#   city_id: bandung
+#   lesson_id: angklung        # opsional; konteks materi aktif (boost retrieval)
+#   question: "..."
+#   expected_chunks: [angklung-001]
+#   note: "..."                # opsional
+#
+# TODO (KH, T-060): isi setelah chunk T-031 terverifikasi.
+[]

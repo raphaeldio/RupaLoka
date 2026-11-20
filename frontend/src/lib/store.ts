@@ -1,15 +1,13 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { FlowState } from '../flow/machine'
+import { emptyPath, type PathProgress } from './rewards'
 
-/** Progres satu kota (SDD §6): tahap, jawaban kuis, materi dibuka, rekor. */
-export interface CityProgress {
-  flow: FlowState | null
-  lessonsSeen: string[]
+/** Progres satu kota: path belajar + rekor game. */
+export interface CityProgress extends PathProgress {
   best: number
 }
 
-const emptyProgress = (): CityProgress => ({ flow: null, lessonsSeen: [], best: 0 })
+const emptyCity = (): CityProgress => ({ ...emptyPath(), best: 0 })
 
 /** Progres disimpan di perangkat saja (tanpa akun, SDD §12). */
 interface ProgressState {
@@ -17,9 +15,10 @@ interface ProgressState {
   collected: Record<string, string[]> // cityId -> itemId terbuka
   cities: Record<string, CityProgress>
   collect: (cityId: string, itemId: string) => void
-  saveFlow: (cityId: string, flow: FlowState) => void
-  markLesson: (cityId: string, lessonId: string) => void
-  recordScore: (cityId: string, score: number) => void
+  /** Titik materi selesai; jawaban benar disimpan bila lebih baik dari sebelumnya. */
+  completeNode: (cityId: string, lessonId: string, correct: number) => void
+  finishGame: (cityId: string, score: number) => void
+  resetCity: (cityId: string) => void
 }
 
 export const useProgress = create<ProgressState>()(
@@ -33,27 +32,35 @@ export const useProgress = create<ProgressState>()(
           const have = s.collected[cityId] ?? []
           return have.includes(itemId) ? s : { collected: { ...s.collected, [cityId]: [...have, itemId] } }
         }),
-      saveFlow: (cityId, flow) =>
-        set((s) => ({
-          lastCity: cityId,
-          cities: { ...s.cities, [cityId]: { ...(s.cities[cityId] ?? emptyProgress()), flow } },
-        })),
-      markLesson: (cityId, lessonId) =>
+      completeNode: (cityId, lessonId, correct) =>
         set((s) => {
-          const p = s.cities[cityId] ?? emptyProgress()
-          if (p.lessonsSeen.includes(lessonId)) return s
-          return { cities: { ...s.cities, [cityId]: { ...p, lessonsSeen: [...p.lessonsSeen, lessonId] } } }
+          const p = s.cities[cityId] ?? emptyCity()
+          return {
+            lastCity: cityId,
+            cities: {
+              ...s.cities,
+              [cityId]: {
+                ...p,
+                completed: p.completed.includes(lessonId) ? p.completed : [...p.completed, lessonId],
+                correct: { ...p.correct, [lessonId]: Math.max(correct, p.correct[lessonId] ?? 0) },
+              },
+            },
+          }
         }),
-      recordScore: (cityId, score) =>
+      finishGame: (cityId, score) =>
         set((s) => {
-          const p = s.cities[cityId] ?? emptyProgress()
-          if (score <= p.best) return s
-          return { cities: { ...s.cities, [cityId]: { ...p, best: score } } }
+          const p = s.cities[cityId] ?? emptyCity()
+          return {
+            lastCity: cityId,
+            cities: { ...s.cities, [cityId]: { ...p, gameDone: true, best: Math.max(p.best, score) } },
+          }
         }),
+      resetCity: (cityId) =>
+        set((s) => ({ cities: { ...s.cities, [cityId]: { ...emptyCity(), best: s.cities[cityId]?.best ?? 0 } } })),
     }),
     {
       name: 'rupaloka-progress',
-      version: 2,
+      version: 3,
       migrate: (old) => {
         const o = (old ?? {}) as Partial<ProgressState>
         return { lastCity: null, cities: {}, collected: o.collected ?? {} } as unknown as ProgressState
@@ -61,3 +68,7 @@ export const useProgress = create<ProgressState>()(
     },
   ),
 )
+
+const EMPTY = emptyCity()
+/** Progres satu kota (objek stabil bila belum ada). */
+export const useCityProgress = (cityId: string): CityProgress => useProgress((s) => s.cities[cityId] ?? EMPTY)

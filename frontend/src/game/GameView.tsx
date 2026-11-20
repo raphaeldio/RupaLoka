@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { labelOr } from '../lib/cities'
 import ItemModal from '../components/ItemModal'
-import { Button } from '../components/ui'
+import { Button } from '../components/primitives'
 import type { CityDetail, Item } from '../lib/api.types'
 import { createGame, pause, resume, start, step, WORLD_H, WORLD_W, type GameConfig, type GameState } from './engine'
 import { debugMultiplier } from './debug'

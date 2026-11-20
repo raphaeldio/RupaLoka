@@ -27,6 +27,7 @@ from app.content_loader import CityContent, Content, load_content
 from app.llm import LLM, GeminiLLM, LLMError
 from app.retrieval import Retriever
 from app.schemas import City
+from app.security import add_security_headers, client_ip
 
 logger = logging.getLogger("rupaloka")
 
@@ -60,16 +61,10 @@ def build_llm(settings: Settings) -> LLM | None:
     return GeminiLLM(settings.gemini_api_key, settings.gemini_model, settings.llm_timeout_s)
 
 
-def client_ip(request: Request) -> str:
-    # Di belakang proxy Vercel/Render: alamat pertama X-Forwarded-For adalah klien.
-    forwarded = request.headers.get("x-forwarded-for", "")
-    first = forwarded.split(",")[0].strip()
-    return first or (request.client.host if request.client else "unknown")
-
-
 def create_app(settings: Settings | None = None, llm: LLM | None = None) -> FastAPI:
     settings = settings or Settings.from_env()
     limiter = RateLimiter(settings.rate_limit_per_min)
+    global_limiter = RateLimiter(settings.global_rate_limit_per_min)
 
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
@@ -83,7 +78,16 @@ def create_app(settings: Settings | None = None, llm: LLM | None = None) -> Fast
         )
         yield
 
-    app = FastAPI(title="Rupaloka API", version="0.1.0", lifespan=lifespan)
+    docs = settings.enable_docs
+    app = FastAPI(
+        title="Rupaloka API",
+        version="0.1.0",
+        lifespan=lifespan,
+        docs_url="/docs" if docs else None,
+        redoc_url="/redoc" if docs else None,
+        openapi_url="/openapi.json" if docs else None,
+    )
+    app.middleware("http")(add_security_headers)
     # Gambar konten (content/assets). `src` di konten relatif ke content/, jadi URL-nya
     # adalah "/api/" + src, mis. assets/images/x.webp -> /api/assets/images/x.webp.
     app.mount(
@@ -154,10 +158,21 @@ def create_app(settings: Settings | None = None, llm: LLM | None = None) -> Fast
         )
 
     @app.post("/api/chat", response_model=ChatResponse)
-    async def chat(req: ChatRequest, request: Request) -> ChatResponse:
-        if not limiter.allow(client_ip(request)):
+    async def chat(req: ChatRequest, request: Request, response: Response) -> ChatResponse:
+        # Jawaban bergantung pada pertanyaan pengguna; jangan disimpan proxy/peramban.
+        response.headers["Cache-Control"] = "no-store"
+        too_many = {"Retry-After": "60", "Cache-Control": "no-store"}
+        if not limiter.allow(client_ip(request, settings.trusted_proxy_hops)):
             raise HTTPException(
-                status_code=429, detail="terlalu banyak pertanyaan; coba lagi nanti"
+                status_code=429,
+                detail="terlalu banyak pertanyaan; coba lagi nanti",
+                headers=too_many,
+            )
+        # Setelah batas per IP: satu IP yang membanjiri tidak menghabiskan kuota global.
+        if not global_limiter.allow("*"):
+            logger.warning("chat: batas laju global tercapai")
+            raise HTTPException(
+                status_code=429, detail="agen sedang ramai; coba lagi sebentar", headers=too_many
             )
         service: ChatService = request.app.state.chat
         try:
@@ -181,6 +196,7 @@ def _city_detail(city: City, cc: CityContent) -> CityDetail:
         city=city,
         phases=cc.config.phases,
         game=cc.config.game,
+        rewards=cc.config.rewards,
         agent_script=cc.agent_script,
         quiz=cc.quiz,
         lessons=[cc.lessons[i] for i in cc.config.lessons if i in cc.lessons],

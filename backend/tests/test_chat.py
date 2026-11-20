@@ -222,11 +222,15 @@ def test_rate_limiter_window() -> None:
     assert limiter.allow("ip")
 
 
-def test_client_ip_prefers_forwarded_for() -> None:
+def test_client_ip_reads_forwarded_for_from_the_right() -> None:
+    # Entri kiri bisa dipalsukan klien; rincian lain di test_security.py (T-064).
     def req(headers: list[tuple[bytes, bytes]]) -> Request:
         return Request({"type": "http", "headers": headers, "client": ("10.0.0.1", 1)})
 
-    assert client_ip(req([(b"x-forwarded-for", b"203.0.113.5, 10.0.0.2")])) == "203.0.113.5"
+    xff = [(b"x-forwarded-for", b"203.0.113.5, 10.0.0.2")]
+    assert client_ip(req(xff)) == "10.0.0.1"  # bawaan: tanpa proxy tepercaya
+    assert client_ip(req(xff), trusted_hops=1) == "10.0.0.2"
+    assert client_ip(req(xff), trusted_hops=2) == "203.0.113.5"
     assert client_ip(req([])) == "10.0.0.1"
 
 

@@ -107,7 +107,7 @@ id: bandung
 phases: [quiz_intro, lessons, game, summary]   # urutan alur
 lessons: [angklung, wayang-golek, museum-sri-baduga]
 game:
-  unlock_every: 100          # poin per item
+  unlock_every: 1000         # poin game per item
   items_order: [item-angklung, item-wayang, item-sri-baduga]
   obstacles: [batu, pagar, becak]   # [PERLU DIISI & disetujui KH; lihat PRD §7]
   background: bandung-day
@@ -192,17 +192,20 @@ Dua tingkat masalah: **galat** (struktur rusak: skema, rujukan id, opsi kuis, ob
 8. Daftar `obstacles` tidak boleh memuat id `sensitive: true` di `sources.yaml` `objects` (galat); rintangan yang belum terdaftar atau belum `approved_by` = tertunda.
 9. Target jumlah (tertunda): kuis dasar 5 soal, 3–4 materi, ≥8 chunk per materi, narasi 100–200 kata, penjelasan item ≤60 kata. `item_unlocked` hanya boleh memakai `{item}` dan `{short_explanation}`.
 
-## 6. Mesin alur belajar (klien)
+## 6. Path belajar dan mesin alur (klien)
 
-State machine sederhana (XState atau reducer sendiri). Status di bawah adalah rincian dari `phases` di `city.yaml`: `quiz_result` adalah sub-status fase `quiz_intro`, dan `lessons(i)` adalah fase `lessons` untuk materi ke-i.
+Diperbarui 20 Nov 2026 (keputusan tim): alur linear kuis → materi → game diganti **path belajar**.
 
 ```
-idle → quiz_intro → quiz_result → lessons(i) → game → summary → (replay game | lessons | peta)
+/kota/:id          path: titik 1..n = materi (urut `lessons` di city.yaml), titik n+1 = game
+/kota/:id/titik/:l kuis topik (soal yang chunk-nya milik materi l) → kartu materi → hasil (+poin, lencana baru)
+/kota/:id/game     game runner → ringkasan (+poin titik game, lencana baru)
 ```
-- Kejadian: `START`, `ANSWER`, `SKIP`, `NEXT`, `FINISH_GAME`, `REPLAY`.
-- Saran materi pada `quiz_result`: soal salah → `chunk` → `lesson_id` chunk tersebut.
-- Progres disimpan (`persist`): kota terakhir, tahap, skor kuis, materi dibuka, item terbuka, rekor.
-- Agen: tiap transisi memicu pesan skrip dari `agent_script.yaml`.
+- Titik ke-1 terbuka; titik berikutnya terbuka setelah titik sebelumnya selesai; titik game terbuka setelah semua titik materi selesai. URL titik terkunci dialihkan ke path.
+- Mesin per titik: reducer murni `flow/machine.ts` (`quiz(i) → lesson → done`; kejadian `ANSWER`, `NEXT`, `SKIP_QUIZ`, `FINISH_LESSON`, `RESET`). Titik tanpa soal mulai dari materi.
+- Poin dan lencana: fungsi murni `lib/rewards.ts`. Poin kota = titik selesai × `points_per_node` + jawaban benar (terbaik per titik) × `points_per_correct` + `game_node_points` bila game pernah ditamatkan. Lencana = `rewards.badges` dengan `min_points` ≤ poin. Mengulang titik tidak menambah poin ganda.
+- Progres disimpan (`zustand persist`, v3): titik selesai, jawaban benar terbaik, game selesai, rekor, item koleksi.
+- Agen: tiap halaman memanggil `useAgent().say(skrip fase)` dan `setContext({phase, lesson_id})`; chatbot melayang (`ChatWidget`) menampilkannya.
 
 ## 7. Desain game runner
 
@@ -265,18 +268,24 @@ KONTEKS:
 Latar: uji awal chatbot museum berbasis LLM (studi pilot kecil) menemukan penyimpangan persona dan klaim sumber yang tidak ada, sementara RAG membantu tetapi dapat membatasi percakapan (Engstrøm & Løvlie, 2025). Karena itu gerbang skor dan validasi sitasi dipasang sebagai kendali teknis. Konsekuensi: cakupan jawaban sebatas konten terkurasi.
 
 **Evaluasi:** `eval/in_scope.yaml` (±30), `eval/out_of_scope.yaml` (±15 + percobaan injeksi); `eval_rag.py` melaporkan recall@k, persen sitasi valid, persen penolakan benar. Hasil dicantumkan di proposal hanya setelah dijalankan.
+- Jenis luar cakupan (`kind`): `off_topic` dan `other_region` wajib ditolak **di gerbang** (tanpa LLM); `near_miss` (topik Bandung yang ada, tetapi hal yang tidak ada di chunk, mis. harga tiket) dan `injection` wajar lolos gerbang dan harus ditolak atau dijinakkan oleh LLM. `expect: no_leak` dan `must_not_contain` memeriksa kebocoran prompt sistem dan klaim palsu.
+- Tahap retrieval (tanpa biaya) selalu jalan: recall@k, persen lolos/ditolak gerbang, `suggested_questions` materi wajib lolos gerbang (saran pada penolakan tidak boleh ikut ditolak), dan sapuan ambang `MIN_SCORE`. Bila `in_scope.yaml` kosong, sapuan memakai `suggested_questions` sebagai dasar sementara.
+- Tahap LLM (`--llm`, perlu `GEMINI_API_KEY`): persen dijawab bersitasi, persen mengutip chunk yang diharapkan, persen penolakan benar, dan pelanggaran (jawaban tanpa sitasi, prompt bocor, frasa terlarang). Kode keluar 1 bila ada pelanggaran. `--json` menyimpan laporan lengkap.
+- Kalibrasi `MIN_SCORE` hanya sah setelah chunk T-031 terisi: di mode pengembangan chunk penanda `[PERLU DIISI]` ikut terindeks (judul materi ikut diindeks per chunk), sehingga skor belum mewakili rilis.
 
 ## 10. Frontend
 
 | Rute | Halaman |
 |---|---|
 | `/` | Beranda = peta Indonesia + pengantar singkat |
-| `/kota/:cityId` | Alur belajar (kuis → materi → game → ringkasan) |
+| `/kota/:cityId` | Path belajar kota (titik materi + game, poin, lencana) |
+| `/kota/:cityId/titik/:lessonId` | Satu titik: kuis topik → materi → hasil |
+| `/kota/:cityId/game` | Game runner → ringkasan |
 | `/koleksi` | Item terbuka |
 | `/tentang`, `/sumber` | Tentang dan sumber/atribusi |
 
-- **IndonesiaMap:** titik kota diposisikan dengan proyeksi yang sama dengan peta; `active` (amber) dapat difokus, `coming_soon` abu-abu berlabel.
-- **AgentPanel:** gelembung skrip + kolom tanya (mode bebas), sitasi sebagai chip yang dapat dibuka, penolakan konsisten; tetap dapat dipakai saat game dijeda.
+- **LeafletMap:** Leaflet 1.9, batas 38 provinsi dari OpenStreetMap (ODbL) di `public/geo/indonesia-provinces.geojson` (dibangun `backend/scripts/build_provinces_geojson.py`), tanpa tile pihak ketiga; warna per kepulauan; titik kota `active` (emas, berdenyut) dapat difokus keyboard, `coming_soon` abu-abu berlabel. Kota tanpa lat/lng diletakkan di tengah provinsinya.
+- **ChatWidget + AgentPanel:** chatbot melayang (tombol maskot kanan bawah) berisi gelembung skrip + kolom tanya, sitasi sebagai chip, penolakan konsisten; tetap terpasang saat ditutup (riwayat utuh) dan dapat dipakai saat game dijeda. **Mascot:** gambar di `src/assets/maskot/` dipakai otomatis; prop `mood` (`idle`/`thinking`/`talking`) untuk animasi.
 - **QuizCard/LessonCard/ItemModal:** komponen presentasional dengan data dari konten.
 - **LocationButton (`mapLinks.ts`):**
 ```ts
@@ -300,6 +309,12 @@ Tab baru, `rel="noopener noreferrer"`; tampilkan alamat teks sebagai cadangan.
 ## 12. Keamanan dan privasi
 
 - Kunci LLM dan Supabase service role hanya di env Render (lokal: `.env`); batas laju per IP; validasi skema; tolak `city_id` tak dikenal; CORS dibatasi; HTTPS; header keamanan dasar.
+- **Rincian T-064** (`app/security.py`):
+  - *IP klien:* `X-Forwarded-For` dibaca **dari kanan** sebanyak `TRUSTED_PROXY_HOPS` (bawaan 0 = header diabaikan, pakai alamat soket). Entri kiri bisa diisi klien sehingga tidak dipercaya. Vercel menimpa `X-Forwarded-For` dengan IP pengunjung pada rewrite eksternal; produksi memakai `2` (Vercel → proxy Render). Uvicorn dijalankan dengan `--no-proxy-headers` agar tidak menimpa `request.client` lebih dulu (bawaannya memercayai `X-Forwarded-For` dari 127.0.0.1).
+  - *Batas laju `/api/chat`:* per IP (`RATE_LIMIT_PER_MIN`, 20) **dan** global (`GLOBAL_RATE_LIMIT_PER_MIN`, 120) sebagai pengaman kuota Gemini bila URL Render dipanggil langsung dengan IP palsu. 429 menyertakan `Retry-After: 60`; jawaban chat `Cache-Control: no-store`.
+  - *Header API:* `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: no-referrer`, `Permissions-Policy`, `Cross-Origin-Opener-Policy`, CSP `default-src 'none'; frame-ancestors 'none'` (kecuali `/docs`), HSTS hanya di HTTPS. `/docs` dimatikan di produksi (`ENABLE_DOCS=false`).
+  - *Bundel FE:* `python scripts/check_bundle_secrets.py [dist]` memindai pola kunci Google, JWT Supabase `service_role`, nama variabel rahasia, dan nilai rahasia dari env/`.env` (tidak dicetak). Jalankan sebelum rilis.
+  - *Verifikasi setelah deploy (T-063):* kirim >20 permintaan chat dengan `X-Forwarded-For` acak lewat domain Vercel; harus 429. Bila tidak, sesuaikan `TRUSTED_PROXY_HOPS`.
 - Teks pengguna diperlakukan sebagai data; aturan prompt menolak instruksi tersisip; validasi sitasi melindungi dari keluaran tanpa sumber.
 - Tanpa akun; progres hanya di perangkat; analitik anonim; log percakapan hanya bila diaktifkan untuk evaluasi dan diberi pemberitahuan.
 - Hak cipta: semua aset melalui `sources.yaml`.
@@ -353,6 +368,15 @@ Sediakan parameter uji `?debug=1` (hanya non-produksi) untuk mempercepat skor ag
 | 15 | Engine game murni (`game/engine.ts`) dengan sub-langkah 1/120 dtk dan RNG berbenih | Kolisi, spawner, unlock dapat diuji deterministik; uji bot membuktikan tak ada rintangan mustahil | Ukuran rintangan per id di `OBSTACLE_SPECS`; id baru memakai ukuran bawaan sampai ditambahkan |
 | 16 | Layar sempit menampilkan bagian kiri dunia (540/680 dari 800 px) | Kanvas 8:3 terlalu pendek di 360 px | Pandangan ke depan ≥0,8 dtk pada kecepatan maks.; modal item tampil di bawah kanvas di ponsel |
 | 17 | `SourceRef` menyertakan `lesson_id` | Saran materi F-022 (soal salah → chunk → materi) tanpa menebak dari id chunk | Tipe TS dibuat ulang |
+| 18 | Path belajar per kota menggantikan alur linear | Keputusan tim 20 Nov 2026; kemajuan terlihat dan bertahap | Kuis dipecah per titik (soal mengikuti materi chunk-nya); validator memperingatkan titik tanpa soal |
+| 19 | Poin path + lencana di `city.yaml` (`rewards`) | Angka dapat diubah tim tanpa kode; lencana dipindah dari P2 ke MVP atas permintaan tim | Angka DRAF (100/titik, 10/jawaban benar, 100 game; lencana 100/300/500) |
+| 20 | Item game tiap 1000 poin (`unlock_every`) | Keputusan tim 20 Nov 2026 | Mencapai item pertama butuh ±25 dtk berlari; `?debug=1` mempercepat ×10 |
+| 21 | Leaflet + GeoJSON OSM tanpa tile | Peta mengikuti batas asli 38 provinsi (geoBoundaries masih 34, data 2017); gaya penuh sesuai palet; tanpa ketergantungan layanan tile | Data ODbL wajib diatribusi; ~detail ±1 km (disederhanakan); bundel +~150 kB, halaman kota dimuat lazy |
+| 22 | Chatbot melayang dengan slot maskot | Permintaan tim; maskot dapat diganti dan dianimasikan tanpa mengubah pemanggil | Status chat di `lib/agentStore.ts` (tidak disimpan) |
+| 23 | Peta: klik provinsi → panel kota; kota aktif → konfirmasi → `map.flyTo` + pesawat (CSS `offset-path`) → path | Permintaan tim (20 Nov 2026); perjalanan terasa seperti "terbang" ke kota | Dialog di-portal ke `body`; animasi dilewati bila `prefers-reduced-motion` |
+| 24 | Mode uji kuis `?demo=1` hanya di dev | Mekanik kuis dapat diuji sebelum soal asli ada, tanpa mengarang fakta budaya | Soal uji ditandai "[Soal uji]" dan spanduk "Mode uji" |
+| 25 | UI: shadcn/ui (AlertDialog, Sheet, Tooltip, Progress, Badge, Sonner, Button) + React Bits (BlurText, CountUp, ClickSpark, SpotlightCard, ShinyText, Magnet, TiltedCard) + `motion` | Permintaan tim (20 Nov 2026): web lebih hidup; animasi ringan tanpa WebGL demi ponsel | Token shadcn dipetakan ke palet (index.css); komponen vendor di `components/ui` dan `components/reactbits` (dikecualikan dari lint); React Bits berlisensi MIT + Commons Clause (lihat `components/reactbits/LICENSE.md`); peta dan halaman sekunder dimuat lazy (bundel awal ±105 kB gzip) |
+| 18 | IP klien dari kanan `X-Forwarded-For` (`TRUSTED_PROXY_HOPS`) + batas laju global | Entri kiri dapat dipalsukan sehingga batas per IP bisa diakali | Jumlah hop harus cocok dengan rantai proxy; diverifikasi setelah deploy (§12) |
 
 ## 17. Risiko teknis
 

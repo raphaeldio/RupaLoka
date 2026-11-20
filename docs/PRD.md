@@ -23,7 +23,7 @@ Rupaloka adalah web edukasi budaya berbasis **gamifikasi**. Alurnya:
 2. **Agen AI (maskot)** memandu seluruh perjalanan di kota itu.
 3. **Kuis pengetahuan dasar** untuk mengukur titik awal.
 4. **Belajar beberapa budaya** kota tersebut (kartu materi bersumber).
-5. **Game runner keliling kota** (pemain berlari/melompat melewati rintangan bertema kota). Tiap kelipatan **100 poin** (parameter), pemain membuka **item/budaya khusus**; permainan berhenti sebentar, agen memberi **penjelasan singkat**, lalu permainan lanjut.
+5. **Game runner keliling kota** (pemain berlari/melompat melewati rintangan bertema kota). Tiap kelipatan **1000 poin** (parameter `unlock_every`; diubah dari 100 pada 20 Nov 2026), pemain membuka **item/budaya khusus**; permainan berhenti sebentar, agen memberi **penjelasan singkat**, lalu permainan lanjut.
 6. **Ringkasan** hasil: item terbuka, skor, dan tombol **Lihat lokasi asli** untuk budaya yang relevan.
 
 Alur belajarnya dibuat berjenjang seperti jalur pelajaran pada aplikasi belajar populer (kuis → materi → latihan → hadiah), tanpa meniru tampilan, karakter, atau merek mana pun.
@@ -79,7 +79,7 @@ Peta Indonesia → pilih Bandung → Agen menyapa
    → Kuis dasar (5 soal) → Hasil + saran materi
    → Materi budaya (3–4 kartu, tiap kartu: narasi + fakta + sumber + tanya agen)
    → Game runner keliling Bandung
-        ↳ tiap 100 poin: pause → Item/Budaya khusus → penjelasan singkat agen → lanjut
+        ↳ tiap 1000 poin: pause → Item/Budaya khusus → penjelasan singkat agen → lanjut
         ↳ game over / selesai → Ringkasan: skor, item terbuka, "Lihat lokasi asli"
 ```
 
@@ -134,12 +134,14 @@ Prioritas: **P0** wajib MVP-0, **P1** tahap seleksi berikutnya, **P2** pengemban
 | F-040 | Game runner 2D di kanvas: karakter orisinal berlari otomatis, melompat (ketuk/spasi), menghindari rintangan | P0 | Berjalan ≥30 fps pada ponsel kelas menengah **[VERIFIKASI]**; satu input saja |
 | F-041 | Latar dan rintangan bertema kota (Bandung) secara visual; kecepatan meningkat bertahap | P0 | Minimal 3 jenis rintangan dan 1 latar |
 | F-042 | Skor naik seiring jarak tempuh (MVP-0 belum memiliki benda yang dipungut saat berlari) | P0 | Skor tampil jelas |
-| F-043 | Setiap kelipatan 100 poin (parameter `unlock_every` di konten): game berhenti, tampil item budaya, penjelasan singkat, tombol "Lanjut" | P0 | Berhenti tepat sekali per ambang; lanjut tanpa kehilangan skor. Ambang ke-k membuka item ke-k pada `items_order`; setelah semua item terbuka, game berjalan terus tanpa jeda sampai game over |
+| F-043 | Setiap kelipatan 1000 poin (parameter `unlock_every` di konten): game berhenti, tampil item budaya, penjelasan singkat, tombol "Lanjut" | P0 | Berhenti tepat sekali per ambang; lanjut tanpa kehilangan skor. Ambang ke-k membuka item ke-k pada `items_order`; setelah semua item terbuka, game berjalan terus tanpa jeda sampai game over |
 | F-044 | Item terbuka masuk Koleksi; tidak muncul ganda dalam satu sesi | P0 | Koleksi tersimpan di perangkat |
 | F-045 | Layar game over + ringkasan (skor, item terbuka, tombol main lagi, lokasi asli) | P0 | — |
 | F-046 | Jeda otomatis saat tab tidak aktif; tombol jeda; hormati `prefers-reduced-motion` (kecepatan lebih rendah) | P0 | — |
 | F-047 | Rekor tertinggi pribadi | P1 | Tersimpan lokal |
-| F-048 | Papan peringkat, lencana, streak harian | P2 | — |
+| F-048 | Papan peringkat, streak harian | P2 | — |
+| F-049 | **Path belajar per kota** (keputusan tim 20 Nov 2026): titik berurutan (materi; titik terakhir = game), tiap titik = kuis topik → kartu materi; titik berikutnya terbuka setelah titik sebelumnya selesai | P0 | Titik terkunci tidak dapat dibuka; progres tersimpan di perangkat |
+| F-049a | **Poin path dan lencana**: +poin per titik selesai, per jawaban kuis benar, dan saat menamatkan game; lencana saat poin melewati ambang (`rewards` di `city.yaml`; angka DRAF 100/300/500) | P0 | Poin tidak dobel saat titik diulang; lencana baru diumumkan sekali |
 
 ### 6.6 Lokasi asli dan pendukung
 | ID | Kebutuhan | Prio |
@@ -208,11 +210,11 @@ MVP-0 menyiapkan **tanda fitur** (`feature_flags`) agar fitur berbayar dapat dit
 
 | Tahap | Isi |
 |---|---|
-| **MVP-0 (pendaftaran diperpanjang)** | Semua P0 untuk Bandung: peta, agen, kuis, materi, game runner dengan item per 100 poin, koleksi, lokasi asli, deploy, video showcase |
+| **MVP-0 (pendaftaran diperpanjang)** | Semua P0 untuk Bandung: peta, agen, kuis, materi, path belajar + poin/lencana, game runner dengan item per 1000 poin, koleksi, lokasi asli, deploy, video showcase |
 | **MVP-1 (6–12 bln)** | P1: kuis penutup, rekor, analitik, uji di sekolah; kota kedua bersama mitra |
 | **Skala (1–5 th)** | P2: penampil 3D, langganan, mode kelas, portal museum, banyak kota |
 
-Fitur P1 (kuis penutup, rekor, analitik) baru dikerjakan setelah semua P0 selesai. Bila P0 pun tidak terkejar, pangkas berurutan: tampilan koleksi dibuat sederhana → variasi rintangan (kurangi ke 2) → materi ke-4. **Tidak boleh dipangkas:** peta di beranda, agen bersumber (sitasi/penolakan), kuis dasar, ≥3 materi bersumber, game dengan item tiap 100 poin, deploy.
+Fitur P1 (kuis penutup, rekor, analitik) baru dikerjakan setelah semua P0 selesai. Bila P0 pun tidak terkejar, pangkas berurutan: tampilan koleksi dibuat sederhana → variasi rintangan (kurangi ke 2) → materi ke-4. **Tidak boleh dipangkas:** peta di beranda, agen bersumber (sitasi/penolakan), kuis dasar, ≥3 materi bersumber, path belajar, game dengan item tiap `unlock_every` poin, deploy.
 
 ## 12. Metrik keberhasilan (target, belum diukur)
 

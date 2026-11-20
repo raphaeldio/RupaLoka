@@ -35,7 +35,7 @@ M = TypeVar("M", bound=BaseModel)
 
 # Target konten per kota (PRD §9, F-020, F-030). Kekurangan = pending.
 QUIZ_INTRO_COUNT = 5
-LESSON_COUNT_RANGE = (3, 4)
+LESSON_COUNT_RANGE = (3, 5)  # titik path materi; titik game ditambah otomatis
 MIN_CHUNKS_PER_LESSON = 8
 NARRATIVE_WORDS = (100, 200)
 ITEM_EXPLANATION_MAX_WORDS = 60
@@ -288,6 +288,13 @@ class _Loader:
         if c.quiz is not None:
             for q in c.quiz.intro + c.quiz.outro:
                 need_chunk(quiz_path, f"soal '{q.id}'", q.chunk)
+            # Path: tiap titik materi sebaiknya punya minimal satu soal kuis.
+            quiz_lessons = {
+                c.chunks[q.chunk].lesson_id for q in c.quiz.intro if q.chunk in c.chunks
+            }
+            for lesson_id in c.config.lessons:
+                if lesson_id not in quiz_lessons:
+                    self.pending(quiz_path, f"titik path '{lesson_id}' belum punya soal kuis")
             if len(c.quiz.intro) != QUIZ_INTRO_COUNT:
                 self.pending(
                     quiz_path,

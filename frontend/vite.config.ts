@@ -8,6 +8,7 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url))
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  resolve: { alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) } },
   server: {
     // content/cities.yaml dibundel sebagai cadangan bila API tidak dapat dihubungi.
     fs: { allow: [repoRoot] },

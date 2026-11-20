@@ -1,0 +1,91 @@
+# Chunk pengetahuan titik "Pengenalan Bandung" (RAG). Target minimal 8 chunk (T-031).
+# Satu chunk = satu gagasan, 1-3 kalimat. Setiap chunk wajib punya sumber dan diverifikasi.
+# source.type: web (wajib url) | buku | jurnal | wawancara | museum
+
+- id: pengenalan-bandung-001
+  lesson_id: pengenalan-bandung
+  text: "[PERLU DIISI]"
+  source:
+    title: "[PERLU DIISI]"
+    url: null
+    type: "[PERLU DIISI]"
+    accessed: null          # tanggal akses, format 2026-11-19
+  verified_by: null         # nama pemeriksa (KH)
+  verified_at: null
+
+- id: pengenalan-bandung-002
+  lesson_id: pengenalan-bandung
+  text: "[PERLU DIISI]"
+  source:
+    title: "[PERLU DIISI]"
+    url: null
+    type: "[PERLU DIISI]"
+    accessed: null          # tanggal akses, format 2026-11-19
+  verified_by: null         # nama pemeriksa (KH)
+  verified_at: null
+
+- id: pengenalan-bandung-003
+  lesson_id: pengenalan-bandung
+  text: "[PERLU DIISI]"
+  source:
+    title: "[PERLU DIISI]"
+    url: null
+    type: "[PERLU DIISI]"
+    accessed: null          # tanggal akses, format 2026-11-19
+  verified_by: null         # nama pemeriksa (KH)
+  verified_at: null
+
+- id: pengenalan-bandung-004
+  lesson_id: pengenalan-bandung
+  text: "[PERLU DIISI]"
+  source:
+    title: "[PERLU DIISI]"
+    url: null
+    type: "[PERLU DIISI]"
+    accessed: null          # tanggal akses, format 2026-11-19
+  verified_by: null         # nama pemeriksa (KH)
+  verified_at: null
+
+- id: pengenalan-bandung-005
+  lesson_id: pengenalan-bandung
+  text: "[PERLU DIISI]"
+  source:
+    title: "[PERLU DIISI]"
+    url: null
+    type: "[PERLU DIISI]"
+    accessed: null          # tanggal akses, format 2026-11-19
+  verified_by: null         # nama pemeriksa (KH)
+  verified_at: null
+
+- id: pengenalan-bandung-006
+  lesson_id: pengenalan-bandung
+  text: "[PERLU DIISI]"
+  source:
+    title: "[PERLU DIISI]"
+    url: null
+    type: "[PERLU DIISI]"
+    accessed: null          # tanggal akses, format 2026-11-19
+  verified_by: null         # nama pemeriksa (KH)
+  verified_at: null
+
+- id: pengenalan-bandung-007
+  lesson_id: pengenalan-bandung
+  text: "[PERLU DIISI]"
+  source:
+    title: "[PERLU DIISI]"
+    url: null
+    type: "[PERLU DIISI]"
+    accessed: null          # tanggal akses, format 2026-11-19
+  verified_by: null         # nama pemeriksa (KH)
+  verified_at: null
+
+- id: pengenalan-bandung-008
+  lesson_id: pengenalan-bandung
+  text: "[PERLU DIISI]"
+  source:
+    title: "[PERLU DIISI]"
+    url: null
+    type: "[PERLU DIISI]"
+    accessed: null          # tanggal akses, format 2026-11-19
+  verified_by: null         # nama pemeriksa (KH)
+  verified_at: null

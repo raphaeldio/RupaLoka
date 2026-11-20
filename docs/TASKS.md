@@ -37,7 +37,7 @@ Fitur P1 (kuis penutup, rekor, analitik) tidak dikerjakan sebelum semua P0 seles
 - [ ] **T-021 (HR)** `IndonesiaMap` di `/` + pengantar singkat + kartu kota + status active/coming_soon. *DoD:* Bandung membuka alur; lainnya "segera hadir"; keyboard OK; lisensi data peta sudah dicek (T-061a). *Status:* peta dan kartu kota selesai; menunggu cek lisensi data peta (T-061a, HW).
 
 ### Konten (paralel, KH)
-- [ ] **T-061a (HW)** Cek lisensi data batas wilayah untuk peta SVG sebelum dipakai T-021; catat atribusi di `sources.yaml`. *DoD:* sumber dan lisensi tercatat. (Sisa pemeriksaan hak cipta ada di T-061.)
+- [ ] **T-061a (HW)** Cek lisensi data batas wilayah untuk peta SVG sebelum dipakai T-021; catat atribusi di `sources.yaml`. *DoD:* sumber dan lisensi tercatat. (Sisa pemeriksaan hak cipta ada di T-061.) *Status (20 Nov 2026):* peta beranda kini memakai batas provinsi OpenStreetMap (ODbL 1.0), atribusi tampil di peta dan `/sumber`; HW tinggal memeriksa ulang. Aset peta Figma lama (`assets/figma-map`) tidak lagi dipakai beranda.
 - [ ] **T-030 (KH)** Kumpulkan ≥2 sumber kredibel per materi. *DoD:* `sources.yaml`.
 - [ ] **T-031 (KH)** Tulis chunk pengetahuan: ≥8 per materi, bersumber, `verified_by`. *DoD:* lolos validasi.
 - [ ] **T-032 (KH)** Tulis materi (100–200 kata), 3 pertanyaan contoh, penjelasan singkat item (≤60 kata). *DoD:* ditinjau satu anggota lain; istilah Sunda dijelaskan.
@@ -63,13 +63,25 @@ Fitur P1 (kuis penutup, rekor, analitik) tidak dikerjakan sebelum semua P0 seles
 - [ ] **T-054 (HW+KH)** Aset visual: karakter pelari (orisinal), latar Bandung, 3 rintangan, gambar item, maskot 3 ekspresi. *DoD:* semua orisinal atau berlisensi jelas; dicatat di `sources.yaml`; rintangan disetujui KH.
 - [x] **T-055 (HR)** Parameter `?debug=1` (non-produksi) untuk mempercepat skor saat uji. *DoD:* item mudah diuji. `?debug=1` → skor ×10, hanya di `npm run dev` (atau `VITE_ALLOW_DEBUG=true`).
 
+## Fase 3b — Path belajar, lencana, chatbot, peta Leaflet (keputusan tim 20 Nov 2026)
+
+- [x] **T-056 (HR)** Path belajar per kota (F-049): titik materi berurutan + titik game; kuis per titik → materi → hasil. *DoD:* titik terkunci tidak dapat dibuka; uji hijau.
+- [x] **T-057 (HR)** Poin path + lencana (F-049a) dari `rewards` di `city.yaml`. *DoD:* poin tidak dobel; lencana baru diumumkan; uji hijau.
+- [ ] **T-058 (KH)** Isi titik "Pengenalan Bandung" (materi, ≥8 chunk bersumber, ≥1 soal) dan sebar 5 soal kuis ke semua titik; tetapkan angka poin dan nama lencana final. *DoD:* validasi tanpa peringatan "titik path belum punya soal kuis".
+- [x] **T-059 (HR)** Chatbot melayang + komponen `Mascot` yang dapat diganti (`src/assets/maskot/`). *DoD:* chat dapat dibuka/ditutup dengan keyboard; riwayat tetap.
+- [ ] **T-059a (HW)** Gambar maskot final + 3 suasana (idle/thinking/talking) dan animasinya. *DoD:* orisinal, tercatat di `sources.yaml`.
+- [x] **T-059b (HR)** Peta Leaflet dengan batas 38 provinsi (OSM, ODbL) bergaya Rupaloka. *DoD:* atribusi tampil; kota dapat dipilih dengan klik/keyboard; gagal muat → daftar kota tetap ada.
+- [x] **T-059c (HR)** Interaksi peta: klik provinsi → zoom + panel daftar kota; pilih kota aktif → "Yakin ke …?" → animasi pesawat + zoom ke kota → path. *DoD:* berfungsi di 360 px dan desktop; hormati `prefers-reduced-motion` (langsung pindah tanpa animasi).
+- [x] **T-055a (HR)** Mode uji kuis `?demo=1` (khusus pengembangan): 2 soal uji netral per titik, bukan materi budaya; `?demo=0` keluar.
+- [x] **T-059d (HR)** UI interaktif dengan shadcn/ui + React Bits (animasi ringan, hormati `prefers-reduced-motion`). *DoD:* uji, lint, build lolos; 360 px tanpa geser horizontal; fps game di ponsel nyata tetap diukur di T-050.
+
 ## Fase 4 — Kualitas dan deploy (Hari-4)
 
-- [ ] **T-060 (KH+HR)** Set evaluasi: 30 dalam cakupan, 15 luar cakupan + percobaan injeksi. *DoD:* `eval/*.yaml`.
+- [ ] **T-060 (KH+HR)** Set evaluasi: 30 dalam cakupan, 15 luar cakupan + percobaan injeksi. *DoD:* `eval/*.yaml`. *Status (20 Nov 2026):* `eval/out_of_scope.yaml` selesai (HR): 15 luar cakupan (7 `off_topic`, 4 `other_region`, 4 `near_miss`) + 6 injeksi. `eval/in_scope.yaml` masih kerangka kosong; KH mengisi ±30 pertanyaan dengan `expected_chunks` setelah chunk T-031 terverifikasi.
 - [ ] **T-061 (HW)** Pemeriksaan hak cipta: gambar, sprite, font, ikon, maskot. *DoD:* `sources.yaml` lengkap; aset bermasalah diganti.
-- [ ] **T-062 (HR)** Jalankan `eval_rag.py`, kalibrasi `MIN_SCORE`. *DoD:* angka dicatat apa adanya; tak ada jawaban tanpa sitasi lolos.
+- [ ] **T-062 (HR)** Jalankan `eval_rag.py`, kalibrasi `MIN_SCORE`. *DoD:* angka dicatat apa adanya; tak ada jawaban tanpa sitasi lolos. *Status (20 Nov 2026):* `scripts/eval_rag.py` selesai dan teruji (tahap retrieval + `--llm`). Jalankan pertama (retrieval saja, `MIN_SCORE` 1.0, 14 dari 17 chunk masih penanda): luar cakupan ditolak gerbang 10/11; pertanyaan saran lolos gerbang 6/8 (2 saran Pengenalan Bandung ikut ditolak karena chunk-nya belum diisi); `oos-03` lolos karena kata "daftar" cocok dengan chunk wayang. Belum dikalibrasi: menunggu `in_scope.yaml` (T-060, KH), chunk T-031, dan `GEMINI_API_KEY` untuk tahap LLM. `MIN_SCORE` dibiarkan 1.0.
 - [ ] **T-063 (HR)** Deploy API ke Render (`CONTENT_STRICT=true`) dan frontend ke Vercel (rewrite `/api/*`); subdomain; hangatkan Render sebelum demo. *DoD:* tautan publik dapat dibuka dari jaringan lain.
-- [ ] **T-064 (HR)** Batas laju, CORS, header keamanan; pastikan kunci tidak ada di bundel FE. *DoD:* pemeriksaan manual.
+- [ ] **T-064 (HR)** Batas laju, CORS, header keamanan; pastikan kunci tidak ada di bundel FE. *DoD:* pemeriksaan manual. *Status:* sisi API selesai (`app/security.py`, SDD §12): IP dari kanan `X-Forwarded-For`, batas laju global, header keamanan, `/docs` mati di produksi; uji lokal manual lolos (XFF palsu tetap kena 429). `check_bundle_secrets.py` pada bundel 20 Nov: 0 temuan. Sisa: header keamanan halaman FE di `frontend/vercel.json`, dan verifikasi `TRUSTED_PROXY_HOPS` setelah deploy (T-063).
 - [ ] **T-065 (semua)** Uji di ≥2 ponsel nyata + desktop; perbaiki bug kritis. *DoD:* putaran penuh selesai di ponsel.
 - [ ] **T-066 (KH+HW)** Uji terpandu 5+ orang (siswa/guru/teman): amati penyelesaian, catat kendala; isi formulir singkat. *DoD:* jumlah, waktu, dan hasil **apa adanya** untuk proposal Bagian 7/14 dan Lampiran 6. Jangan menulis hasil yang tidak terjadi.
 - [ ] **T-067 (HR)** **Pembekuan kode** (code freeze); tag rilis; cadangan. *DoD:* tag `v0.1-lomba`.

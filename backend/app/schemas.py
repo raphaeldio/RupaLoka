@@ -76,11 +76,44 @@ class GameConfig(Strict):
         return self
 
 
+class Badge(Strict):
+    """Lencana yang didapat saat poin path kota mencapai `min_points`."""
+
+    id: Id
+    name: Text
+    min_points: int = Field(gt=0)
+    description: Text
+
+
+class Rewards(Strict):
+    """Poin path belajar (titik = materi, titik terakhir = game) dan lencana.
+
+    Poin kota = titik materi selesai × points_per_node + jawaban kuis benar ×
+    points_per_correct + (game_node_points bila game sudah dimainkan sekali).
+    """
+
+    points_per_node: int = Field(default=100, ge=0)
+    points_per_correct: int = Field(default=10, ge=0)
+    game_node_points: int = Field(default=100, ge=0)
+    badges: list[Badge] = Field(default_factory=list)
+
+    @model_validator(mode="after")
+    def _ordered(self) -> Rewards:
+        _no_duplicates([b.id for b in self.badges], "badges")
+        mins = [b.min_points for b in self.badges]
+        if mins != sorted(mins) or len(set(mins)) != len(mins):
+            raise ValueError("badges harus berurutan naik menurut min_points tanpa ambang ganda")
+        return self
+
+
 class CityConfig(Strict):
     id: Id
     phases: list[Phase] = Field(min_length=1)
+    # Urutan titik path belajar. Tiap titik: kuis (soal yang chunk-nya milik materi ini),
+    # lalu kartu materi.
     lessons: list[Id] = Field(min_length=1)
     game: GameConfig
+    rewards: Rewards = Field(default_factory=Rewards)
 
     @model_validator(mode="after")
     def _unique(self) -> CityConfig:

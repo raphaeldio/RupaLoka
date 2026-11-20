@@ -1,7 +1,8 @@
+import { motion } from 'motion/react'
 import { useEffect, useRef } from 'react'
-import { labelOr } from '../lib/cities'
-import type { Lesson, QuizQuestion, SourceRef } from '../lib/api.types'
-import { Button, Card, ContentText, SourceChip } from './ui'
+import type { QuizQuestion, SourceRef } from '../lib/api.types'
+import { Button, Card, ContentText, SourceChip } from './primitives'
+import ClickSpark from './reactbits/ClickSpark'
 
 const LETTERS = 'ABCDEFGH'
 
@@ -49,6 +50,7 @@ export function QuizCard({
         <legend className="text-xl font-extrabold leading-snug text-tinta">
           <ContentText text={question.question} fallback="Soal sedang disiapkan tim konten." />
         </legend>
+        <ClickSpark sparkColor={['#e8b64c', '#146b68', '#8bb9a0']} sparkCount={10} sparkRadius={26} sparkSize={11}>
         <ul className="mt-4 grid gap-2">
           {question.options.map((opt, i) => {
             const isChosen = answer === i
@@ -79,13 +81,17 @@ export function QuizCard({
             )
           })}
         </ul>
+        </ClickSpark>
       </fieldset>
 
       {answered && (
-        <div
+        <motion.div
           ref={feedbackRef}
           tabIndex={-1}
           role="status"
+          initial={{ opacity: 0, y: 10, scale: 0.97 }}
+          animate={correct ? { opacity: 1, y: 0, scale: 1 } : { opacity: 1, y: 0, scale: 1, x: [0, -8, 8, -5, 5, 0] }}
+          transition={{ duration: 0.45 }}
           className={`mt-4 rounded-2xl p-4 outline-none ${correct ? 'bg-teal-50' : 'bg-amber-50'}`}
         >
           <p className={`font-extrabold ${correct ? 'text-teal' : 'text-amber'}`}>
@@ -97,7 +103,7 @@ export function QuizCard({
           <div className="mt-3">
             <SourceChip source={source} label="Sumber" />
           </div>
-        </div>
+        </motion.div>
       )}
 
       <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
@@ -105,52 +111,7 @@ export function QuizCard({
           Lewati kuis
         </Button>
         <Button onClick={onNext} disabled={!answered}>
-          {number < total ? 'Soal berikutnya' : 'Lihat hasil'}
-        </Button>
-      </div>
-    </Card>
-  )
-}
-
-/** Hasil kuis + saran materi dari soal yang salah (F-022). */
-export function QuizResult({
-  score,
-  total,
-  suggested,
-  onNext,
-}: {
-  score: number
-  total: number
-  suggested: Lesson[]
-  onNext: () => void
-}) {
-  return (
-    <Card>
-      <p className="text-xs font-extrabold uppercase tracking-[1.6px] text-redup">Hasil kuis dasar</p>
-      <p className="mt-2 text-4xl font-extrabold text-teal">
-        {score}
-        <span className="text-xl text-redup"> / {total}</span>
-      </p>
-      <p className="mt-2 text-[15px] text-redup">
-        {score === total
-          ? 'Hebat! Kamu sudah tahu banyak. Materi berikut akan menambah wawasanmu.'
-          : 'Ini baru permulaan. Materi berikut akan membantumu mengenal budaya kota ini.'}
-      </p>
-      {suggested.length > 0 && (
-        <div className="mt-4">
-          <p className="text-sm font-bold">Perhatikan materi ini, ya:</p>
-          <ul className="mt-2 flex flex-wrap gap-2">
-            {suggested.map((l) => (
-              <li key={l.id} className="rounded-full bg-amber-50 px-3 py-1.5 text-sm font-bold text-amber">
-                {labelOr(l.title, 'Materi budaya')}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-      <div className="mt-6 flex justify-end">
-        <Button onClick={onNext} autoFocus>
-          Mulai materi
+          {number < total ? 'Soal berikutnya' : 'Lanjut ke materi'}
         </Button>
       </div>
     </Card>

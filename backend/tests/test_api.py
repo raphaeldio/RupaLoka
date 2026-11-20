@@ -68,6 +68,7 @@ def test_city_detail_has_sources_but_no_chunk_text(client: TestClient) -> None:
     ref = sources["materi-a-001"]
     assert ref["chunk_id"] == "materi-a-001"
     assert ref["lesson_id"] == "materi-a"
+    assert body["rewards"]["points_per_node"] == 100
     assert ref["title"] == "Sumber contoh"
     assert "text" not in ref
     assert "Teks pengetahuan contoh" not in str(body)

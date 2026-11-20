@@ -2,15 +2,37 @@
 id: bandung
 phases: [quiz_intro, lessons, game, summary]
 
-# KANDIDAT materi dari PRD §9, BELUM FINAL (T-002, KH). Ubah daftar ini bila materi berubah;
-# setiap id wajib punya lessons/<id>.yaml.
-lessons: [angklung, wayang-golek, museum-sri-baduga]
+# Titik path belajar, berurutan (titik ke-1 terbuka dulu, berikutnya terbuka setelah yang
+# sebelumnya selesai). Tiap titik = kuis (soal di quiz.yaml yang chunk-nya milik materi ini)
+# lalu kartu materi. Titik game ditambahkan otomatis di akhir. KANDIDAT, BELUM FINAL (T-002, KH).
+# Setiap id wajib punya lessons/<id>.yaml.
+lessons: [pengenalan-bandung, angklung, wayang-golek, museum-sri-baduga]
 
 game:
-  unlock_every: 100            # poin per item (F-043)
-  # Item ke-k terbuka di ambang ke-k (100, 200, 300). Setelah habis, game lanjut tanpa jeda.
+  unlock_every: 1000           # poin game per item (F-043; keputusan tim 20 Nov 2026)
+  # Item ke-k terbuka di ambang ke-k (1000, 2000, 3000). Setelah habis, game lanjut tanpa jeda.
   items_order: [item-angklung, item-wayang, item-sri-baduga]
   # Rintangan: harus terdaftar di sources.yaml (objects) dan disetujui KH. [PERLU DIISI daftar final]
   obstacles: [batu, pagar, becak]
   background: bandung-day      # id latar di assets/sprites (T-054)
   speed: { start: 240, max: 520, ramp_per_100: 25 }   # piksel/detik; kalibrasi saat uji
+
+# Poin path dan lencana (DRAF 20 Nov 2026; angka dan nama boleh diubah tim).
+# 4 titik materi × 100 + titik game 100 = 500, ditambah 10 per jawaban kuis benar.
+rewards:
+  points_per_node: 100
+  points_per_correct: 10
+  game_node_points: 100
+  badges:
+    - id: penjelajah-pemula
+      name: "Penjelajah Pemula"
+      min_points: 100
+      description: "Menyelesaikan titik pertama perjalanan."
+    - id: penjelajah-kota
+      name: "Penjelajah Kota"
+      min_points: 300
+      description: "Sudah mengenal beberapa budaya kota ini."
+    - id: sahabat-budaya
+      name: "Sahabat Budaya"
+      min_points: 500
+      description: "Menuntaskan seluruh perjalanan kota ini."

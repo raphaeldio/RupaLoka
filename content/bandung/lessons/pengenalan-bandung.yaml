@@ -1,0 +1,17 @@
+# Titik path 1: pengenalan kota (F-030). Narasi 100-200 kata, ramah pelajar; istilah Sunda dijelaskan.
+# SEMUA isi [PERLU DIISI] oleh KH dari sumber (T-030-T-032). Jangan diisi tebakan.
+id: pengenalan-bandung
+title: "Pengenalan Bandung"
+narrative: |
+  [PERLU DIISI] narasi 100-200 kata tentang Bandung: letak, sebutan kota, budaya Sunda secara umum.
+key_facts:
+  - text: "[PERLU DIISI]"
+    chunk: pengenalan-bandung-001
+images:
+  - src: assets/images/pengenalan-bandung-1.webp
+    alt: "[PERLU DIISI] deskripsi gambar"
+    license: "[PERLU DIISI]"
+location: null
+suggested_questions:
+  - "Bandung ada di provinsi apa?"
+  - "Bahasa apa yang dipakai sehari-hari di Bandung?"

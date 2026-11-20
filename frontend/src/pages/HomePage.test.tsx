@@ -29,7 +29,7 @@ describe('HomePage', () => {
       '/kota/bandung',
     )
 
-    await userEvent.click(screen.getByRole('button', { name: /^Yogyakarta, DI Yogyakarta: segera hadir/ }))
+    await userEvent.click(screen.getByRole('button', { name: /^Yogyakarta/ }))
     expect(within(card()).queryByRole('link')).toBeNull()
     expect(within(card()).getByText('Segera hadir')).toBeInTheDocument()
   })

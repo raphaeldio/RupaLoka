@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Card, ContentText, SafeImage, SourceChip } from '../components/ui'
+import { Card, ContentText, SafeImage, SourceChip } from '../components/primitives'
+import BlurText from '../components/reactbits/BlurText'
+import TiltedCard from '../components/reactbits/TiltedCard'
 import { getCity } from '../lib/api'
 import type { CityDetail } from '../lib/api.types'
 import { bundledCities, labelOr } from '../lib/cities'
@@ -29,7 +31,9 @@ export default function CollectionPage() {
 
   return (
     <main id="konten" className="mx-auto w-full max-w-[1000px] px-4 pb-16 sm:px-8">
-      <h1 className="text-3xl font-extrabold tracking-tight text-teal">Koleksi</h1>
+      <h1 className="text-3xl font-extrabold tracking-tight text-teal" aria-label="Koleksi">
+        <BlurText text="Koleksi" animateBy="words" delay={80} className="inline-flex" />
+      </h1>
       <p className="mt-2 text-redup">
         Item budaya yang kamu temukan saat bermain. Tersimpan di perangkat ini saja ({total} item).
       </p>
@@ -58,6 +62,7 @@ export default function CollectionPage() {
                 const owned = have.includes(item.id)
                 return (
                   <li key={item.id}>
+                    <TiltedCard containerHeight="100%" containerWidth="100%" rotateAmplitude={owned ? 12 : 4} scaleOnHover={owned ? 1.05 : 1} glare={owned ? 0.35 : 0} radius={24}>
                     <Card className="h-full p-3 sm:p-4">
                       {owned ? (
                         <>
@@ -81,6 +86,7 @@ export default function CollectionPage() {
                         </div>
                       )}
                     </Card>
+                    </TiltedCard>
                   </li>
                 )
               })}

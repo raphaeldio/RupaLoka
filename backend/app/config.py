@@ -40,6 +40,13 @@ class Settings:
     llm_timeout_s: float = 15.0
     min_score: float = DEFAULT_MIN_SCORE
     rate_limit_per_min: int = 20
+    # Batas total /api/chat dari semua IP; pengaman kuota Gemini bila IP dipalsukan (T-064).
+    global_rate_limit_per_min: int = 120
+    # Jumlah proxy tepercaya di depan API. 0 = X-Forwarded-For diabaikan (lokal, aman);
+    # di Render lewat rewrite Vercel pakai 2 (lihat SDD §12).
+    trusted_proxy_hops: int = 0
+    # Swagger /docs; matikan di produksi agar permukaan serangan kecil.
+    enable_docs: bool = True
     mascot_name: str = "Pemandu Rupaloka"  # [PERLU DIISI] nama maskot final
 
     @classmethod
@@ -55,5 +62,8 @@ class Settings:
             llm_timeout_s=float(env("LLM_TIMEOUT_S") or 15.0),
             min_score=float(env("MIN_SCORE") or DEFAULT_MIN_SCORE),
             rate_limit_per_min=int(env("RATE_LIMIT_PER_MIN") or 20),
+            global_rate_limit_per_min=int(env("GLOBAL_RATE_LIMIT_PER_MIN") or 120),
+            trusted_proxy_hops=max(0, int(env("TRUSTED_PROXY_HOPS") or 0)),
+            enable_docs=_bool(env("ENABLE_DOCS"), default=True),
             mascot_name=_str(env("MASCOT_NAME")) or "Pemandu Rupaloka",
         )

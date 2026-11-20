@@ -1,0 +1,143 @@
+/* Gaya peta Leaflet mengikuti palet Rupaloka (lihat @theme di index.css). */
+.peta-leaflet.leaflet-container {
+  background:
+    radial-gradient(circle at 20% 15%, rgb(255 255 255 / 0.7), transparent 45%),
+    radial-gradient(circle at 85% 80%, rgb(220 235 226 / 0.8), transparent 50%),
+    #e6efe9;
+  font-family: var(--font-sans);
+}
+
+.peta-leaflet .provinsi {
+  cursor: pointer;
+  transition: fill-opacity 160ms ease, stroke-width 160ms ease;
+}
+.peta-leaflet .provinsi--dipilih {
+  stroke: #146b68;
+  stroke-width: 3px;
+  fill-opacity: 1;
+}
+
+.provinsi-tooltip.leaflet-tooltip {
+  border: 0;
+  border-radius: 999px;
+  background: #1d2a2a;
+  color: #fff;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  box-shadow: 0 6px 16px -6px rgb(15 76 92 / 0.45);
+}
+.provinsi-tooltip.leaflet-tooltip-top::before {
+  border-top-color: #1d2a2a;
+}
+
+/* Titik kota (divIcon) */
+.kota-pin {
+  background: none;
+  border: 0;
+}
+.kota-pin__titik {
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  border: 3px solid #fff;
+  box-shadow: 0 4px 10px -2px rgb(15 76 92 / 0.45);
+}
+.kota-pin--aktif .kota-pin__titik {
+  background: #e8b64c;
+}
+.kota-pin--aktif .kota-pin__titik::after {
+  content: '';
+  position: absolute;
+  inset: -9px;
+  border-radius: 999px;
+  border: 2px solid #e8b64c;
+  animation: kota-denyut 1.8s ease-out infinite;
+}
+.kota-pin--segera .kota-pin__titik {
+  background: #9aa39a;
+  transform: scale(0.75);
+}
+.kota-pin--dipilih .kota-pin__titik {
+  background: #146b68;
+  transform: scale(1.25);
+}
+.kota-pin__label {
+  position: absolute;
+  left: 50%;
+  top: 22px;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.95);
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 800;
+  color: #1d2a2a;
+  box-shadow: 0 2px 6px rgb(31 41 51 / 0.12);
+}
+.kota-pin--segera .kota-pin__label {
+  color: #6d796e;
+  font-weight: 700;
+}
+.peta--jauh .kota-pin--segera:not(.kota-pin--dipilih) .kota-pin__label {
+  display: none;
+}
+.kota-pin--dipilih .kota-pin__label {
+  background: #146b68;
+  color: #fff;
+}
+.kota-pin:focus-visible {
+  outline: 2px solid #a8761a;
+  outline-offset: 4px;
+  border-radius: 999px;
+}
+
+@keyframes kota-denyut {
+  from {
+    opacity: 0.9;
+    transform: scale(0.6);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.6);
+  }
+}
+
+/* Kontrol zoom dan atribusi */
+.peta-leaflet .leaflet-bar {
+  border: 0;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgb(31 41 51 / 0.06), 0 8px 24px -8px rgb(31 41 51 / 0.14);
+}
+.peta-leaflet .leaflet-bar a {
+  width: 36px;
+  height: 36px;
+  line-height: 36px;
+  color: #146b68;
+  border-bottom-color: #e6e2d6;
+}
+.peta-leaflet .leaflet-bar a:hover {
+  background: #e3efec;
+}
+.peta-leaflet .leaflet-control-attribution {
+  margin: 0 14px 8px 0;
+  border-radius: 10px;
+  padding: 1px 8px;
+  background: rgb(255 255 255 / 0.8);
+  font-size: 10px;
+  color: #6d796e;
+}
+.peta-leaflet .leaflet-control-attribution a {
+  color: #146b68;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kota-pin--aktif .kota-pin__titik::after {
+    animation: none;
+  }
+  .peta-leaflet .provinsi {
+    transition: none;
+  }
+}

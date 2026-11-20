@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
-import { Button, Card } from '../components/ui'
+import { Button, Card } from '../components/primitives'
+import BlurText from '../components/reactbits/BlurText'
 import { getSources } from '../lib/api'
 import type { SourcesResponse } from '../lib/api.types'
 import { isPlaceholder } from '../lib/cities'
@@ -24,7 +25,9 @@ export default function SourcesPage() {
 
   return (
     <main id="konten" className="mx-auto w-full max-w-[900px] px-4 pb-16 sm:px-8">
-      <h1 className="text-3xl font-extrabold tracking-tight text-teal">Sumber dan atribusi</h1>
+      <h1 className="text-3xl font-extrabold tracking-tight text-teal" aria-label="Sumber dan atribusi">
+        <BlurText text="Sumber dan atribusi" animateBy="words" delay={80} className="inline-flex" />
+      </h1>
       <p className="mt-2 text-redup">
         Semua fakta budaya di Rupaloka berasal dari sumber di bawah dan diperiksa tim. Pemandu AI hanya menjawab dari
         sumber ini.
@@ -115,9 +118,18 @@ export default function SourcesPage() {
               Lainnya
             </h2>
             <ul className="mt-2 list-disc space-y-1 pl-5">
-              {/* TODO(T-061a): isi sumber dan lisensi data batas wilayah peta setelah diverifikasi. */}
-              <li>Peta provinsi: sumber dan lisensi data batas wilayah sedang diverifikasi.</li>
+              <li>
+                Peta provinsi: batas wilayah ©{' '}
+                <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer" className="text-teal hover:underline">
+                  kontributor OpenStreetMap
+                </a>
+                , lisensi ODbL 1.0 (disederhanakan oleh tim). Peta ditampilkan dengan Leaflet (BSD-2-Clause).
+              </li>
               <li>Huruf: Nunito Sans (SIL Open Font License 1.1).</li>
+              <li>
+                Komponen antarmuka: shadcn/ui (MIT), Radix UI (MIT), ikon Lucide (ISC), animasi Motion (MIT), dan
+                komponen animasi React Bits oleh David Haz (MIT + Commons Clause).
+              </li>
               <li>Karakter pelari dan ilustrasi game: dibuat sendiri oleh tim (sementara, menunggu aset final).</li>
             </ul>
           </section>

@@ -1,13 +1,8 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
+import { useAgent } from '../lib/agentStore'
 import { ApiError, postChat, shouldUseScript, splitAnswer } from '../lib/api'
-import type { ChatContext, ChatResponse, HistoryTurn } from '../lib/api.types'
-
-/** Permintaan tanya dari luar panel (kartu materi, item). `id` unik per permintaan. */
-export interface AgentRequest {
-  id: number
-  text: string
-  lessonId?: string | null
-}
+import type { ChatResponse, HistoryTurn } from '../lib/api.types'
+import Mascot from './Mascot'
 
 type Msg =
   | { kind: 'script'; text: string }
@@ -19,19 +14,6 @@ const MAX_LEN = 500
 
 /** Nama dan visual maskot belum final (T-005); sementara "Pemandu". */
 export const AGENT_NAME = 'Pemandu'
-
-function Avatar() {
-  return (
-    <span aria-hidden="true" className="grid size-9 shrink-0 place-items-center rounded-full bg-teal text-white">
-      <svg viewBox="0 0 24 24" className="size-5">
-        <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" strokeWidth="1.8" />
-        <circle cx="9" cy="10.5" r="1.2" fill="currentColor" />
-        <circle cx="15" cy="10.5" r="1.2" fill="currentColor" />
-        <path d="M8.5 14.5c1.8 1.8 5.2 1.8 7 0" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-      </svg>
-    </span>
-  )
-}
 
 function Answer({ resp, onSuggest }: { resp: ChatResponse; onSuggest: (q: string) => void }) {
   const parts = splitAnswer(resp.answer, resp.citations)
@@ -92,37 +74,30 @@ function Answer({ resp, onSuggest }: { resp: ChatResponse; onSuggest: (q: string
 }
 
 /**
- * Panel pemandu AI (F-010–F-014). Skrip per fase selalu tampil; tanya bebas memanggil
- * /api/chat. Bila AI gagal (jaringan, 429, 503), panel menampilkan pemberitahuan dan alur
+ * Isi chatbot pemandu (F-010–F-014). Skrip per fase dari `useAgent().say`; tanya bebas
+ * memanggil /api/chat. Bila AI gagal (jaringan, 429, 503), tampil pemberitahuan dan alur
  * tetap berjalan dengan skrip.
  */
-export default function AgentPanel({
-  cityId,
-  context,
-  script,
-  request,
-}: {
-  cityId: string
-  context: ChatContext
-  /** Kalimat skrip untuk fase saat ini; tiap perubahan ditambahkan sebagai gelembung baru. */
-  script: string | null
-  request: AgentRequest | null
-}) {
+export default function AgentPanel({ cityId, onClose }: { cityId: string; onClose?: () => void }) {
+  const scripts = useAgent((s) => s.scripts)
+  const request = useAgent((s) => s.request)
+  const mood = useAgent((s) => s.mood)
+  const setMood = useAgent((s) => s.setMood)
   const [msgs, setMsgs] = useState<Msg[]>([])
   const [history, setHistory] = useState<HistoryTurn[]>([])
   const [input, setInput] = useState('')
   const [busy, setBusy] = useState(false)
   const listRef = useRef<HTMLDivElement>(null)
   const ctrlRef = useRef<AbortController | null>(null)
-  const lastScript = useRef<string | null>(null)
+  const shownScript = useRef(0)
   const lastRequest = useRef<number | null>(null)
 
   useEffect(() => {
-    if (script && script !== lastScript.current) {
-      lastScript.current = script
-      setMsgs((m) => [...m, { kind: 'script', text: script }])
-    }
-  }, [script])
+    const fresh = scripts.filter((s) => s.id > shownScript.current)
+    if (fresh.length === 0) return
+    shownScript.current = fresh.at(-1)!.id
+    setMsgs((m) => [...m, ...fresh.map((s) => ({ kind: 'script' as const, text: s.text }))])
+  }, [scripts])
 
   useEffect(() => {
     const el = listRef.current
@@ -134,16 +109,18 @@ export default function AgentPanel({
   const ask = async (text: string, lessonId?: string | null) => {
     const message = text.trim().slice(0, MAX_LEN)
     if (!message || busy) return
+    const context = useAgent.getState().context
     setMsgs((m) => [...m, { kind: 'user', text: message }])
     setInput('')
     setBusy(true)
+    setMood('thinking')
     const ctrl = new AbortController()
     ctrlRef.current = ctrl
     try {
       const resp = await postChat(
         {
           city_id: cityId,
-          context: { phase: context.phase, lesson_id: lessonId ?? context.lesson_id ?? null },
+          context: { phase: context.phase ?? null, lesson_id: lessonId ?? context.lesson_id ?? null },
           message,
           history: history.slice(-6),
         },
@@ -153,23 +130,31 @@ export default function AgentPanel({
       setHistory((h) =>
         [...h, { role: 'user' as const, content: message }, { role: 'assistant' as const, content: resp.answer }].slice(-6),
       )
+      setMood('talking')
     } catch (err) {
       if (ctrl.signal.aborted) return
-      let text = 'Maaf, pemandu belum bisa menjawab sekarang. Kamu tetap bisa melanjutkan petualangan.'
-      if (err instanceof ApiError && err.status === 429) text = 'Pertanyaannya banyak sekali! Tunggu sebentar, lalu coba lagi, ya.'
-      else if (!shouldUseScript(err)) text = 'Pertanyaan ini belum bisa diproses. Coba tulis dengan kalimat lain.'
-      setMsgs((m) => [...m, { kind: 'notice', text }])
+      let notice = 'Maaf, pemandu belum bisa menjawab sekarang. Kamu tetap bisa melanjutkan petualangan.'
+      if (err instanceof ApiError && err.status === 429) notice = 'Pertanyaannya banyak sekali! Tunggu sebentar, lalu coba lagi, ya.'
+      else if (!shouldUseScript(err)) notice = 'Pertanyaan ini belum bisa diproses. Coba tulis dengan kalimat lain.'
+      setMsgs((m) => [...m, { kind: 'notice', text: notice }])
+      setMood('idle')
     } finally {
       setBusy(false)
     }
   }
 
   useEffect(() => {
+    if (mood !== 'talking') return
+    const id = window.setTimeout(() => setMood('idle'), 1600)
+    return () => window.clearTimeout(id)
+  }, [mood, setMood])
+
+  useEffect(() => {
     if (request && request.id !== lastRequest.current) {
       lastRequest.current = request.id
       void ask(request.text, request.lessonId)
     }
-    // ask sengaja tidak menjadi dependensi: hanya permintaan baru yang memicu pengiriman.
+    // ask sengaja bukan dependensi: hanya permintaan baru yang memicu pengiriman.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [request])
 
@@ -179,13 +164,25 @@ export default function AgentPanel({
   }
 
   return (
-    <section aria-label={`Panel ${AGENT_NAME}`} className="flex h-full min-h-0 flex-col rounded-3xl border border-garis bg-white shadow-kartu">
-      <header className="flex items-center gap-3 border-b border-garis px-4 py-3">
-        <Avatar />
-        <div>
+    <section aria-label={`Chat ${AGENT_NAME}`} className="flex h-full min-h-0 flex-col overflow-hidden rounded-3xl border border-garis bg-white shadow-melayang">
+      <header className="flex items-center gap-3 border-b border-garis bg-teal-50/60 px-4 py-3">
+        <Mascot mood={mood} className="size-10 shrink-0" />
+        <div className="min-w-0 flex-1">
           <p className="font-extrabold text-teal">{AGENT_NAME}</p>
           <p className="text-[11px] text-redup">Menjawab dari sumber terverifikasi saja</p>
         </div>
+        {onClose && (
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Tutup chat"
+            className="grid size-8 place-items-center rounded-full text-redup hover:bg-white hover:text-tinta"
+          >
+            <svg viewBox="0 0 16 16" className="size-3.5" aria-hidden="true">
+              <path d="M3 3l10 10M13 3L3 13" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+            </svg>
+          </button>
+        )}
       </header>
 
       <div ref={listRef} role="log" aria-live="polite" className="min-h-0 flex-1 space-y-3 overflow-y-auto px-4 py-4 text-sm">
@@ -198,11 +195,7 @@ export default function AgentPanel({
             )
           }
           const tone =
-            m.kind === 'notice'
-              ? 'bg-amber-50 text-tinta'
-              : m.kind === 'answer' && !m.resp.grounded
-                ? 'bg-pasir/60'
-                : 'bg-kertas'
+            m.kind === 'notice' ? 'bg-amber-50 text-tinta' : m.kind === 'answer' && !m.resp.grounded ? 'bg-pasir/60' : 'bg-kertas'
           return (
             <div key={i} className={`mr-4 rounded-2xl rounded-bl-md px-3 py-2 ${tone}`}>
               {m.kind === 'answer' ? <Answer resp={m.resp} onSuggest={(q) => void ask(q)} /> : <p>{m.text}</p>}

@@ -14,11 +14,20 @@ export const detailFixture: CityDetail = {
   city: { id: 'kota-a', name: 'Kota A', province: 'Provinsi A', status: 'active', lat: 0, lng: 0, summary: 'Ringkasan A.' },
   phases: ['quiz_intro', 'lessons', 'game', 'summary'],
   game: {
-    unlock_every: 100,
+    unlock_every: 1000,
     items_order: ['item-x'],
     obstacles: ['batu'],
     background: 'bg',
     speed: { start: 240, max: 520, ramp_per_100: 25 },
+  },
+  rewards: {
+    points_per_node: 100,
+    points_per_correct: 10,
+    game_node_points: 100,
+    badges: [
+      { id: 'lencana-1', name: 'Lencana Satu', min_points: 100, description: 'Deskripsi satu.' },
+      { id: 'lencana-2', name: 'Lencana Dua', min_points: 300, description: 'Deskripsi dua.' },
+    ],
   },
   agent_script: {
     quiz_intro: 'Skrip kuis.',

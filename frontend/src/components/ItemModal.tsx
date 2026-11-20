@@ -1,8 +1,11 @@
+import { motion } from 'motion/react'
 import { useEffect, useRef } from 'react'
 import { fillTemplate } from '../lib/api'
 import type { Item, SourceRef } from '../lib/api.types'
 import { isPlaceholder, labelOr } from '../lib/cities'
-import { Button, SafeImage, SourceChip } from './ui'
+import { Pop } from './motion'
+import { Button, SafeImage, SourceChip } from './primitives'
+import ClickSpark from './reactbits/ClickSpark'
 
 /**
  * Item budaya terbuka (F-012, F-043): gambar, nama, penjelasan singkat bersumber,
@@ -54,7 +57,13 @@ export default function ItemModal({
         <h2 id="item-judul" className="mt-1 text-2xl font-extrabold text-teal">
           {labelOr(item.name, 'Item budaya')}
         </h2>
-        <SafeImage image={item.image} className="mt-3 aspect-square w-28 rounded-2xl" />
+        <ClickSpark sparkColor={['#e8b64c', '#146b68']} sparkCount={14} sparkRadius={40} className="mt-3 !h-auto !w-fit">
+          <Pop delay={0.1}>
+            <motion.div animate={{ rotate: [0, -4, 4, 0] }} transition={{ duration: 1.6, repeat: 2, delay: 0.5 }}>
+              <SafeImage image={item.image} className="aspect-square w-28 rounded-2xl" />
+            </motion.div>
+          </Pop>
+        </ClickSpark>
         <p id="item-teks" className="mt-3 text-[15px] leading-relaxed">
           {text}
         </p>

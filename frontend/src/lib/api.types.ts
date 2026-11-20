@@ -17,6 +17,14 @@ export interface AssetEntry {
   note: string | null
 }
 
+/** Lencana yang didapat saat poin path kota mencapai `min_points`. */
+export interface Badge {
+  id: string
+  name: string
+  min_points: number
+  description: string
+}
+
 export interface ChatContext {
   phase?: "quiz_intro" | "lessons" | "game" | "summary" | null
   lesson_id?: string | null
@@ -57,6 +65,7 @@ export interface CityDetail {
   city: City
   phases: ("quiz_intro" | "lessons" | "game" | "summary")[]
   game: GameConfig
+  rewards: Rewards
   agent_script: AgentScript
   quiz: Quiz
   lessons: Lesson[]
@@ -148,6 +157,18 @@ export interface QuizQuestion {
   correct: number
   explanation: string
   chunk: string
+}
+
+/**
+ * Poin path belajar (titik = materi, titik terakhir = game) dan lencana.
+ * Poin kota = titik materi selesai × points_per_node + jawaban kuis benar ×
+ * points_per_correct + (game_node_points bila game sudah dimainkan sekali).
+ */
+export interface Rewards {
+  points_per_node: number
+  points_per_correct: number
+  game_node_points: number
+  badges: Badge[]
 }
 
 export interface Source {

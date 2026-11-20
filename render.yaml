@@ -7,7 +7,8 @@ services:
     plan: free                      # tidur setelah idle; lihat SDD §15 soal cold start
     region: singapore
     buildCommand: pip install -r backend/requirements.txt && python backend/scripts/validate_content.py
-    startCommand: cd backend && uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    # --no-proxy-headers: IP klien ditentukan app/security.py (TRUSTED_PROXY_HOPS), bukan uvicorn.
+    startCommand: cd backend && uvicorn app.main:app --host 0.0.0.0 --port $PORT --no-proxy-headers
     healthCheckPath: /api/health
     buildFilter:
       paths:
@@ -29,6 +30,12 @@ services:
         value: "1.0"                # kalibrasi di T-062
       - key: RATE_LIMIT_PER_MIN
         value: "20"
+      - key: GLOBAL_RATE_LIMIT_PER_MIN
+        value: "120"                # semua IP; pengaman kuota Gemini (T-064)
+      - key: TRUSTED_PROXY_HOPS
+        value: "2"                  # Vercel -> Render; verifikasi setelah deploy (SDD §12)
+      - key: ENABLE_DOCS
+        value: "false"              # matikan /docs di produksi
       - key: MASCOT_NAME
         sync: false
       - key: SUPABASE_URL

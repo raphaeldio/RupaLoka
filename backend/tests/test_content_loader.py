@@ -281,3 +281,18 @@ def test_cli_exit_codes(make_content: Any, capsys: pytest.CaptureFixture[str]) -
     assert validate_main(["--content", str(pending_root)]) == 0
     assert validate_main(["--content", str(pending_root), "--release"]) == 1
     assert "GALAT" in capsys.readouterr().out
+
+
+def test_rewards_default_and_badge_order() -> None:
+    from pydantic import ValidationError
+
+    from app.schemas import Rewards
+
+    r = Rewards()
+    assert (r.points_per_node, r.points_per_correct, r.game_node_points) == (100, 10, 100)
+    assert r.badges == []
+    badge = {"id": "a", "name": "A", "min_points": 300, "description": "x"}
+    with pytest.raises(ValidationError):
+        Rewards(badges=[badge, {**badge, "id": "b", "min_points": 100}])
+    with pytest.raises(ValidationError):
+        Rewards(badges=[badge, {**badge, "id": "b"}])

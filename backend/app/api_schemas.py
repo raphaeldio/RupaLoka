@@ -13,6 +13,7 @@ from app.schemas import (
     Lesson,
     Phase,
     Quiz,
+    Rewards,
     Source,
 )
 
@@ -41,6 +42,7 @@ class CityDetail(BaseModel):
     city: City
     phases: list[Phase]
     game: GameConfig
+    rewards: Rewards
     agent_script: AgentScript
     quiz: Quiz
     lessons: list[Lesson]  # urut sesuai city.yaml
