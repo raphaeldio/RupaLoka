@@ -33,8 +33,8 @@ Fitur P1 (kuis penutup, rekor, analitik) tidak dikerjakan sebelum semua P0 seles
 - [x] **T-013 (HR)** `/api/chat`: gerbang skor → LLM → validasi sitasi (SDD §9). *DoD:* dalam cakupan bersitasi valid; luar cakupan ditolak tanpa memanggil LLM.
 
 ### Frontend
-- [ ] **T-020 (HR)** Vite+React+TS+Tailwind, routing, tema, store persist. *DoD:* rute placeholder.
-- [ ] **T-021 (HR)** `IndonesiaMap` di `/` + pengantar singkat + kartu kota + status active/coming_soon. *DoD:* Bandung membuka alur; lainnya "segera hadir"; keyboard OK; lisensi data peta sudah dicek (T-061a).
+- [x] **T-020 (HR)** Vite+React+TS+Tailwind, routing, tema, store persist. *DoD:* rute placeholder. Selesai 20 Nov 2026.
+- [ ] **T-021 (HR)** `IndonesiaMap` di `/` + pengantar singkat + kartu kota + status active/coming_soon. *DoD:* Bandung membuka alur; lainnya "segera hadir"; keyboard OK; lisensi data peta sudah dicek (T-061a). *Status:* peta dan kartu kota selesai; menunggu cek lisensi data peta (T-061a, HW).
 
 ### Konten (paralel, KH)
 - [ ] **T-061a (HW)** Cek lisensi data batas wilayah untuk peta SVG sebelum dipakai T-021; catat atribusi di `sources.yaml`. *DoD:* sumber dan lisensi tercatat. (Sisa pemeriksaan hak cipta ada di T-061.)
@@ -47,21 +47,21 @@ Fitur P1 (kuis penutup, rekor, analitik) tidak dikerjakan sebelum semua P0 seles
 
 ## Fase 2 — Alur belajar (Hari-2)
 
-- [ ] **T-040 (HR)** State machine alur (SDD §6) + persist progres. *DoD:* transisi benar; uji unit hijau.
-- [ ] **T-041 (HR)** `QuizCard` + hasil + saran materi. *DoD:* 5 soal berjalan; penjelasan muncul setelah menjawab; skor tersimpan.
-- [ ] **T-042 (HR)** `LessonCard` (narasi, fakta, gambar, sumber, "Tanya agen", "Lihat lokasi asli"). *DoD:* 3 materi dapat dilewati.
-- [ ] **T-043 (HR)** `AgentPanel`: skrip per fase + tanya bebas + sitasi + penolakan + penanganan 429/503. *DoD:* percakapan 3 giliran; AI mati → skrip tetap jalan.
-- [ ] **T-044 (HR)** `LocationButton` + `mapLinks.ts`. *DoD:* tautan benar di ponsel dan desktop.
-- [ ] **T-045 (HR)** Halaman `/koleksi`, `/tentang`, `/sumber`. *DoD:* semua data tampil.
+- [x] **T-040 (HR)** State machine alur (SDD §6) + persist progres. *DoD:* transisi benar; uji unit hijau. `flow/machine.ts` + 7 uji; progres per kota di `lib/store.ts` (v2).
+- [x] **T-041 (HR)** `QuizCard` + hasil + saran materi. *DoD:* 5 soal berjalan; penjelasan muncul setelah menjawab; skor tersimpan. Teks soal masih `[PERLU DIISI]` (T-033) dan tampil sebagai placeholder.
+- [x] **T-042 (HR)** `LessonCard` (narasi, fakta, gambar, sumber, "Tanya agen", "Lihat lokasi asli"). *DoD:* 3 materi dapat dilewati.
+- [x] **T-043 (HR)** `AgentPanel`: skrip per fase + tanya bebas + sitasi + penolakan + penanganan 429/503. *DoD:* percakapan 3 giliran; AI mati → skrip tetap jalan. Diuji: sitasi, konteks materi, fallback 503. Jawaban LLM nyata belum diuji (butuh kunci Gemini, T-004).
+- [x] **T-044 (HR)** `LocationButton` + `mapLinks.ts`. *DoD:* tautan benar di ponsel dan desktop. Tautan diuji unit; koordinat situs belum ada (T-034), jadi tombol menampilkan "Koordinat sedang diverifikasi".
+- [x] **T-045 (HR)** Halaman `/koleksi`, `/tentang`, `/sumber`. *DoD:* semua data tampil.
 
 ## Fase 3 — Game runner (Hari-2 sore – Hari-3)
 
-- [ ] **T-050 (HR)** Engine kanvas: loop, gravitasi, lompat, kolisi, spawner, skor, kecepatan bertahap (SDD §7). *DoD:* dapat dimainkan di ponsel ≥30 fps **[ukur]**; spawner tidak menghasilkan rintangan mustahil.
-- [ ] **T-051 (HR)** Mekanik unlock tiap `unlock_every`: pause → `ItemModal` → hitung mundur → resume. *DoD:* satu kali per ambang; skor tidak berubah saat resume; uji unit hijau.
-- [ ] **T-052 (HR)** Layar game over + ringkasan + koleksi + main lagi + lokasi asli. *DoD:* alur penuh kuis → materi → game → ringkasan selesai.
-- [ ] **T-053 (HR)** Jeda otomatis (tab tidak aktif), tombol jeda, kurangi gerak. *DoD:* terverifikasi manual.
+- [ ] **T-050 (HR)** Engine kanvas: loop, gravitasi, lompat, kolisi, spawner, skor, kecepatan bertahap (SDD §7). *DoD:* dapat dimainkan di ponsel ≥30 fps **[ukur]**; spawner tidak menghasilkan rintangan mustahil. *Status:* Logika dan uji selesai (bot 2 menit tanpa tabrakan); **fps di ponsel nyata belum diukur**, gambar masih vektor placeholder (T-054).
+- [x] **T-051 (HR)** Mekanik unlock tiap `unlock_every`: pause → `ItemModal` → hitung mundur → resume. *DoD:* satu kali per ambang; skor tidak berubah saat resume; uji unit hijau.
+- [x] **T-052 (HR)** Layar game over + ringkasan + koleksi + main lagi + lokasi asli. *DoD:* alur penuh kuis → materi → game → ringkasan selesai.
+- [ ] **T-053 (HR)** Jeda otomatis (tab tidak aktif), tombol jeda, kurangi gerak. *DoD:* terverifikasi manual. *Status:* Diterapkan (visibilitychange/blur, tombol Jeda/P, reduced-motion ×0,75); **verifikasi manual di ponsel nyata belum**.
 - [ ] **T-054 (HW+KH)** Aset visual: karakter pelari (orisinal), latar Bandung, 3 rintangan, gambar item, maskot 3 ekspresi. *DoD:* semua orisinal atau berlisensi jelas; dicatat di `sources.yaml`; rintangan disetujui KH.
-- [ ] **T-055 (HR)** Parameter `?debug=1` (non-produksi) untuk mempercepat skor saat uji. *DoD:* item mudah diuji.
+- [x] **T-055 (HR)** Parameter `?debug=1` (non-produksi) untuk mempercepat skor saat uji. *DoD:* item mudah diuji. `?debug=1` → skor ×10, hanya di `npm run dev` (atau `VITE_ALLOW_DEBUG=true`).
 
 ## Fase 4 — Kualitas dan deploy (Hari-4)
 

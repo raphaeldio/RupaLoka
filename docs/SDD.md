@@ -349,6 +349,10 @@ Sediakan parameter uji `?debug=1` (hanya non-produksi) untuk mempercepat skor ag
 | 11 | Vercel (frontend) + Render (API) | Pilihan tim; tanpa mengelola VPS | Cold start Render gratis; konten ikut deploy API |
 | 12 | Supabase hanya untuk data runtime | Konten tetap tervalidasi di git; DB baru dibutuhkan untuk log, analitik, akun | Tabel ditambah bertahap; progres MVP-0 tetap lokal |
 | 13 | Gemini (`google-genai`) sebagai LLM | Keputusan tim | Antarmuka `LLM` kecil di `app/llm.py` sehingga penyedia dapat diganti; perilaku (sitasi, penolakan) dievaluasi ulang di T-062 |
+| 14 | Mesin alur = reducer murni (`frontend/src/flow/machine.ts`), bukan XState | Kecil, mudah diuji, tanpa dependensi | Progres (`FlowState`) disimpan apa adanya di localStorage; direset bila jumlah soal berubah |
+| 15 | Engine game murni (`game/engine.ts`) dengan sub-langkah 1/120 dtk dan RNG berbenih | Kolisi, spawner, unlock dapat diuji deterministik; uji bot membuktikan tak ada rintangan mustahil | Ukuran rintangan per id di `OBSTACLE_SPECS`; id baru memakai ukuran bawaan sampai ditambahkan |
+| 16 | Layar sempit menampilkan bagian kiri dunia (540/680 dari 800 px) | Kanvas 8:3 terlalu pendek di 360 px | Pandangan ke depan ≥0,8 dtk pada kecepatan maks.; modal item tampil di bawah kanvas di ponsel |
+| 17 | `SourceRef` menyertakan `lesson_id` | Saran materi F-022 (soal salah → chunk → materi) tanpa menebak dari id chunk | Tipe TS dibuat ulang |
 
 ## 17. Risiko teknis
 
