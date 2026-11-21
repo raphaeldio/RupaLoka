@@ -33,7 +33,7 @@ services:
       - key: GLOBAL_RATE_LIMIT_PER_MIN
         value: "120"                # semua IP; pengaman kuota Gemini (T-064)
       - key: TRUSTED_PROXY_HOPS
-        value: "2"                  # Vercel -> Render; verifikasi setelah deploy (SDD §12)
+        value: "2"                  # > 0 = di belakang proxy; IP dari CF-Connecting-IP / Vercel (SDD ADR 33)
       - key: ENABLE_DOCS
         value: "false"              # matikan /docs di produksi
       - key: MASCOT_NAME

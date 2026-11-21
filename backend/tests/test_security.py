@@ -54,6 +54,38 @@ def test_client_ip_reads_from_the_right(xff: str | None, hops: int, expected: st
     assert client_ip(make_request(xff), hops) == expected
 
 
+def proxied(xff: str, cf: str, vercel: str | None = None) -> Request:
+    headers = [(b"x-forwarded-for", xff.encode()), (b"cf-connecting-ip", cf.encode())]
+    if vercel is not None:
+        headers.append((b"x-vercel-forwarded-for", vercel.encode()))
+    return Request({"type": "http", "headers": headers, "client": ("10.0.0.9", 1234)})
+
+
+# Bentuk rantai produksi yang diukur 21 Nov 2026 (alamat contoh). Server Vercel (V*) dan
+# edge Cloudflare (C*) berganti tiap permintaan; klien/pengunjung harus tetap sama.
+@pytest.mark.parametrize(
+    ("req", "expected"),
+    [
+        # Lewat Vercel: [pengunjung, server Vercel, edge Cloudflare, internal Render]
+        (proxied("1.2.3.4, 5.5.5.1, 6.6.6.1, 10.1.0.2", "5.5.5.1", "1.2.3.4"), "1.2.3.4"),
+        (proxied("1.2.3.4, 5.5.5.2, 6.6.6.2, 10.1.0.2", "5.5.5.2", "1.2.3.4"), "1.2.3.4"),
+        # Langsung ke Render: [klien, edge Cloudflare, internal Render]
+        (proxied("8.8.4.4, 6.6.6.1, 10.1.0.2", "8.8.4.4"), "8.8.4.4"),
+        (proxied("8.8.4.4, 6.6.6.3, 10.1.0.2", "8.8.4.4"), "8.8.4.4"),
+        # Langsung + entri kiri palsu tanpa header Vercel: tetap IP Cloudflare
+        (proxied("9.9.9.9, 8.8.4.4, 6.6.6.1, 10.1.0.2", "8.8.4.4"), "8.8.4.4"),
+        # Header Vercel palsu yang tidak cocok dengan bentuk rantai: diabaikan
+        (proxied("8.8.4.4, 6.6.6.1, 10.1.0.2", "8.8.4.4", "9.9.9.9"), "8.8.4.4"),
+    ],
+)
+def test_client_ip_behind_vercel_and_cloudflare(req: Request, expected: str) -> None:
+    assert client_ip(req, 2) == expected
+
+
+def test_client_ip_ignores_cloudflare_header_without_trusted_proxy() -> None:
+    assert client_ip(proxied("1.2.3.4", "1.2.3.4"), 0) == "10.0.0.9"
+
+
 @pytest.mark.parametrize(
     ("hops", "xff"),
     [(0, "9.9.9.{i}"), (1, "9.9.9.{i}, 203.0.113.5"), (2, "9.9.9.{i}, 203.0.113.5, 76.76.21.1")],
@@ -171,22 +203,20 @@ def test_scan_missing_target(tmp_path: Path) -> None:
     assert check_main([str(tmp_path / "tidak-ada")]) == 2
 
 
-def test_debug_client_chain_reveals_no_ip_addresses(make_content: Any) -> None:
-    from fastapi.testclient import TestClient
-
-    from app.config import Settings
-    from app.main import create_app
-
-    app = create_app(Settings(content_dir=make_content(), trusted_proxy_hops=2), llm=None)
-    with TestClient(app) as c:
-        r = c.get(
-            "/api/debug/client-chain",
-            headers={"X-Forwarded-For": "1.2.3.4, 10.0.0.5", "X-Real-IP": "1.2.3.4"},
-        )
-    body = r.json()
-    assert r.status_code == 200
-    assert body["xff_count"] == 2
-    assert body["xff_private"] == [False, True]
-    assert body["other_headers"]["x-real-ip"]["xff_index"] == 0
-    assert body["derived_tag"] == body["xff_tags"][0]
-    assert "1.2.3.4" not in r.text and "10.0.0.5" not in r.text
+def test_rate_limit_holds_when_vercel_and_cloudflare_servers_rotate(make_content: Any) -> None:
+    """Pola produksi: pengunjung sama, server Vercel dan edge Cloudflare berganti."""
+    body = {"city_id": "kota-uji", "message": OUT_OF_SCOPE}
+    with client_for(make_content(), rate_limit_per_min=2, trusted_proxy_hops=2) as c:
+        codes = [
+            c.post(
+                "/api/chat",
+                json=body,
+                headers={
+                    "X-Forwarded-For": f"1.2.3.4, 5.5.5.{i}, 6.6.6.{i}, 10.1.0.2",
+                    "CF-Connecting-IP": f"5.5.5.{i}",
+                    "X-Vercel-Forwarded-For": "1.2.3.4",
+                },
+            ).status_code
+            for i in range(1, 4)
+        ]
+    assert codes == [200, 200, 429]

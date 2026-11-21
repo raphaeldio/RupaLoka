@@ -2,9 +2,6 @@
 
 from __future__ import annotations
 
-import hashlib
-import ipaddress
-import secrets
 from collections.abc import Awaitable, Callable
 
 from fastapi import Request, Response
@@ -24,71 +21,43 @@ SECURITY_HEADERS: dict[str, str] = {
 HSTS = "max-age=31536000; includeSubDomains"
 
 
-def client_ip(request: Request, trusted_hops: int = 0) -> str:
-    """IP klien dari X-Forwarded-For, dibaca dari kanan.
+def _first(value: str | None) -> str:
+    return value.split(",")[0].strip() if value else ""
 
-    Entri di kiri dapat diisi bebas oleh klien, jadi entri pertama tidak boleh dipercaya.
-    Setiap proxy tepercaya menambahkan satu entri di kanan; dengan `trusted_hops` proxy,
-    IP klien adalah entri ke-`trusted_hops` dari kanan. Bila entri lebih sedikit (mis.
-    proxy terdekat tidak menambahkan entri), pakai entri paling kiri yang tersedia.
-    Dengan `trusted_hops` 0 header diabaikan: tanpa proxy, seluruh isinya dari klien.
+
+def client_ip(request: Request, trusted_hops: int = 0) -> str:
+    """IP klien untuk batas laju.
+
+    Produksi (Vercel → Cloudflare → Render, diukur 21 Nov 2026): rantai X-Forwarded-For lewat
+    Vercel = [pengunjung, server Vercel, edge Cloudflare, internal Render], langsung ke Render =
+    [klien, edge Cloudflare, internal Render]. Server Vercel dan edge Cloudflare berganti tiap
+    permintaan, jadi jumlah hop tetap tidak pernah menunjuk klien yang sama.
+
+    Dengan `trusted_hops` > 0 (di belakang proxy) dan header `CF-Connecting-IP` ada:
+    - `CF-Connecting-IP` = mesin yang terhubung ke Cloudflare; tidak dapat dipalsukan
+      (Cloudflare menolak permintaan yang mengirimnya sendiri).
+    - Bila mesin itu server Vercel, pengunjung asli = entri tepat di kiri `CF-Connecting-IP`
+      dan sama dengan `X-Vercel-Forwarded-For` (Vercel menimpa header ini). Bentuk ini dapat
+      ditiru oleh pemanggil yang langsung ke Render; untuk kasus itu batas global tetap berlaku.
+    - Selain itu, pakai `CF-Connecting-IP`.
+    Tanpa header Cloudflare: entri ke-`trusted_hops` dari kanan X-Forwarded-For (entri kiri
+    dapat diisi klien). Dengan `trusted_hops` 0 semua header diabaikan (tanpa proxy).
     """
     socket_ip = request.client.host if request.client else "unknown"
     if trusted_hops <= 0:
         return socket_ip
     hops = [h.strip() for h in request.headers.get("x-forwarded-for", "").split(",") if h.strip()]
+    cf = _first(request.headers.get("cf-connecting-ip"))
+    if cf:
+        vercel = _first(request.headers.get("x-vercel-forwarded-for"))
+        if vercel and cf in hops:
+            i = hops.index(cf)
+            if i >= 1 and hops[i - 1] == vercel:
+                return vercel
+        return cf
     if hops:
         return hops[max(0, len(hops) - trusted_hops)]
     return socket_ip
-
-
-# --- diagnostik rantai proxy (SEMENTARA, 21 Nov 2026) -------------------------
-# Batas laju per IP tidak pernah aktif di produksi: entri X-Forwarded-For yang dipilih
-# `trusted_hops` berubah tiap permintaan. Endpoint diagnostik memakai fungsi ini untuk
-# melihat BENTUK rantai tanpa membuka alamat IP: tiap entri hanya diwakili hash bergaram
-# (garam acak per proses, tidak pernah dikirim) dan tanda privat/publik. Hapus setelah
-# TRUSTED_PROXY_HOPS / cara membaca IP diperbaiki.
-_DIAG_SALT = secrets.token_bytes(16)
-_DIAG_HEADERS = ("cf-connecting-ip", "true-client-ip", "x-real-ip", "x-vercel-forwarded-for")
-
-
-def _tag(value: str) -> str:
-    return hashlib.sha256(_DIAG_SALT + value.encode()).hexdigest()[:8]
-
-
-def _is_private(value: str) -> bool | None:
-    try:
-        return ipaddress.ip_address(value).is_private
-    except ValueError:
-        return None
-
-
-def describe_client_chain(request: Request, trusted_hops: int) -> dict[str, object]:
-    """Bentuk rantai proxy tanpa alamat IP (lihat catatan di atas)."""
-    hops = [h.strip() for h in request.headers.get("x-forwarded-for", "").split(",") if h.strip()]
-    tags = [_tag(h) for h in hops]
-    socket_ip = request.client.host if request.client else ""
-    derived = client_ip(request, trusted_hops)
-    other: dict[str, object] = {}
-    for name in _DIAG_HEADERS:
-        raw = request.headers.get(name)
-        if raw is None:
-            continue
-        first = raw.split(",")[0].strip()
-        other[name] = {
-            "tag": _tag(first),
-            "xff_index": tags.index(_tag(first)) if _tag(first) in tags else None,
-        }
-    return {
-        "trusted_hops": trusted_hops,
-        "xff_count": len(hops),
-        "xff_tags": tags,
-        "xff_private": [_is_private(h) for h in hops],
-        "socket_tag": _tag(socket_ip),
-        "socket_private": _is_private(socket_ip),
-        "derived_tag": _tag(derived),
-        "other_headers": other,
-    }
 
 
 def is_https(request: Request) -> bool:
