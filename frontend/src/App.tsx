@@ -13,6 +13,7 @@ const GamePage = lazy(() => import('./pages/city/GamePage'))
 const CollectionPage = lazy(() => import('./pages/CollectionPage'))
 const AboutPage = lazy(() => import('./pages/AboutPage'))
 const SourcesPage = lazy(() => import('./pages/SourcesPage'))
+const SubscriptionPage = lazy(() => import('./pages/SubscriptionPage'))
 
 const loading = (
   <main id="konten" className="mx-auto max-w-2xl px-4 py-20 text-center" aria-busy="true">
@@ -36,6 +37,7 @@ export default function App() {
             <Route path="/koleksi" element={<CollectionPage />} />
             <Route path="/tentang" element={<AboutPage />} />
             <Route path="/sumber" element={<SourcesPage />} />
+            <Route path="/langganan" element={<SubscriptionPage />} />
             <Route path="*" element={<PlaceholderPage title="Halaman tidak ditemukan" task="404" />} />
           </Routes>
         </Suspense>

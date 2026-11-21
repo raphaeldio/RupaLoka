@@ -29,6 +29,7 @@ import {
 import { useCityProgress, useProgress } from '../../lib/store'
 import { Bamboo, BatikCorner, BatikEdge, DancerFinale, NodeScene, PlantScene } from './pathScene'
 import { featureFlags } from '../../lib/flags'
+import ModeSwitch from '../../components/ModeSwitch'
 import { useCity } from './useCity'
 
 /** Geser horizontal titik (px) agar path berkelok; pola berulang. */
@@ -265,6 +266,11 @@ export default function PathPage() {
                 />
               </p>
             </section>
+          </div>
+
+          {/* Pilihan mode tampilan: 2D (sekarang) atau 3D (khusus pelanggan → halaman langganan) */}
+          <div className="mt-5 flex justify-center">
+            <ModeSwitch />
           </div>
 
           {/* Path */}
