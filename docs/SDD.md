@@ -44,7 +44,7 @@ Keputusan kunci: SPA statis di Vercel + API tipis di Render. **Konten tetap berk
 | State | Zustand + `persist` (localStorage) | Progres, koleksi, rekor |
 | Routing | React Router | — |
 | Backend | FastAPI + Pydantic v2 | — |
-| Retrieval | BM25 ditulis sendiri (`app/retrieval.py`, IDF gaya Lucene) | Bukan `rank_bm25`: IDF `BM25Okapi` bisa negatif pada korpus kecil dan mengacaukan `MIN_SCORE`. Embedding menyusul bila evaluasi memerlukan |
+| Retrieval | BM25 ditulis sendiri (`app/retrieval.py`, IDF gaya Lucene) + stemmer Sastrawi dan normalisasi kata gaul | Bukan `rank_bm25`: IDF `BM25Okapi` bisa negatif pada korpus kecil dan mengacaukan `MIN_SCORE`. Embedding menyusul bila evaluasi memerlukan |
 | LLM | Gemini API lewat SDK `google-genai`; model dari env `GEMINI_MODEL` (default `gemini-3.5-flash-lite`) | Kunci hanya di server; diganti dari Anthropic atas keputusan tim (ADR #13) |
 | Deploy | Frontend: Vercel. API: Render (`render.yaml`, Python 3.11) | Domain **[PERLU DIISI]**; Render paket gratis tidur saat idle (lihat §15) |
 | Basis data | Supabase (Postgres) untuk data runtime | Bukan untuk konten; akses hanya dari backend dengan service role key |
@@ -249,7 +249,7 @@ Respons: `{ "answer": "... [1]", "grounded": true, "citations": [{"chunk_id":"..
 
 1. Praproses: huruf kecil, buang aksen, buang kata henti/kata tanya bahasa Indonesia, pemotongan ringan (-lah, -kah, -pun, -nya), token unik, maks. 500 karakter / 64 token.
 2. BM25 (k1=1,5, b=0,75) pada chunk kota yang sama; teks yang diindeks = teks chunk + judul materinya. Boost perkalian ×1,5 untuk chunk dari `lesson_id` aktif (hanya mengubah urutan; chunk tanpa kecocokan tidak pernah ikut); top-k=4.
-3. **Gerbang skor:** `raw_score` teratas (sebelum boost) < `MIN_SCORE` → tolak (`out_of_scope`) tanpa memanggil LLM.
+3. **Gerbang skor (dua jalur, 21 Nov 2026):** tolak (`out_of_scope`) tanpa memanggil LLM, kecuali ada kecocokan DAN (kueri menyebut istilah topik = kata dari judul materi kota, ATAU `raw_score` teratas sebelum boost ≥ `MIN_SCORE`). `passes_gate` di `app/retrieval.py`; dipakai juga oleh `eval_rag.py`.
 4. Generasi: konteks `[chunk_id] teks` + aturan; maks 120 kata, bahasa ramah pelajar.
 5. **Validasi pasca-jawaban:** wajib ada sitasi; `chunk_id` harus ada di konteks; sitasi tak valid dibuang; tanpa sitasi valid → penolakan.
 6. Format: ubah penanda menjadi `citations`.
@@ -272,7 +272,11 @@ Latar: uji awal chatbot museum berbasis LLM (studi pilot kecil) menemukan penyim
 - Jenis luar cakupan (`kind`): `off_topic` dan `other_region` wajib ditolak **di gerbang** (tanpa LLM); `near_miss` (topik Bandung yang ada, tetapi hal yang tidak ada di chunk, mis. harga tiket) dan `injection` wajar lolos gerbang dan harus ditolak atau dijinakkan oleh LLM. `expect: no_leak` dan `must_not_contain` memeriksa kebocoran prompt sistem dan klaim palsu.
 - Tahap retrieval (tanpa biaya) selalu jalan: recall@k, persen lolos/ditolak gerbang, `suggested_questions` materi wajib lolos gerbang (saran pada penolakan tidak boleh ikut ditolak), dan sapuan ambang `MIN_SCORE`. Bila `in_scope.yaml` kosong, sapuan memakai `suggested_questions` sebagai dasar sementara.
 - Tahap LLM (`--llm`, perlu `GEMINI_API_KEY`): persen dijawab bersitasi, persen mengutip chunk yang diharapkan, persen penolakan benar, dan pelanggaran (jawaban tanpa sitasi, prompt bocor, frasa terlarang). Kode keluar 1 bila ada pelanggaran. `--json` menyimpan laporan lengkap.
-- Kalibrasi `MIN_SCORE` hanya sah setelah chunk T-031 terisi: di mode pengembangan chunk penanda `[PERLU DIISI]` ikut terindeks (judul materi ikut diindeks per chunk), sehingga skor belum mewakili rilis.
+- Chunk penanda (`[PERLU DIISI]`, `TODO`) **tidak diindeks** (21 Nov 2026): tidak berisi fakta dan sebelumnya meloloskan kata seperti "perlu" di gerbang.
+- `--strict`: keluar 1 bila gerbang salah memilah pada `MIN_SCORE` (dalam cakupan/saran ditolak, atau `off_topic`/`other_region` lolos). Uji `test_repo_gate_separates_at_default_min_score` menjalankan pemeriksaan yang sama pada konten repo, sehingga perubahan chunk yang menggeser IDF memaksa kalibrasi ulang.
+- Tokenisasi (21 Nov 2026): huruf kecil → kata gaul obrolan diganti bentuk baku (`SLANG`, mis. gmn, yg, brp, ultah, bikin; partikel sih/dong/tuh dibuang) → stem ke kata dasar dengan Sastrawi (kamus kata dasar, MIT). Bentuk obrolan "-in" dan "nge-/ng-" dicoba sebagai "-kan" dan "me-/meng-" hanya bila kata aslinya tidak dikenali kamus. Chunk dan pertanyaan memakai tokenisasi yang sama.
+- Kalibrasi 21 Nov 2026, 41 chunk, set 40 soal (30 + 10 bahasa santai) (`MIN_SCORE` = 5.45, ambang jalur skor): sapuan hanya memakai kueri tanpa istilah topik. Luar cakupan tertinggi 4.999, dalam cakupan/saran terendah 5.892; recall@4 40/40. Kalibrasi ulang setiap chunk bertambah dan setelah KH meninjau set evaluasi.
+- `near_miss` (disetujui tim 21 Nov 2026): dinilai benar bila ditolak penuh ATAU dijawab parsial (mengaku belum punya info yang ditanya + fakta terkait bersitasi). Luar topik dan injeksi tetap harus ditolak penuh.
 
 ## 10. Frontend
 
@@ -301,7 +305,7 @@ Tab baru, `rel="noopener noreferrer"`; tampilkan alamat teks sebagai cadangan.
 
 ## 11. Fitur berbayar dan mitra (desain kesiapan)
 
-- `feature_flags` (`lib/flags.ts`, dari konfigurasi): `viewer3d`, `class_mode`, `premium_content` = `false` pada MVP-0.
+- `feature_flags` (`lib/flags.ts`, dari konfigurasi): `viewer3d`, `class_mode`, `premium_content` = `false` pada MVP-0. `strict_node_requirements` = `false` pada MVP (keputusan tim 21 Nov 2026): syarat titik selesai (kedua kuis dijawab semua + video ditonton 3 menit pertama, ADR 28) disembunyikan; titik selesai walau kuis/video dilewati. Kode syarat tetap ada dan diuji dengan flag aktif.
 - Konten berlabel `tier: free|premium` di YAML (default `free`) agar paket berlangganan dapat ditambahkan tanpa migrasi struktur.
 - Penampil 3D (P2): `@react-three/fiber` + GLB (Draco/Meshopt, ≤3 MB/objek), dimuat lambat hanya bila flag aktif. Sumber model: pindai sendiri (dengan izin lokasi) atau model berlisensi CC0/CC-BY dengan atribusi.
 - Autentikasi, pembayaran, dan mode kelas (akun guru, tautan kelas, laporan) memerlukan backend tambahan (DB + auth). **Bukan bagian MVP-0**; rancang pada MVP-1.
@@ -380,7 +384,9 @@ Sediakan parameter uji `?debug=1` (hanya non-produksi) untuk mempercepat skor ag
 | 26 | Item game tiap 100 m (`unlock_every` dalam meter), ditandai pertemuan NPC | Permintaan tim 20 Nov 2026 | Setara 1000 poin; ±35 dtk ke item pertama; rintangan ditunda di sekitar titik temu; `?debug=1` mempercepat ×10 |
 | 18 | IP klien dari kanan `X-Forwarded-For` (`TRUSTED_PROXY_HOPS`) + batas laju global | Entri kiri dapat dipalsukan sehingga batas per IP bisa diakali | Jumlah hop harus cocok dengan rantai proxy; diverifikasi setelah deploy (§12) |
 | 19 | Papan peringkat akhir tur kota (21 Nov 2026) di Supabase, tanpa akun | Tim ingin kompetisi "Si Paling Bandung"; akun masih P2 | Identitas = UUID acak di `localStorage` + nama panggilan (disaring). Skor dari klien tidak bisa dibuktikan; dibatasi poin maksimum kota + batas laju. Tabel/fungsi: `supabase/migrations/20261121000000_leaderboard.sql` + `…000100_leaderboard_tiebreak.sql` (seri: achieved_at lalu player_id), diterapkan ke proyek Supabase `rupaloka` (ap-southeast-1) 21 Nov 2026; tanpa env Supabase memakai memori (hanya pengembangan) |
-
-## 17. Risiko teknis
-
-Lihat PRD §13. Tambahan: performa kanvas di ponsel lama (sprite kecil, kurangi gerak), kalibrasi kecepatan dan jarak rintangan agar adil, ambang `MIN_SCORE` salah kalibrasi (evaluasi sebelum demo), penyimpanan lokal dibersihkan peramban (tampilkan pemberitahuan).
+| 27 | Skor game terbaik ikut dijumlahkan ke poin kota, dibatasi `rewards.game_score_cap` (Bandung 3000 = skor saat item ke-3) | Permintaan tim 21 Nov 2026: skor game terakumulasi dengan poin materi | `max_points` papan peringkat = poin materi/kuis/bonus game + batas skor game; `lib/rewards.ts` `gamePoints`/`maxCityPoints` dan `backend/app/leaderboard.py` harus sejalan |
+| 28 | Titik selesai hanya bila kuis awal & akhir dijawab semua dan 3 menit pertama video materi ditonton | Permintaan tim 21 Nov 2026; materi dan kuis boleh dilewati tapi tanpa poin dan path tidak maju | Waktu tonton diukur lewat YouTube IFrame API (`lib/ytApi.ts`, detik yang dilompati tidak dihitung, `lib/watch.ts`); bila API gagal dimuat, cadangan menghitung waktu selama sematan terbuka dan tab terlihat (lebih mudah diakali) |
+| 29 | Gerbang tetap satu ambang `raw_score` (2.47) + chunk penanda tidak diindeks; syarat "cakupan kueri" ditolak | Uji coba 21 Nov 2026: rasio IDF kueri yang tercakup chunk tidak memisahkan pertanyaan sah ("Dari bahan apa angklung dibuat?" 0.19) dari luar topik ("persamaan kuadrat" 0.19); ambang mentah memisahkan sempurna setelah chunk penanda dikeluarkan | Margin tipis (2.432 vs 2.510); dijaga `eval_rag.py --strict` dan uji repo. Embedding/reranker dipertimbangkan bila konten bertambah dan jendela menutup |
+| 30 | Penanda sumber pada kalimat penolakan LLM dibuang sebelum validasi sitasi (`drop_refusal_citations`, `REFUSAL_PATTERN` di `app/chat.py`) | Eval LLM 21 Nov 2026: 4/18 kasus luar cakupan lolos sebagai jawaban bersumber karena Gemini menulis "belum punya informasi … [id]" | Memperketat (bukan melonggarkan) validasi; jawaban parsial tetap boleh (kalimat fakta bersitasi dipertahankan). Pola penolakan berbasis frasa: penolakan dengan kata lain bisa lolos, dipantau lewat eval |
+| 31 | Gerbang dua jalur: istilah topik (judul materi) ATAU `raw_score` ≥ `MIN_SCORE` (4.6); menggantikan ambang tunggal ADR 29 | Setelah chunk bertambah jadi 41 (21 Nov 2026) ambang tunggal tidak lagi memisahkan: "Apa itu angklung?" turun ke 2.08 (IDF "angklung" rendah), luar topik naik ke 3.31 lewat satu kata umum. Disetujui tim 21 Nov 2026 | Pertanyaan apa pun yang menyebut istilah topik (mis. "bandung", "angklung") selalu sampai ke LLM; keamanan bergantung pada aturan prompt + validasi sitasi + penolakan (ADR 30). Istilah topik diturunkan otomatis dari judul materi (termasuk kata lemah seperti "pengenalan") |
+| 32 | Stemmer Sastrawi (1.0.1, MIT) + peta kata gaul pada tokenisasi BM25 | Permintaan tim 21 Nov 2026: pertanyaan berbahasa santai harus bisa dijawab; tanpa stem, "dimainin/bikinnya/ngelatih" tidak cocok dengan "dimainkan/dibuat/melatih" (recall 36/40 → 40/40) | Dependensi baru, rilis terakhir 2016 tetapi murni Python dan berkamus. Stem membuat kata umum lebih sering cocok ("bersama"/"persamaan" → "sama"), jendela ambang menyempit ke 4.999–5.892; `MIN_SCORE` 5.45. Peta kata gaul ditulis tangan dan perlu dirawat |
