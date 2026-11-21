@@ -4,6 +4,9 @@ import {
   earnedBadges,
   emptyPath,
   GAME_NODE,
+  gamePoints,
+  lessonPoints,
+  maxCityPoints,
   maxPathPoints,
   newBadges,
   nextBadge,
@@ -17,6 +20,7 @@ const rewards: Rewards = {
   points_per_node: 100,
   points_per_correct: 10,
   game_node_points: 100,
+  game_score_cap: 1000,
   leaderboard: null,
   badges: [badge('a', 100), badge('b', 300), badge('c', 500)],
 }
@@ -46,6 +50,18 @@ describe('poin dan lencana', () => {
     // id materi usang tidak dihitung
     expect(pathPoints(lessons, { completed: ['lama'], correct: { lama: 5 }, gameDone: false }, rewards)).toBe(0)
     expect(maxPathPoints(lessons, 5, rewards)).toBe(450)
+  })
+
+  it('skor game terbaik ikut dijumlahkan setelah game selesai', () => {
+    const p = { completed: lessons, correct: { l1: 2 }, gameDone: true, best: 337 }
+    expect(lessonPoints(lessons, p, rewards)).toBe(420)
+    expect(gamePoints(p, rewards)).toBe(337)
+    // Dibatasi game_score_cap agar batas papan peringkat tetap berlaku.
+    expect(gamePoints({ ...p, best: 5000 }, rewards)).toBe(1000)
+    expect(maxCityPoints(lessons, 5, rewards)).toBe(1450)
+    expect(pathPoints(lessons, p, rewards)).toBe(757)
+    // Skor tersimpan tapi game belum tamat → belum dihitung.
+    expect(gamePoints({ ...p, gameDone: false }, rewards)).toBe(0)
   })
 
   it('lencana didapat, berikutnya, dan yang baru', () => {

@@ -8,12 +8,22 @@ import CountUp from '../../components/reactbits/CountUp'
 import { celebrateBadges } from '../../lib/celebrate'
 import { QuizCard } from '../../components/QuizCard'
 import { Button, Card } from '../../components/primitives'
-import { initialNode, nodeReducer, postQuestionsFor, questionsFor, quizScore, type NodeStage } from '../../flow/machine'
+import {
+  initialNode,
+  missingParts,
+  nodeComplete,
+  nodeReducer,
+  postQuestionsFor,
+  questionsFor,
+  quizScore,
+  type NodeStage,
+} from '../../flow/machine'
 import { useAgent } from '../../lib/agentStore'
 import type { Badge } from '../../lib/api.types'
 import { labelOr } from '../../lib/cities'
 import { GAME_NODE, newBadges, nextNode, pathNodes, pathPoints } from '../../lib/rewards'
 import { useCityProgress, useProgress } from '../../lib/store'
+import { featureFlags } from '../../lib/flags'
 import { useCity } from './useCity'
 
 function Steps({ stage, hasQuiz, hasPost }: { stage: NodeStage; hasQuiz: boolean; hasPost: boolean }) {
@@ -65,7 +75,7 @@ function NodePage() {
   const reducer = useMemo(() => nodeReducer(questions.length, postQuestions.length), [questions.length, postQuestions.length])
   const [state, dispatch] = useReducer(reducer, undefined, () => initialNode(questions.length, postQuestions.length))
 
-  const [result, setResult] = useState<{ before: number; after: number; badges: Badge[] } | null>(null)
+  const [result, setResult] = useState<{ before: number; after: number; badges: Badge[]; complete: boolean } | null>(null)
   const preCorrect = quizScore(questions, state.answers)
   const postCorrect = quizScore(postQuestions, state.postAnswers)
   // Poin jawaban benar memakai hasil terbaik dari kuis awal dan akhir, dibatasi jumlah soal titik ini
@@ -83,10 +93,16 @@ function NodePage() {
     if (!lesson) return
     const p = useProgress.getState().cities[cityId] ?? progress
     const before = pathPoints(lessonIds, p, detail.rewards)
+    // Syarat ketat (flag, mati di MVP): kuis/materi dilewati → titik tidak selesai, tanpa poin.
+    const complete = featureFlags.strict_node_requirements ? nodeComplete(state) : true
+    if (!complete) {
+      setResult({ before, after: before, badges: [], complete })
+      return
+    }
     completeNode(cityId, lesson.id, correct)
     const after = pathPoints(lessonIds, useProgress.getState().cities[cityId] ?? p, detail.rewards)
     const badges = newBadges(before, after, detail.rewards.badges)
-    setResult({ before, after, badges })
+    setResult({ before, after, badges, complete })
     celebrateBadges(badges)
   }
 
@@ -143,9 +159,45 @@ function NodePage() {
         eyebrow={`Titik ${position} · Materi`}
         sources={detail.sources}
         onAsk={(q) => ask(q, lesson.id)}
-        onFinish={() => dispatch({ type: 'FINISH_LESSON' })}
+        onFinish={(watched) => dispatch({ type: 'FINISH_LESSON', watched })}
         finishLabel={postQuestions.length > 0 ? 'Lanjut ke kuis akhir' : 'Selesaikan titik'}
       />
+    )
+  } else if (result && !result.complete) {
+    const alreadyDone = progress.completed.includes(lesson.id)
+    body = (
+      <Card className="text-center">
+        <p className="text-xs font-extrabold uppercase tracking-[1.6px] text-redup">Titik {position} belum selesai</p>
+        <h2 className="mt-1 text-2xl font-extrabold text-teal">{title}</h2>
+        <p className="mt-3 text-sm text-redup">
+          Kamu melewati sebagian titik ini, jadi belum ada poin{alreadyDone ? ' baru' : ''} dan path belum bisa dilanjutkan
+          {alreadyDone ? ' dari percobaan ini' : ''}. Lengkapi dulu:
+        </p>
+        <ul className="mx-auto mt-3 grid max-w-sm gap-2 text-left text-sm">
+          {missingParts(state).map((m) => (
+            <li key={m} className="flex items-start gap-2 rounded-2xl bg-kertas p-3 font-semibold">
+              <span aria-hidden="true" className="text-amber">
+                ●
+              </span>
+              {m}
+            </li>
+          ))}
+        </ul>
+        <div className="mt-6 flex flex-wrap justify-center gap-2">
+          <Button variant="secondary" onClick={() => navigate(`/kota/${cityId}`)}>
+            Kembali ke path
+          </Button>
+          <Button
+            autoFocus
+            onClick={() => {
+              setResult(null)
+              dispatch({ type: 'RESET' })
+            }}
+          >
+            Ulangi titik ini
+          </Button>
+        </div>
+      </Card>
     )
   } else {
     const r = result

@@ -185,12 +185,14 @@ export interface QuizQuestion {
 /**
  * Poin path belajar (titik = materi, titik terakhir = game) dan lencana.
  * Poin kota = titik materi selesai × points_per_node + jawaban kuis benar ×
- * points_per_correct + (game_node_points bila game sudah dimainkan sekali).
+ * points_per_correct + (game_node_points bila game sudah dimainkan sekali) +
+ * skor game terbaik, dibatasi game_score_cap (agar batas papan peringkat tetap ada).
  */
 export interface Rewards {
   points_per_node: number
   points_per_correct: number
   game_node_points: number
+  game_score_cap: number
   badges: Badge[]
   leaderboard: LeaderboardConfig | null
 }

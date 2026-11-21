@@ -15,7 +15,9 @@ from app.leaderboard import MemoryStore, NicknameError, clean_nickname
 from app.main import create_app
 
 CITY = "kota-uji/city.yaml"
-MAX = 3 * 100 + 5 * 10 + 100  # 3 materi, 5 soal kuis awal, titik game (rewards bawaan)
+MAX = (
+    3 * 100 + 5 * 10 + 100 + 1000
+)  # 3 materi, 5 soal kuis awal, titik game, batas skor game (rewards bawaan)
 
 
 def with_board(files: dict[str, Any]) -> None:

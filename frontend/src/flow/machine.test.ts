@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { QuizQuestion, SourceRef } from '../lib/api.types'
-import { initialNode, nodeReducer, postQuestionsFor, questionsFor, quizScore, type NodeEvent, type NodeState } from './machine'
+import { initialNode, missingParts, nodeComplete, nodeReducer, postQuestionsFor, questionsFor, quizScore, type NodeEvent, type NodeState } from './machine'
 
 const reduce = nodeReducer(2)
 const run = (events: NodeEvent[], from: NodeState = initialNode(2)) => events.reduce(reduce, from)
@@ -88,5 +88,35 @@ describe('postQuestionsFor', () => {
     const quiz = { intro: [q('q1', 'a-1'), q('q2', 'b-1'), q('q3', 'a-1')], outro: [] }
     expect(postQuestionsFor('a', quiz, sources).map((x) => x.id)).toEqual(['q3', 'q1'])
     expect(quiz.intro.map((x) => x.id)).toEqual(['q1', 'q2', 'q3']) // tidak mengubah asli
+  })
+})
+
+describe('syarat titik selesai', () => {
+  const r = nodeReducer(1, 1)
+  const answerNext: NodeEvent[] = [{ type: 'ANSWER', choice: 0 }, { type: 'NEXT' }]
+  const go = (events: NodeEvent[]) => events.reduce(r, initialNode(1, 1))
+
+  it('selesai bila kedua kuis dijawab dan video ditonton', () => {
+    const s = go([...answerNext, { type: 'FINISH_LESSON', watched: true }, ...answerNext])
+    expect(s.stage).toBe('done')
+    expect(nodeComplete(s)).toBe(true)
+    expect(missingParts(s)).toEqual([])
+  })
+
+  it('kuis dilewati → titik tidak selesai', () => {
+    const s = go([{ type: 'SKIP_QUIZ' }, { type: 'FINISH_LESSON', watched: true }, ...answerNext])
+    expect(s.stage).toBe('done')
+    expect(nodeComplete(s)).toBe(false)
+    expect(missingParts(s)).toEqual(['Kuis awal belum dijawab semua'])
+  })
+
+  it('materi dilewati tanpa menonton → titik tidak selesai', () => {
+    const s = go([...answerNext, { type: 'FINISH_LESSON', watched: false }, { type: 'SKIP_QUIZ' }])
+    expect(nodeComplete(s)).toBe(false)
+    expect(missingParts(s)).toHaveLength(2)
+  })
+
+  it('belum sampai tahap hasil → belum selesai', () => {
+    expect(nodeComplete(go(answerNext))).toBe(false)
   })
 })

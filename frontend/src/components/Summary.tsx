@@ -67,7 +67,7 @@ export default function Summary({
 
       {pointsGained > 0 && (
         <p className="mt-4 rounded-2xl bg-teal-50 p-3 text-sm font-bold text-teal">
-          Titik game selesai: +{pointsGained} poin path!
+          +{pointsGained} poin path (bonus titik game + skor terbaikmu)!
         </p>
       )}
       {badges.length > 0 && (

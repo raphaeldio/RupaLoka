@@ -5,6 +5,9 @@
  *
  * `quiz` = kuis awal (menebak sebelum belajar), `post` = kuis akhir setelah materi.
  * Tahap tanpa soal dilewati. Path, poin, dan lencana: lib/rewards.ts.
+ *
+ * Kuis dan materi boleh dilewati, tetapi titik baru dianggap selesai (dan memberi poin)
+ * bila kedua kuis dijawab semua dan video materi ditonton sesuai syarat (`nodeComplete`).
  */
 import type { QuizQuestion, SourceRef } from '../lib/api.types'
 
@@ -15,13 +18,17 @@ export interface NodeState {
   index: number // soal ke-i saat stage quiz/post
   answers: (number | null)[] // kuis awal
   postAnswers: (number | null)[] // kuis akhir
+  /** Kuis yang dilewati dengan tombol "Lewati kuis". */
+  skipped: { quiz: boolean; post: boolean }
+  /** Syarat tonton video materi terpenuhi. */
+  watched: boolean
 }
 
 export type NodeEvent =
   | { type: 'ANSWER'; choice: number }
   | { type: 'NEXT' }
   | { type: 'SKIP_QUIZ' }
-  | { type: 'FINISH_LESSON' }
+  | { type: 'FINISH_LESSON'; watched?: boolean }
   | { type: 'RESET' }
 
 export const initialNode = (questionCount: number, postCount = 0): NodeState => ({
@@ -29,6 +36,8 @@ export const initialNode = (questionCount: number, postCount = 0): NodeState => 
   index: 0,
   answers: Array<number | null>(questionCount).fill(null),
   postAnswers: Array<number | null>(postCount).fill(null),
+  skipped: { quiz: false, post: false },
+  watched: false,
 })
 
 export function nodeReducer(questionCount: number, postCount = 0) {
@@ -52,16 +61,28 @@ export function nodeReducer(questionCount: number, postCount = 0) {
           if (s[key][s.index] === null) return s
           return s.index + 1 < count ? { ...s, index: s.index + 1 } : leave()
         }
-        if (e.type === 'SKIP_QUIZ') return leave()
+        if (e.type === 'SKIP_QUIZ') return { ...leave(), skipped: { ...s.skipped, [s.stage]: true } }
         return s
       }
       case 'lesson':
-        return e.type === 'FINISH_LESSON' ? afterLesson(s) : s
+        return e.type === 'FINISH_LESSON' ? afterLesson({ ...s, watched: e.watched ?? true }) : s
       case 'done':
         return s
     }
   }
 }
+
+/** Bagian titik yang belum dikerjakan (kosong = titik selesai). */
+export function missingParts(s: NodeState): string[] {
+  const out: string[] = []
+  if (s.skipped.quiz || s.answers.some((a) => a === null)) out.push('Kuis awal belum dijawab semua')
+  if (!s.watched) out.push('Video materi belum ditonton minimal 3 menit pertama')
+  if (s.skipped.post || s.postAnswers.some((a) => a === null)) out.push('Kuis akhir belum dijawab semua')
+  return out
+}
+
+/** Titik selesai bila kedua kuis dijawab semua dan video materi ditonton. */
+export const nodeComplete = (s: NodeState): boolean => s.stage === 'done' && missingParts(s).length === 0
 
 /** Jumlah jawaban benar. */
 export function quizScore(questions: QuizQuestion[], answers: (number | null)[]): number {

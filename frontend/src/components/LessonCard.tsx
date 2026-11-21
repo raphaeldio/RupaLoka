@@ -1,7 +1,11 @@
 import { motion } from 'motion/react'
+import { useState } from 'react'
 import type { Lesson, SourceRef } from '../lib/api.types'
 import { labelOr } from '../lib/cities'
-import LessonVideos from './LessonVideos'
+import { featureFlags } from '../lib/flags'
+import { formatClock, MIN_WATCH_SECONDS } from '../lib/watch'
+import { youtubeId } from '../lib/youtube'
+import LessonVideos, { type WatchProgress } from './LessonVideos'
 import LocationButton from './LocationButton'
 import { Button, Card, ContentText, SafeImage, SourceChip } from './primitives'
 
@@ -19,14 +23,19 @@ export default function LessonCard({
   eyebrow: string
   sources: Record<string, SourceRef>
   onAsk: (question: string) => void
-  onFinish: () => void
+  /** `watched` = syarat tonton terpenuhi (selalu true bila materi tanpa video). */
+  onFinish: (watched: boolean) => void
   finishLabel?: string
 }) {
   const hasVideo = lesson.videos.length > 0
+  // Syarat tonton 3 menit hanya bila flag aktif (disembunyikan di MVP).
+  const mustWatch = featureFlags.strict_node_requirements && lesson.videos.some((v) => youtubeId(v.url))
+  const [watch, setWatch] = useState<WatchProgress>({ watched: 0, required: MIN_WATCH_SECONDS, done: false })
+  const watched = !mustWatch || watch.done
   const image = hasVideo ? undefined : lesson.images[0]
   return (
     <Card className="overflow-hidden p-0 sm:p-0">
-      {hasVideo && <LessonVideos videos={lesson.videos} />}
+      {hasVideo && <LessonVideos videos={lesson.videos} onProgress={setWatch} />}
       {image && <SafeImage image={image} className="aspect-[16/9] w-full" />}
       <div className="p-5 sm:p-6">
         <p className="text-xs font-extrabold uppercase tracking-[1.6px] text-redup">
@@ -89,8 +98,41 @@ export default function LessonCard({
           <p className="mt-3 text-[11px] text-redup">Gambar: {image.license}</p>
         )}
 
-        <div className="mt-6 flex justify-end">
-          <Button onClick={onFinish}>{finishLabel}</Button>
+        {mustWatch && (
+          <div className="mt-6 rounded-2xl bg-kertas p-3" role="status" aria-live="polite">
+            <p className="text-sm font-bold">
+              {watched
+                ? 'Mantap, video sudah ditonton. Poin titik ini bisa kamu dapat!'
+                : `Tonton video minimal ${formatClock(watch.required)} pertama untuk mendapat poin.`}
+            </p>
+            <div
+              className="mt-2 h-2 overflow-hidden rounded-full bg-pasir"
+              role="progressbar"
+              aria-label="Waktu tonton video"
+              aria-valuemin={0}
+              aria-valuemax={watch.required}
+              aria-valuenow={watch.watched}
+            >
+              <div
+                className="h-full rounded-full bg-teal transition-[width] duration-500"
+                style={{ width: `${watched ? 100 : Math.round((watch.watched / watch.required) * 100)}%` }}
+              />
+            </div>
+            <p className="mt-1 text-xs tabular-nums text-redup">
+              {formatClock(watch.watched)} / {formatClock(watch.required)} · melompati video tidak dihitung
+            </p>
+          </div>
+        )}
+
+        <div className="mt-6 flex flex-wrap items-center justify-end gap-2">
+          {!watched && (
+            <Button variant="ghost" onClick={() => onFinish(false)}>
+              Lewati materi (tanpa poin)
+            </Button>
+          )}
+          <Button onClick={() => onFinish(true)} disabled={!watched}>
+            {finishLabel}
+          </Button>
         </div>
       </div>
     </Card>

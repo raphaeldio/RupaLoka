@@ -18,6 +18,8 @@ export interface PathProgress {
   correct: Record<string, number>
   /** Game sudah dimainkan sampai selesai minimal sekali. */
   gameDone: boolean
+  /** Skor game terbaik (jarak/10); ikut dijumlahkan ke poin path setelah game selesai. */
+  best?: number
 }
 
 export const emptyPath = (): PathProgress => ({ completed: [], correct: {}, gameDone: false })
@@ -48,15 +50,32 @@ export function nextNode(nodes: PathNode[]): PathNode | null {
   return nodes.find((n) => n.status === 'open') ?? null
 }
 
-/** Poin kota: hanya titik materi yang ada di kota (id usang diabaikan). */
-export function pathPoints(lessonIds: string[], p: PathProgress, r: Rewards): number {
+/** Poin materi + kuis + bonus titik game (tanpa skor lari). Id materi usang diabaikan. */
+export function lessonPoints(lessonIds: string[], p: PathProgress, r: Rewards): number {
   const done = lessonIds.filter((id) => p.completed.includes(id))
   const correct = done.reduce((n, id) => n + (p.correct[id] ?? 0), 0)
   return done.length * r.points_per_node + correct * r.points_per_correct + (p.gameDone ? r.game_node_points : 0)
 }
 
+/** Skor game yang ikut dihitung: skor terbaik (maks. `game_score_cap`), hanya setelah game pernah diselesaikan. */
+export const gamePoints = (p: PathProgress, r: Rewards): number =>
+  p.gameDone ? Math.min(gameCap(r), Math.max(0, Math.round(p.best ?? 0))) : 0
+
+/** Batas skor game; API lama tanpa field ini → skor game tidak dihitung (aman untuk batas papan peringkat). */
+const gameCap = (r: Rewards): number => (Number.isFinite(r.game_score_cap) ? Math.max(0, r.game_score_cap) : 0)
+
+/** Poin kota = poin materi/kuis + skor game terbaik (dipakai lencana dan papan peringkat). */
+export function pathPoints(lessonIds: string[], p: PathProgress, r: Rewards): number {
+  return lessonPoints(lessonIds, p, r) + gamePoints(p, r)
+}
+
+/** Poin maksimum dari materi, kuis, dan bonus titik game (skor lari tidak punya batas atas). */
 export const maxPathPoints = (lessonIds: string[], questionCount: number, r: Rewards): number =>
   lessonIds.length * r.points_per_node + questionCount * r.points_per_correct + r.game_node_points
+
+/** Poin kota maksimum termasuk batas skor game (= max_points papan peringkat di backend). */
+export const maxCityPoints = (lessonIds: string[], questionCount: number, r: Rewards): number =>
+  maxPathPoints(lessonIds, questionCount, r) + gameCap(r)
 
 export function earnedBadges(points: number, badges: Badge[]): Badge[] {
   return badges.filter((b) => points >= b.min_points)

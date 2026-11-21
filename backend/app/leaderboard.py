@@ -73,13 +73,14 @@ def clean_nickname(raw: str) -> str:
 
 
 def max_points(cc: CityContent) -> int:
-    """Poin path tertinggi yang mungkin (sama dengan maxPathPoints di frontend)."""
+    """Poin kota tertinggi yang mungkin (sama dengan maxCityPoints di frontend)."""
     r = cc.config.rewards
     intro = len(cc.quiz.intro) if cc.quiz else 0
     return (
         len(cc.config.lessons) * r.points_per_node
         + intro * r.points_per_correct
         + r.game_node_points
+        + r.game_score_cap
     )
 
 

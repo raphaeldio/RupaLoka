@@ -98,12 +98,14 @@ class Rewards(Strict):
     """Poin path belajar (titik = materi, titik terakhir = game) dan lencana.
 
     Poin kota = titik materi selesai × points_per_node + jawaban kuis benar ×
-    points_per_correct + (game_node_points bila game sudah dimainkan sekali).
+    points_per_correct + (game_node_points bila game sudah dimainkan sekali) +
+    skor game terbaik, dibatasi game_score_cap (agar batas papan peringkat tetap ada).
     """
 
     points_per_node: int = Field(default=100, ge=0)
     points_per_correct: int = Field(default=10, ge=0)
     game_node_points: int = Field(default=100, ge=0)
+    game_score_cap: int = Field(default=1000, ge=0)
     badges: list[Badge] = Field(default_factory=list)
     leaderboard: LeaderboardConfig | None = None
 

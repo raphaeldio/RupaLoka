@@ -1,4 +1,4 @@
-import { screen, within } from '@testing-library/react'
+import { act, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -11,6 +11,15 @@ import CityLayout from './CityLayout'
 import GamePage from './GamePage'
 import NodePage from './NodePage'
 import PathPage from './PathPage'
+
+// Flag dapat diubah per uji; komponen membacanya saat dipakai.
+const mockFlags = vi.hoisted(() => ({
+  viewer3d: false,
+  class_mode: false,
+  premium_content: false,
+  strict_node_requirements: false,
+}))
+vi.mock('../../lib/flags', () => ({ featureFlags: mockFlags }))
 
 const json = (body: unknown, status = 200) =>
   Promise.resolve(new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } }))
@@ -75,6 +84,16 @@ describe('path kota', () => {
     expect(screen.getByRole('progressbar', { name: 'Menuju lencana Lencana Satu' })).toHaveAttribute('aria-valuenow', '0')
   })
 
+  it('penari tampil hanya setelah semua titik dan game selesai', async () => {
+    useProgress.getState().completeNode('kota-a', 'a', 0)
+    useProgress.getState().completeNode('kota-a', 'b', 0)
+    renderAt('/kota/kota-a')
+    await screen.findByRole('heading', { name: 'Jelajah Kota A' })
+    expect(screen.queryByRole('heading', { name: /tamat/ })).not.toBeInTheDocument()
+    act(() => useProgress.getState().finishGame('kota-a', 50))
+    expect(await screen.findByRole('heading', { name: 'Hore, path Kota A tamat!' })).toBeInTheDocument()
+  })
+
   it('titik terkunci tidak bisa dibuka lewat URL', async () => {
     renderAt('/kota/kota-a/titik/b')
     expect(await screen.findByRole('heading', { name: 'Jelajah Kota A' })).toBeInTheDocument()
@@ -123,6 +142,52 @@ describe('titik path', () => {
     await user.click(screen.getByRole('button', { name: 'Lewati kuis' }))
     expect(screen.getByLabelText('Bertambah 0 poin')).toBeInTheDocument()
     expect(useProgress.getState().cities['kota-a'].correct.a).toBe(1)
+  })
+
+  it('MVP (syarat disembunyikan): kuis dilewati → titik tetap selesai, tanpa syarat tonton', async () => {
+    const user = userEvent.setup()
+    renderAt('/kota/kota-a/titik/a')
+    await user.click(await screen.findByRole('button', { name: 'Lewati kuis' }))
+    expect(screen.queryByRole('progressbar', { name: 'Waktu tonton video' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /Lewati materi/ })).not.toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Lanjut ke kuis akhir' }))
+    await user.click(screen.getByRole('button', { name: 'Lewati kuis' }))
+    expect(screen.getByText('Titik 1 selesai')).toBeInTheDocument()
+    expect(useProgress.getState().cities['kota-a'].completed).toEqual(['a'])
+  })
+})
+
+describe('syarat titik ketat (strict_node_requirements = true)', () => {
+  beforeEach(() => {
+    mockFlags.strict_node_requirements = true
+  })
+  afterEach(() => {
+    mockFlags.strict_node_requirements = false
+  })
+
+  it('mengulang dengan kuis dilewati: tidak dihitung selesai lagi, progres lama utuh', async () => {
+    useProgress.getState().completeNode('kota-a', 'a', 1)
+    const user = userEvent.setup()
+    renderAt('/kota/kota-a/titik/a')
+    await user.click(await screen.findByRole('button', { name: 'Lewati kuis' }))
+    await user.click(screen.getByRole('button', { name: 'Lanjut ke kuis akhir' }))
+    await user.click(screen.getByRole('button', { name: 'Lewati kuis' }))
+    expect(screen.getByText('Titik 1 belum selesai')).toBeInTheDocument()
+    expect(screen.getByText('Kuis awal belum dijawab semua')).toBeInTheDocument()
+    expect(useProgress.getState().cities['kota-a'].correct.a).toBe(1)
+    expect(useProgress.getState().cities['kota-a'].completed).toEqual(['a'])
+  })
+
+  it('kuis dilewati → titik belum selesai, titik berikutnya tetap terkunci', async () => {
+    const user = userEvent.setup()
+    renderAt('/kota/kota-a/titik/a')
+    await user.click(await screen.findByRole('button', { name: 'Lewati kuis' }))
+    await user.click(screen.getByRole('button', { name: 'Lanjut ke kuis akhir' }))
+    await user.click(screen.getByRole('button', { name: 'Lewati kuis' }))
+    expect(screen.getByText('Titik 1 belum selesai')).toBeInTheDocument()
+    expect(useProgress.getState().cities['kota-a']?.completed ?? []).toEqual([])
+    await user.click(screen.getByRole('button', { name: 'Ulangi titik ini' }))
+    expect(screen.getByRole('button', { name: 'Lewati kuis' })).toBeInTheDocument()
   })
 })
 

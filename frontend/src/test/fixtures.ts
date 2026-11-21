@@ -24,6 +24,7 @@ export const detailFixture: CityDetail = {
     points_per_node: 100,
     points_per_correct: 10,
     game_node_points: 100,
+    game_score_cap: 1000,
     leaderboard: { enabled: true, champion_title: 'Si Paling A', size: 10 },
     badges: [
       { id: 'lencana-1', name: 'Lencana Satu', min_points: 100, description: 'Deskripsi satu.' },

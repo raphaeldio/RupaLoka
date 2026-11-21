@@ -45,7 +45,7 @@ export default function GamePage() {
     (score: number, unlocked: string[]) => {
       const p = useProgress.getState().cities[cityId] ?? progress
       const before = pathPoints(lessonIds, p, detail.rewards)
-      const after = pathPoints(lessonIds, { ...p, gameDone: true }, detail.rewards)
+      const after = pathPoints(lessonIds, { ...p, gameDone: true, best: Math.max(p.best, score) }, detail.rewards)
       finishGame(cityId, score)
       const badges = newBadges(before, after, detail.rewards.badges)
       setResult({ score, unlocked, gained: after - before, badges, total: after })

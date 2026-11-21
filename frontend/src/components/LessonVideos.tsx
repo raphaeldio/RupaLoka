@@ -1,12 +1,111 @@
-import { useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { VideoRef } from '../lib/api.types'
+import { isWatched, recordWatch, requiredSeconds } from '../lib/watch'
 import { youtubeEmbed, youtubeId } from '../lib/youtube'
+import { loadYouTubeApi, YT_PLAYING, type YTPlayer } from '../lib/ytApi'
+
+export interface WatchProgress {
+  /** Detik dari jendela wajib yang sudah ditonton. */
+  watched: number
+  /** Detik wajib tonton (3 menit pertama, atau hampir seluruh video bila lebih pendek). */
+  required: number
+  done: boolean
+}
+
+/**
+ * Pemutar video utama yang mengukur waktu tonton lewat YouTube IFrame API.
+ * Bila API gagal dimuat, sematan biasa dipakai dan waktu dihitung selama tab terlihat (cadangan).
+ */
+function TrackedPlayer({ id, title, onProgress }: { id: string; title: string; onProgress?: (p: WatchProgress) => void }) {
+  const host = useRef<HTMLDivElement>(null)
+  const [fallback, setFallback] = useState(false)
+  const report = useRef(onProgress)
+  useLayoutEffect(() => {
+    report.current = onProgress
+  })
+
+  useEffect(() => {
+    let seen: ReadonlySet<number> = new Set()
+    let required = requiredSeconds(0)
+    let player: YTPlayer | null = null
+    let poll = 0
+    let cancelled = false
+    const emit = () => report.current?.({ watched: Math.min(seen.size, required), required, done: isWatched(seen, required) })
+
+    loadYouTubeApi()
+      .then((YT) => {
+        if (cancelled || !host.current) return
+        // Elemen dibuat manual: YT mengganti elemen ini dengan iframe, jadi jangan dikelola React.
+        const el = document.createElement('div')
+        el.className = 'absolute inset-0 size-full'
+        host.current.appendChild(el)
+        player = new YT.Player(el, {
+          videoId: id,
+          host: 'https://www.youtube-nocookie.com',
+          width: '100%',
+          height: '100%',
+          playerVars: { rel: 0, autoplay: 1, playsinline: 1 },
+        })
+        poll = window.setInterval(() => {
+          if (!player || typeof player.getPlayerState !== 'function') return
+          required = requiredSeconds(player.getDuration())
+          if (player.getPlayerState() !== YT_PLAYING) return
+          const next = recordWatch(seen, player.getCurrentTime(), required)
+          if (next !== seen) {
+            seen = next
+            emit()
+          }
+        }, 500)
+        emit()
+      })
+      .catch(() => {
+        if (cancelled) return
+        setFallback(true)
+        // Cadangan: hitung detik selama sematan terbuka dan tab terlihat.
+        poll = window.setInterval(() => {
+          if (document.visibilityState !== 'visible') return
+          const next = recordWatch(seen, seen.size, required)
+          if (next !== seen) {
+            seen = next
+            emit()
+          }
+        }, 1000)
+        emit()
+      })
+
+    return () => {
+      cancelled = true
+      window.clearInterval(poll)
+      try {
+        player?.destroy()
+      } catch {
+        // pemutar sudah hilang
+      }
+    }
+  }, [id])
+
+  return (
+    <div ref={host} className="absolute inset-0 size-full">
+      {fallback && (
+        <iframe
+          src={`${youtubeEmbed(id)}&autoplay=1`}
+          title={title}
+          className="absolute inset-0 size-full"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          referrerPolicy="strict-origin-when-cross-origin"
+          allowFullScreen
+        />
+      )}
+    </div>
+  )
+}
 
 /**
  * Video materi: video pertama disematkan (dimuat setelah diklik, agar ringan dan tanpa cookie
- * sebelum diputar), video lain tampil sebagai tautan "tonton juga".
+ * sebelum diputar), video lain tampil sebagai tautan "tonton juga". Waktu tonton video pertama
+ * dilaporkan lewat `onProgress` (syarat poin titik).
  */
-export default function LessonVideos({ videos }: { videos: VideoRef[] }) {
+export default function LessonVideos({ videos, onProgress }: { videos: VideoRef[]; onProgress?: (p: WatchProgress) => void }) {
   const [playing, setPlaying] = useState(false)
   const valid = videos.filter((v) => youtubeId(v.url))
   if (valid.length === 0) return null
@@ -17,14 +116,7 @@ export default function LessonVideos({ videos }: { videos: VideoRef[] }) {
     <section aria-label="Video materi">
       <div className="relative aspect-video w-full overflow-hidden bg-tinta">
         {playing ? (
-          <iframe
-            src={`${youtubeEmbed(id)}&autoplay=1`}
-            title={main.title}
-            className="absolute inset-0 size-full"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            referrerPolicy="strict-origin-when-cross-origin"
-            allowFullScreen
-          />
+          <TrackedPlayer id={id} title={main.title} onProgress={onProgress} />
         ) : (
           <button
             type="button"
