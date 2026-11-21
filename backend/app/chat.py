@@ -1,7 +1,8 @@
 """Tanya-jawab bersumber (SDD §8.1, §9).
 
 Alur: retrieval → gerbang `MIN_SCORE` (tolak tanpa memanggil LLM) → LLM → validasi sitasi
-(penanda yang tidak ada di konteks dibuang; tanpa sitasi valid = penolakan) → format.
+(penanda pada kalimat penolakan dan penanda yang tidak ada di konteks dibuang; tanpa sitasi valid
+= penolakan) → format.
 """
 
 from __future__ import annotations
@@ -18,7 +19,7 @@ from app.config import Settings
 from app.content_loader import Content
 from app.llm import LLM, LLMError, Turn
 from app.prompts import system_prompt, user_prompt
-from app.retrieval import Hit, Retriever
+from app.retrieval import Hit, Retriever, passes_gate
 from app.schemas import Chunk, Id, Phase
 
 MAX_MESSAGE_CHARS = 500
@@ -83,6 +84,30 @@ class UnknownContext(ValueError):
 _MARKER = re.compile(r"\[\s*([a-z0-9-]+(?:\s*[,;]\s*[a-z0-9-]+)*)\s*\]")
 _SPACE_BEFORE_PUNCT = re.compile(r"\s+([.,;:!?])")
 _MULTI_SPACE = re.compile(r"[ \t]{2,}")
+
+
+# Kalimat penolakan LLM ("aku belum punya informasinya"). Penanda sumber pada kalimat seperti ini
+# dibuang: penolakan tidak didukung chunk mana pun, dan tanpa ini penolakan bersitasi lolos sebagai
+# jawaban bersumber (eval 21 Nov 2026: 4 dari 18 kasus luar cakupan).
+REFUSAL_PATTERN = re.compile(
+    r"\b(belum|tidak|tak)\s+(punya|ada|memiliki|tahu|menemukan)\b[^.!?]*"
+    r"\b(informasi|info|data|catatan|jawaban|keterangan)"
+    r"|\b(belum|tidak|tak)\s+(tahu|mengetahui)\b",
+    re.IGNORECASE,
+)
+_SENTENCE = re.compile(r"[^.!?]+(?:[.!?]+(?:\s*\[[^\]]*\])*|$)")
+
+
+def is_refusal_sentence(sentence: str) -> bool:
+    return REFUSAL_PATTERN.search(sentence) is not None
+
+
+def drop_refusal_citations(text: str) -> str:
+    """Hapus penanda `[...]` dari kalimat yang berupa penolakan; kalimat fakta tidak diubah."""
+    return "".join(
+        _MARKER.sub("", m.group(0)) if is_refusal_sentence(m.group(0)) else m.group(0)
+        for m in _SENTENCE.finditer(text)
+    )
 
 
 def apply_citations(text: str, allowed: dict[str, Chunk]) -> tuple[str, list[Chunk]]:
@@ -156,7 +181,8 @@ class ChatService:
             raise UnknownContext(f"lesson_id '{lesson_id}' bukan materi kota ini")
 
         hits = self.retriever.search(req.city_id, req.message, lesson_id=lesson_id)
-        if not hits or hits[0].raw_score < self.settings.min_score:
+        topical = self.retriever.is_topical(req.city_id, req.message)
+        if not passes_gate(hits, topical, self.settings.min_score):
             return self._refusal("out_of_scope", req.city_id, lesson_id)
 
         if self.llm is None:
@@ -164,7 +190,7 @@ class ChatService:
         raw = await self.llm.generate(self.system, self._turns(req, hits))
 
         allowed = {h.chunk.id: h.chunk for h in hits}
-        text, cited = apply_citations(raw, allowed)
+        text, cited = apply_citations(drop_refusal_citations(raw), allowed)
         if not cited:
             return self._refusal("no_valid_citation", req.city_id, lesson_id)
         return ChatResponse(

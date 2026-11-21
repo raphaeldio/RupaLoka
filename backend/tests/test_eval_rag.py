@@ -11,6 +11,7 @@ import pytest
 import yaml
 
 from app.chat import ChatResponse, Citation
+from app.config import DEFAULT_MIN_SCORE
 from app.content_loader import load_content
 from app.llm import Turn
 from app.prompts import system_prompt
@@ -21,6 +22,7 @@ from scripts.eval_rag import (
     OutOfScopeCase,
     build_report,
     check_cases,
+    gate_failures,
     judge,
     load_cases,
     main,
@@ -69,6 +71,19 @@ def test_repo_eval_sets_are_valid_against_content() -> None:
     assert any(c.kind == "injection" for c in out_cases)
     errors, _ = check_cases(content, in_cases, out_cases)
     assert errors == []
+
+
+def test_repo_gate_separates_at_default_min_score() -> None:
+    """Gerbang pada MIN_SCORE bawaan memilah set evaluasi repo dengan benar. Bila gagal setelah
+    konten berubah: jalankan `python scripts/eval_rag.py` dan kalibrasi ulang DEFAULT_MIN_SCORE."""
+    content = load_content(REPO_EVAL.parent / "content").content
+    in_cases = load_cases(REPO_EVAL / "in_scope.yaml", InScopeCase)
+    out_cases = load_cases(REPO_EVAL / "out_of_scope.yaml", OutOfScopeCase)
+    assert len(in_cases) >= 30
+    report = build_report(
+        content, Retriever.from_content(content), in_cases, out_cases, DEFAULT_MIN_SCORE
+    )
+    assert gate_failures(report.retrieval) == []
 
 
 # --- pemuatan dan pemeriksaan -----------------------------------------------
@@ -123,7 +138,7 @@ def test_build_report_retrieval_metrics(make_content: Any) -> None:
     assert by_id["inj-1"].gate_expected is False  # injeksi tidak wajib ditolak gerbang
     assert report.metrics["recall@4 dalam cakupan"] == "1/1 (100%)"
     assert report.metrics["luar cakupan ditolak gerbang"] == "1/1 (100%)"
-    assert report.sweep_basis == "in_scope.yaml"
+    assert report.sweep_basis.startswith("in_scope.yaml")
 
 
 def test_sweep_and_separable_range() -> None:
@@ -164,6 +179,19 @@ def test_judge_flags_violations() -> None:
     assert refused.correct_refusal and refused.violations == []
 
 
+def test_partial_answer_counts_as_refusal_only_for_near_miss() -> None:
+    partial = _res("Aku belum punya informasi harganya. Museum ini di Bandung [1].", ["a-001"])
+    near = judge(partial, "out_of_scope", "x", expect="refusal", kind="near_miss")
+    assert near.partial and near.correct_refusal and near.violations == []
+    # Luar topik/injeksi tetap harus ditolak penuh.
+    other = judge(partial, "out_of_scope", "x", expect="refusal", kind="injection")
+    assert other.partial and not other.correct_refusal
+    # Jawaban biasa tanpa pengakuan "belum punya informasi" bukan jawaban parsial.
+    full = judge(_res("Museum ini di Bandung [1].", ["a-001"]), "out_of_scope", "x",
+                 expect="refusal", kind="near_miss")  # fmt: skip
+    assert not full.partial and not full.correct_refusal
+
+
 # --- main ------------------------------------------------------------------
 
 
@@ -184,6 +212,14 @@ def test_main_retrieval_only_writes_json(make_content: Any, tmp_path: Path) -> N
     assert run_main(make_content(), _eval_dir(tmp_path, [oos()]), "--json", str(out)) == 0
     data = json.loads(out.read_text(encoding="utf-8"))
     assert data["min_score"] == 0.01 and data["violations"] == []
+
+
+def test_main_strict_fails_when_gate_misclassifies(make_content: Any, tmp_path: Path) -> None:
+    # Cocok dengan chunk tetapi ditandai luar cakupan (gerbang): --strict harus gagal.
+    case = oos(kind="off_topic", question="Teks pengetahuan contoh nomor 1")
+    eval_dir = _eval_dir(tmp_path, [case])
+    assert run_main(make_content(), eval_dir) == 0
+    assert run_main(make_content(), eval_dir, "--strict") == 1
 
 
 def test_main_with_llm_passes_clean_answers(make_content: Any, tmp_path: Path) -> None:

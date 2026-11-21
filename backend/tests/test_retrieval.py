@@ -10,8 +10,10 @@ from app.content_loader import load_content
 from app.retrieval import (
     MAX_QUERY_TOKENS,
     CityIndex,
+    Hit,
     Retriever,
     normalize_query,
+    passes_gate,
     tokenize,
 )
 from app.schemas import Chunk
@@ -43,6 +45,22 @@ def test_tokenize_strips_particles_and_nya() -> None:
     assert tokenize("bunyinya bagaimanakah alatnya") == ["bunyi", "alat"]
     # Kata pendek tidak dipotong.
     assert tokenize("punya") == ["punya"]
+
+
+def test_tokenize_stems_affixes_to_root() -> None:
+    # Pertanyaan dan chunk distem sama sehingga bentuk berimbuhan saling cocok.
+    assert tokenize("dimainkan") == tokenize("bermain") == ["main"]
+    assert tokenize("terbuat") == tokenize("dibuat") == ["buat"]
+    # Kamus kata dasar mencegah pemotongan berlebih.
+    assert tokenize("berita") == ["berita"]
+
+
+def test_tokenize_casual_chat_language() -> None:
+    assert tokenize("angklung tuh dimainin gmn sih?") == ["angklung", "main"]
+    assert tokenize("yg ngerancang gedung sate") == ["rancang", "gedung", "sate"]
+    assert tokenize("kak, bikinnya dari apa ya?") == ["buat"]
+    assert tokenize("ultahnya tgl brp") == ["ulang", "tahun", "tanggal"]
+    assert tokenize("bareng2") == ["sama"]  # huruf dan angka dipisah; angka 1 digit dibuang
 
 
 def test_normalize_query_dedupes_and_limits() -> None:
@@ -167,3 +185,35 @@ def test_retriever_from_loaded_content(make_content: Any) -> None:
     hits = retriever.search("kota-uji", "Teks pengetahuan contoh nomor 3", lesson_id="materi-b")
     assert len(hits) == 4
     assert hits[0].chunk.lesson_id == "materi-b"
+
+
+def test_placeholder_chunks_are_not_indexed(make_content: Any) -> None:
+    """Chunk `[PERLU DIISI]` tidak berisi fakta; tidak boleh meloloskan kata "perlu" di gerbang."""
+
+    def mutate(files: dict[str, Any]) -> None:
+        chunks = files["kota-uji/knowledge/materi-a.yaml"]
+        chunks[0]["text"] = "[PERLU DIISI]"
+
+    content = load_content(make_content(mutate)).content
+    retriever = Retriever.from_content(content)
+    placeholder = content.city_content["kota-uji"].chunks["materi-a-001"]
+    assert placeholder.text == "[PERLU DIISI]"
+    assert retriever.search("kota-uji", "apa yang perlu diisi") == []
+    assert "materi-a-001" not in ids(retriever.search("kota-uji", "Teks pengetahuan contoh"))
+
+
+def test_topic_terms_come_from_lesson_titles() -> None:
+    index = CityIndex([chunk("a-001", "Alat musik dari bambu.", "a")], {"a": "Angklung Sunda"})
+    assert index.is_topical("Apa itu angklung?")
+    assert index.is_topical("sunda")
+    assert not index.is_topical("Bagaimana cara memasak nasi?")
+
+
+def test_passes_gate_two_paths() -> None:
+    c = chunk("a-001", "Teks.")
+    low = [Hit(chunk=c, score=0.5, raw_score=0.5)]
+    high = [Hit(chunk=c, score=9.0, raw_score=9.0)]
+    assert passes_gate(low, topical=True, min_score=5.0)  # jalur topik
+    assert not passes_gate(low, topical=False, min_score=5.0)
+    assert passes_gate(high, topical=False, min_score=5.0)  # jalur skor
+    assert not passes_gate([], topical=True, min_score=0.0)  # tanpa kecocokan selalu ditolak

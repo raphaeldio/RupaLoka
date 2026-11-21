@@ -10,7 +10,10 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 
 DEFAULT_GEMINI_MODEL = "gemini-3.5-flash-lite"
 # Ambang skor BM25 mentah. Nilai awal kasar; kalibrasi dengan eval_rag.py (T-062).
-DEFAULT_MIN_SCORE = 1.0
+# Ambang jalur skor gerbang dua jalur (T-062, eval_rag.py, 21 Nov 2026; 41 chunk, tokenizer
+# dengan stemmer + kata gaul): luar cakupan tanpa istilah topik tertinggi 4.999, dalam cakupan/saran
+# tanpa istilah topik terendah 5.892. Kalibrasi ulang tiap chunk bertambah (`eval_rag.py --strict`).
+DEFAULT_MIN_SCORE = 5.45
 
 
 def _bool(value: str | None, default: bool = False) -> bool:

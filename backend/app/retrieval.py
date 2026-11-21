@@ -7,6 +7,13 @@ chunk, sehingga skor tidak stabil untuk gerbang `MIN_SCORE` (T-013).
 `raw_score` adalah skor BM25 murni (dipakai gerbang). `score` = `raw_score` setelah boost
 materi aktif (dipakai mengurutkan). Boost bersifat perkalian sehingga chunk tanpa kecocokan
 tidak pernah lolos karena boost.
+
+Gerbang dua jalur (`passes_gate`, disetujui tim 21 Nov 2026): pertanyaan lolos bila menyebut
+istilah topik (kata dari judul materi kota, mis. "angklung") dan cocok dengan chunk, ATAU bila
+`raw_score` teratas >= `MIN_SCORE`. Istilah topik muncul di banyak chunk sehingga IDF-nya rendah;
+tanpa jalur ini "Apa itu angklung?" ditolak, sementara satu kata umum ("cara", "sejarah")
+meloloskan pertanyaan luar topik. Pertanyaan bertopik tetap harus dijawab bersitasi oleh LLM
+atau ditolak.
 """
 
 from __future__ import annotations
@@ -15,10 +22,12 @@ import math
 import re
 import unicodedata
 from collections import Counter
-from collections.abc import Iterable, Mapping
+from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass
+from functools import lru_cache
+from typing import Any
 
-from app.content_loader import CityContent, Content
+from app.content_loader import CityContent, Content, is_unfilled
 from app.schemas import Chunk
 
 TOP_K = 4
@@ -36,8 +45,69 @@ STOPWORDS = frozenset("""
     sebagai sebutkan sedang sejak seperti siapa sudah supaya tahu tentang tersebut tidak untuk
     yaitu yakni yang
     """.split())
-_PARTICLES = ("lah", "kah", "pun")
-_TOKEN = re.compile(r"[a-z0-9]+")
+_TOKEN = re.compile(r"[a-z]+|[0-9]+")  # "bareng2" → "bareng", "2"
+
+# Bahasa obrolan pelajar → bentuk baku (21 Nov 2026). Hanya singkatan/kata gaul umum; partikel
+# obrolan dibuang lewat STOPWORDS_CHAT. Bentuk -in dan nge- ditangani `_formal_candidates`.
+SLANG = {
+    "gmn": "bagaimana", "gimana": "bagaimana", "yg": "yang", "dmn": "dimana", "dimn": "dimana",
+    "knp": "kenapa", "napa": "kenapa", "brp": "berapa", "tgl": "tanggal", "thn": "tahun",
+    "ultah": "ulang tahun", "bikin": "buat", "bkin": "buat", "bareng": "bersama",
+    "gak": "tidak", "ga": "tidak", "nggak": "tidak", "enggak": "tidak", "tdk": "tidak",
+    "udah": "sudah", "udh": "sudah", "aja": "saja", "pake": "pakai", "muka": "wajah",
+    "dgn": "dengan", "utk": "untuk", "krn": "karena", "jg": "juga", "sm": "sama", "tau": "tahu",
+}  # fmt: skip
+STOPWORDS_CHAT = frozenset("sih dong deh kok nih loh lho tuh ya yah kak kakak min mimin".split())
+
+
+@lru_cache(maxsize=1)
+def _stemmer() -> Any:
+    """Stemmer bahasa Indonesia berbasis kamus kata dasar (Sastrawi, MIT)."""
+    from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
+
+    return StemmerFactory().create_stemmer()
+
+
+@lru_cache(maxsize=50_000)
+def _stem(token: str) -> str:
+    """Kata dasar; bentuk obrolan (-in, nge-/ng-) dicoba sebagai bentuk baku lebih dulu.
+    Kandidat baku hanya dipakai bila kamus mengenalinya (hasil stem berbeda dari kandidat)."""
+    if token.isdigit():
+        return token
+    stem = _stemmer().stem
+    root = stem(token)
+    if root and root != token:  # kata baku berimbuhan yang dikenali kamus ("bermain" → "main")
+        return root
+    for candidate in _formal_candidates(token):  # hanya bila kata aslinya tidak dikenali
+        cand_root = stem(candidate)
+        if cand_root and cand_root != candidate:
+            return cand_root
+    return root or token
+
+
+def _formal_candidates(token: str) -> list[str]:
+    """dimainin → dimainkan; ngelatih → melatih; ngajarin → mengajarkan."""
+    forms = [token]
+    if token.endswith("in") and len(token) > 5:
+        forms.append(token[:-2] + "kan")
+    out: list[str] = []
+    for form in forms:
+        if form.startswith("nge") and len(form) > 5:
+            out.append("me" + form[3:])
+        elif form.startswith("ng") and len(form) > 4:
+            out.append("meng" + form[2:])
+        if form != token:
+            out.append(form)
+    return out
+
+
+def _unslang(word: str) -> str:
+    """Ganti kata gaul, juga bila berakhiran -nya ("bikinnya" → "buat", "ultahnya")."""
+    if word in SLANG:
+        return SLANG[word]
+    if word.endswith("nya") and word[:-3] in SLANG:
+        return SLANG[word[:-3]]
+    return word
 
 
 def _strip_accents(text: str) -> str:
@@ -45,21 +115,18 @@ def _strip_accents(text: str) -> str:
     return "".join(ch for ch in normalized if not unicodedata.combining(ch))
 
 
-def _light_stem(token: str) -> str:
-    """Buang partikel (-lah, -kah, -pun) dan -nya bila sisa kata masih cukup panjang."""
-    for suffix in (*_PARTICLES, "nya"):
-        if token.endswith(suffix) and len(token) - len(suffix) >= 4:
-            return token[: -len(suffix)]
-    return token
-
-
 def tokenize(text: str) -> list[str]:
+    """Huruf kecil, buang aksen, ganti kata gaul, buang kata fungsi, lalu stem ke kata dasar.
+    Dipakai sama untuk chunk dan pertanyaan agar "dimainkan", "bermain", dan "dimainin" cocok."""
     text = _strip_accents(text.lower())
     out: list[str] = []
     for raw in _TOKEN.findall(text):
-        token = _light_stem(raw)
-        if token not in STOPWORDS and len(token) > 1:
-            out.append(token)
+        for word in _unslang(raw).split():
+            if word in STOPWORDS or word in STOPWORDS_CHAT or len(word) <= 1:
+                continue
+            token = _stem(word)
+            if token not in STOPWORDS and len(token) > 1:
+                out.append(token)
     return out
 
 
@@ -87,6 +154,7 @@ class CityIndex:
         b: float = B,
     ) -> None:
         titles = lesson_titles or {}
+        self.topic_terms = frozenset(t for title in titles.values() for t in tokenize(title))
         self.chunks = sorted(chunks, key=lambda c: c.id)
         self.k1, self.b = k1, b
         # Judul materi ikut diindeks agar chunk yang tidak menyebut nama materinya tetap terjangkau.
@@ -111,6 +179,10 @@ class CityIndex:
                 score += self._idf[term] * f * (self.k1 + 1) / (f + norm)
         return score
 
+    def is_topical(self, query: str) -> bool:
+        """Kueri menyebut istilah topik kota (kata dari judul materi)."""
+        return not self.topic_terms.isdisjoint(normalize_query(query))
+
     def search(self, query: str, lesson_id: str | None = None, top_k: int = TOP_K) -> list[Hit]:
         terms = normalize_query(query)
         if not terms or top_k <= 0:
@@ -124,6 +196,11 @@ class CityIndex:
             hits.append(Hit(chunk=chunk, score=raw * boost, raw_score=raw))
         hits.sort(key=lambda h: (-h.score, h.chunk.id))
         return hits[:top_k]
+
+
+def passes_gate(hits: Sequence[Hit], topical: bool, min_score: float) -> bool:
+    """Gerbang skor (tanpa LLM): ada kecocokan, dan kueri bertopik atau skor teratas cukup."""
+    return bool(hits) and (topical or hits[0].raw_score >= min_score)
 
 
 class Retriever:
@@ -144,7 +221,15 @@ class Retriever:
             raise KeyError(city_id)
         return index.search(query, lesson_id=lesson_id, top_k=top_k)
 
+    def is_topical(self, city_id: str, query: str) -> bool:
+        index = self._indexes.get(city_id)
+        if index is None:
+            raise KeyError(city_id)
+        return index.is_topical(query)
+
 
 def _index_city(cc: CityContent) -> CityIndex:
+    """Chunk penanda (`[PERLU DIISI]`, `TODO`) tidak diindeks: tidak berisi fakta, sehingga
+    hanya membuat kata seperti "perlu" atau judul materi meloloskan pertanyaan di gerbang."""
     titles = {lesson_id: lesson.title for lesson_id, lesson in cc.lessons.items()}
-    return CityIndex(cc.chunks.values(), titles)
+    return CityIndex((c for c in cc.chunks.values() if not is_unfilled(c.text)), titles)

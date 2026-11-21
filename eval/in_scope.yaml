@@ -14,5 +14,189 @@
 #   expected_chunks: [angklung-001]
 #   note: "..."                # opsional
 #
-# TODO (KH, T-060): isi setelah chunk T-031 terverifikasi.
-[]
+# DRAF HR (21 Nov 2026), MENUNGGU TINJAUAN KH. Pertanyaan diturunkan dari teks chunk yang ada
+# (bukan pengetahuan umum) agar MIN_SCORE bisa dikalibrasi. Chunk sumbernya sendiri belum
+# diverifikasi (verified_by kosong); bila KH mengubah chunk, perbarui pertanyaan/expected_chunks.
+# wayang-golek-003 masih penanda, jadi tidak dipakai.
+
+# --- pengenalan-bandung ---------------------------------------------------------
+- id: ins-01
+  city_id: bandung
+  question: "Kapan hari jadi Kota Bandung?"
+  expected_chunks: [pengenalan-bandung-001]
+- id: ins-02
+  city_id: bandung
+  lesson_id: pengenalan-bandung
+  question: "Siapa pendiri kota Bandung?"
+  expected_chunks: [pengenalan-bandung-001]
+- id: ins-03
+  city_id: bandung
+  question: "dulu ibu kota kabupaten bandung ada dimana sebelum pindah?"
+  expected_chunks: [pengenalan-bandung-002]
+  note: "huruf kecil, tanpa tanda baca"
+- id: ins-04
+  city_id: bandung
+  question: "Kenapa Daendels minta ibu kota Bandung dipindahkan?"
+  expected_chunks: [pengenalan-bandung-002]
+- id: ins-05
+  city_id: bandung
+  question: "Sejak kapan Bandung jadi ibu kota Keresidenan Priangan?"
+  expected_chunks: [pengenalan-bandung-003]
+- id: ins-06
+  city_id: bandung
+  question: "Apakah 1 April 1906 itu hari ulang tahun Bandung?"
+  expected_chunks: [pengenalan-bandung-003]
+- id: ins-07
+  city_id: bandung
+  question: "Konferensi Asia Afrika diadakan kapan dan di gedung apa?"
+  expected_chunks: [pengenalan-bandung-004]
+- id: ins-08
+  city_id: bandung
+  question: "Kenapa Bandung disebut Paris van Java?"
+  expected_chunks: [pengenalan-bandung-005]
+- id: ins-09
+  city_id: bandung
+  question: "Siapa arsitek yang merancang Gedung Sate?"
+  expected_chunks: [pengenalan-bandung-006]
+- id: ins-10
+  city_id: bandung
+  question: "Hiasan tusuk sate di puncak Gedung Sate artinya apa sih?"
+  expected_chunks: [pengenalan-bandung-006]
+  note: "gaya santai"
+- id: ins-11
+  city_id: bandung
+  question: "Gedung Sate sekarang dipakai buat apa?"
+  expected_chunks: [pengenalan-bandung-007]
+- id: ins-12
+  city_id: bandung
+  question: "Apa nama bioskop pertama di Bandung?"
+  expected_chunks: [pengenalan-bandung-008]
+- id: ins-13
+  city_id: bandung
+  lesson_id: pengenalan-bandung
+  question: "Ceritakan sejarah Jalan Braga."
+  expected_chunks: [pengenalan-bandung-008, pengenalan-bandung-005]
+
+# --- angklung -------------------------------------------------------------------
+- id: ins-14
+  city_id: bandung
+  question: "Angklung dimainkan dengan cara apa?"
+  expected_chunks: [angklung-001]
+- id: ins-15
+  city_id: bandung
+  lesson_id: angklung
+  question: "Tahun berapa angklung masuk daftar UNESCO?"
+  expected_chunks: [angklung-001]
+- id: ins-16
+  city_id: bandung
+  question: "angklung terbuat dari bahan apa"
+  expected_chunks: [angklung-001, angklung-004, angklung-007]
+  note: "jawaban di chunk memakai kata 'bambu', bukan 'bahan'"
+- id: ins-17
+  city_id: bandung
+  question: "Siapa Daeng Soetigna?"
+  expected_chunks: [angklung-002]
+- id: ins-18
+  city_id: bandung
+  lesson_id: angklung
+  question: "Apa bedanya angklung padaeng dengan angklung biasa?"
+  expected_chunks: [angklung-002]
+- id: ins-19
+  city_id: bandung
+  question: "Siapa yang mendirikan Saung Angklung Udjo?"
+  expected_chunks: [angklung-003]
+- id: ins-20
+  city_id: bandung
+  question: "Saung Angklung Udjo ada di daerah mana?"
+  expected_chunks: [angklung-003]
+
+# --- wayang-golek ---------------------------------------------------------------
+- id: ins-21
+  city_id: bandung
+  question: "Wayang golek itu terbuat dari apa?"
+  expected_chunks: [wayang-golek-002]
+- id: ins-22
+  city_id: bandung
+  question: "Kapan wayang diakui UNESCO?"
+  expected_chunks: [wayang-golek-001, wayang-golek-011]
+  note: "011 (tambahan 21 Nov) juga memuat tahun 2008; KH bisa menggabungkan 001 dan 011"
+- id: ins-23
+  city_id: bandung
+  lesson_id: wayang-golek
+  question: "Siapa Si Cepot?"
+  expected_chunks: [wayang-golek-004]
+- id: ins-24
+  city_id: bandung
+  question: "Kenapa wajah Cepot berwarna merah, dia melambangkan apa?"
+  expected_chunks: [wayang-golek-004]
+- id: ins-25
+  city_id: bandung
+  question: "Astrajingga itu tokoh apa di wayang golek?"
+  expected_chunks: [wayang-golek-004]
+
+# --- museum-sri-baduga ----------------------------------------------------------
+- id: ins-26
+  city_id: bandung
+  question: "Alamat Museum Sri Baduga di mana?"
+  expected_chunks: [museum-sri-baduga-001]
+- id: ins-27
+  city_id: bandung
+  question: "Kapan Museum Sri Baduga diresmikan?"
+  expected_chunks: [museum-sri-baduga-002]
+- id: ins-28
+  city_id: bandung
+  lesson_id: museum-sri-baduga
+  question: "Berapa jumlah koleksi museum ini?"
+  expected_chunks: [museum-sri-baduga-003]
+  note: "merujuk 'museum ini'; mengandalkan boost materi aktif"
+- id: ins-29
+  city_id: bandung
+  question: "Museum Sri Baduga milik provinsi mana?"
+  expected_chunks: [museum-sri-baduga-001, museum-sri-baduga-006]
+- id: ins-30
+  city_id: bandung
+  question: "Sejak kapan museumnya pakai nama Sri Baduga?"
+  expected_chunks: [museum-sri-baduga-002]
+
+# --- bahasa santai / percakapan (draf HR 21 Nov 2026, menunggu tinjauan KH) -------
+# Gaya obrolan pelajar: singkatan chat, partikel (sih, dong, ya), akhiran -in, kata gaul.
+- id: ins-31
+  city_id: bandung
+  question: "angklung tuh dimainin gmn sih?"
+  expected_chunks: [angklung-001, angklung-005]
+- id: ins-32
+  city_id: bandung
+  question: "kak, angklung bikinnya dari apa ya?"
+  expected_chunks: [angklung-001, angklung-004, angklung-007]
+- id: ins-33
+  city_id: bandung
+  question: "yg ngerancang gedung sate siapa?"
+  expected_chunks: [pengenalan-bandung-006]
+- id: ins-34
+  city_id: bandung
+  question: "bandung ultahnya tgl brp?"
+  expected_chunks: [pengenalan-bandung-001]
+- id: ins-35
+  city_id: bandung
+  question: "museum sri baduga dmn alamatnya?"
+  expected_chunks: [museum-sri-baduga-001]
+- id: ins-36
+  city_id: bandung
+  question: "si cepot tuh siapa sih? kok mukanya merah"
+  expected_chunks: [wayang-golek-004]
+- id: ins-37
+  city_id: bandung
+  question: "knp bandung dijulukin paris van java?"
+  expected_chunks: [pengenalan-bandung-005]
+- id: ins-38
+  city_id: bandung
+  question: "wayang golek tuh bonekanya dari kayu ya?"
+  expected_chunks: [wayang-golek-002, wayang-golek-005]
+- id: ins-39
+  city_id: bandung
+  question: "koleksi di museum sri baduga ada brp banyak?"
+  expected_chunks: [museum-sri-baduga-003, museum-sri-baduga-007]
+- id: ins-40
+  city_id: bandung
+  question: "main angklung bareng2 tuh ngelatih apa aja?"
+  expected_chunks: [angklung-009, angklung-005]

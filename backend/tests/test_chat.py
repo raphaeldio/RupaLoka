@@ -10,7 +10,7 @@ import pytest
 from fastapi.testclient import TestClient
 from starlette.requests import Request
 
-from app.chat import RateLimiter, apply_citations
+from app.chat import RateLimiter, apply_citations, drop_refusal_citations
 from app.config import Settings
 from app.llm import LLMError, Turn
 from app.main import client_ip, create_app
@@ -46,6 +46,9 @@ def root(make_content: Any) -> Path:
 
 
 def make_client(root: Path, llm: FakeLLM | None, **settings: Any) -> TestClient:
+    # Korpus fikstur kecil: skornya tidak sebanding dengan MIN_SCORE bawaan (dikalibrasi pada konten
+    # asli), jadi uji memakai ambang tetap; uji gerbang mengatur min_score sendiri.
+    settings.setdefault("min_score", 1.0)
     return TestClient(create_app(Settings(content_dir=root, **settings), llm=llm))
 
 
@@ -101,6 +104,15 @@ def test_low_score_below_min_score_is_refused(root: Path) -> None:
     assert llm.calls == []
 
 
+def test_topical_question_passes_gate_even_with_low_score(root: Path) -> None:
+    # "materi" ada di judul materi fikstur: jalur topik, ke LLM walau skor rendah.
+    llm = FakeLLM("Zorblat dibuat dari kayu [materi-a-001].")
+    with make_client(root, llm, min_score=1000.0) as c:
+        body = ask(c, "Materi ini tentang apa?").json()
+    assert len(llm.calls) == 1
+    assert body["refusal_reason"] != "out_of_scope"
+
+
 def test_answer_without_valid_citation_is_refused(root: Path) -> None:
     for reply in ["Zorblat dibuat dari kayu.", "Zorblat [palsu-001].", ""]:
         with make_client(root, FakeLLM(reply)) as c:
@@ -108,6 +120,37 @@ def test_answer_without_valid_citation_is_refused(root: Path) -> None:
         assert body["refusal_reason"] == "no_valid_citation", reply
         assert body["grounded"] is False
         assert "belum punya informasi" in body["answer"]
+
+
+def test_refusal_with_citation_marker_is_still_a_refusal(root: Path) -> None:
+    # Gemini kadang menolak sambil memberi penanda; itu bukan jawaban bersumber.
+    replies = [
+        "Maaf, aku belum punya informasi tentang harga tiket [materi-a-001].",
+        "Halo! Aku belum punya informasinya [materi-a-001].",
+        "Aku tidak tahu soal itu [materi-a-001]",
+    ]
+    for reply in replies:
+        with make_client(root, FakeLLM(reply)) as c:
+            body = ask(c).json()
+        assert body["refusal_reason"] == "no_valid_citation", reply
+        assert body["citations"] == []
+
+
+def test_partial_answer_keeps_cited_facts(root: Path) -> None:
+    reply = "Zorblat dibuat dari kayu [materi-a-001]. Aku belum punya informasi soal harganya."
+    with make_client(root, FakeLLM(reply)) as c:
+        body = ask(c).json()
+    assert body["refusal_reason"] != "out_of_scope"
+    assert [x["chunk_id"] for x in body["citations"]] == ["materi-a-001"]
+    assert body["answer"].startswith("Zorblat dibuat dari kayu [1].")
+
+
+def test_drop_refusal_citations_only_touches_refusals() -> None:
+    text = "Fakta satu [a-001]. Aku belum punya informasi itu [a-002]. Fakta dua [a-003]!"
+    assert drop_refusal_citations(text) == (
+        "Fakta satu [a-001]. Aku belum punya informasi itu . Fakta dua [a-003]!"
+    )
+    assert drop_refusal_citations("Tidak ada data harga [a-001]") == "Tidak ada data harga "
 
 
 def test_lesson_context_limits_suggestions(root: Path) -> None:

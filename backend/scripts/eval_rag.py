@@ -5,6 +5,7 @@ Pemakaian (dari folder backend/):
     python scripts/eval_rag.py --min-score 2.5    # coba ambang lain
     python scripts/eval_rag.py --llm              # alur chat penuh (perlu GEMINI_API_KEY)
     python scripts/eval_rag.py --json hasil.json  # simpan semua baris dan metrik
+    python scripts/eval_rag.py --strict           # keluar 1 bila gerbang salah memilah
 
 Set evaluasi: `eval/in_scope.yaml` dan `eval/out_of_scope.yaml` (T-060).
 
@@ -38,12 +39,18 @@ from pydantic import BaseModel, ConfigDict, Field, TypeAdapter, ValidationError
 BACKEND_DIR = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(BACKEND_DIR))
 
-from app.chat import ChatContext, ChatRequest, ChatResponse, ChatService  # noqa: E402
+from app.chat import (  # noqa: E402
+    ChatContext,
+    ChatRequest,
+    ChatResponse,
+    ChatService,
+    is_refusal_sentence,
+)
 from app.config import Settings  # noqa: E402
 from app.content_loader import Content, is_unfilled, load_content  # noqa: E402
 from app.llm import LLM, GeminiLLM, LLMError  # noqa: E402
 from app.prompts import SYSTEM_TEMPLATE  # noqa: E402
-from app.retrieval import TOP_K, Retriever  # noqa: E402
+from app.retrieval import TOP_K, Retriever, passes_gate  # noqa: E402
 
 DEFAULT_CONTENT = BACKEND_DIR.parent / "content"
 DEFAULT_EVAL_DIR = BACKEND_DIR.parent / "eval"
@@ -137,6 +144,7 @@ class RetrievalRow:
     gate_pass: bool
     recall_hit: bool | None = None  # hanya dalam cakupan
     gate_expected: bool | None = None  # hanya luar cakupan
+    topical: bool = False  # lolos lewat jalur istilah topik (judul materi), bukan skor
 
 
 def retrieve_rows(
@@ -151,8 +159,15 @@ def retrieve_rows(
         hits = retriever.search(city, q, lesson_id=lesson, top_k=top_k)
         top = hits[0].raw_score if hits else 0.0
         chunks = [h.chunk.id for h in hits]
+        topical = bool(hits) and retriever.is_topical(city, q)
         return RetrievalRow(
-            case_id, set_name, q, round(top, 4), chunks, bool(hits) and top >= min_score
+            case_id,
+            set_name,
+            q,
+            round(top, 4),
+            chunks,
+            passes_gate(hits, topical, min_score),
+            topical=topical,
         )
 
     rows: list[RetrievalRow] = []
@@ -211,6 +226,18 @@ def separable_range(
     return (hi_block, lo_pass) if hi_block < lo_pass else None
 
 
+def gate_failures(rows: Iterable[RetrievalRow]) -> list[str]:
+    """Kasus yang salah dipilah gerbang pada ambang laporan: dalam cakupan atau pertanyaan saran
+    yang ditolak, serta luar cakupan (`off_topic`, `other_region`) yang lolos."""
+    out: list[str] = []
+    for r in rows:
+        if r.set in ("in_scope", "suggested") and not r.gate_pass:
+            out.append(f"{r.case_id}: seharusnya lolos gerbang (skor {r.top_score})")
+        elif r.set == "out_of_scope" and r.gate_expected and r.gate_pass:
+            out.append(f"{r.case_id}: seharusnya ditolak gerbang (skor {r.top_score})")
+    return out
+
+
 # --- tahap LLM ---------------------------------------------------------------
 
 
@@ -240,8 +267,16 @@ class LLMRow:
     violations: list[str] = field(default_factory=list)
     expected_cited: bool | None = None  # dalam cakupan: sitasi memuat chunk yang diharapkan
     correct_refusal: bool | None = None  # luar cakupan dengan expect=refusal
+    partial: bool = False  # menyatakan belum punya info + fakta terkait bersitasi
     error: str | None = None
     answer: str = ""
+
+
+def is_partial_answer(res: ChatResponse) -> bool:
+    """Jawaban parsial: bersitasi, dan memuat kalimat "belum punya informasi" untuk bagian yang
+    tidak ada di konteks (pola yang diizinkan, ADR 30)."""
+    sentences = re.split(r"(?<=[.!?])\s+", res.answer)
+    return bool(res.citations) and any(is_refusal_sentence(s) for s in sentences)
 
 
 def judge(
@@ -251,6 +286,7 @@ def judge(
     expected_chunks: Iterable[str] = (),
     expect: str | None = None,
     must_not_contain: Iterable[str] = (),
+    kind: str | None = None,
 ) -> LLMRow:
     cited = [c.chunk_id for c in res.citations]
     row = LLMRow(case_id, set_name, res.refusal_reason, cited, answer=res.answer)
@@ -261,13 +297,20 @@ def judge(
         row.violations.append("grounded tidak sesuai refusal_reason")
     if prompt_leaked(res.answer):
         row.violations.append("prompt sistem bocor")
-    low = res.answer.lower()
-    row.violations += [f"memuat '{p}'" for p in must_not_contain if p.lower() in low]
+    # Frasa terlarang dihitung pada kalimat klaim saja: "aku belum punya informasi bahwa angklung
+    # berasal dari Jepang" adalah penolakan yang benar, bukan klaim palsu.
+    claims = " ".join(
+        s for s in re.split(r"(?<=[.!?])\s+", res.answer) if not is_refusal_sentence(s)
+    ).lower()
+    row.violations += [f"memuat '{p}'" for p in must_not_contain if p.lower() in claims]
     expected = list(expected_chunks)
     if expected:
         row.expected_cited = any(c in cited for c in expected)
+    row.partial = not refused and is_partial_answer(res)
     if expect == "refusal":
-        row.correct_refusal = refused
+        # near_miss (disetujui tim 21 Nov 2026): boleh menolak penuh ATAU menjawab parsial, yaitu
+        # mengaku belum punya info yang ditanya lalu memberi fakta terkait yang bersitasi.
+        row.correct_refusal = refused or (kind == "near_miss" and row.partial)
     return row
 
 
@@ -305,6 +348,7 @@ async def run_llm(
                     case.id,
                     expect=case.expect,
                     must_not_contain=case.must_not_contain,
+                    kind=case.kind,
                 )
             )
     return rows
@@ -358,19 +402,24 @@ def build_report(
     m["luar cakupan ditolak gerbang"] = pct(sum(not r.gate_pass for r in gate_rows), len(gate_rows))
     m["pertanyaan saran lolos gerbang"] = pct(sum(r.gate_pass for r in sug_rows), len(sug_rows))
 
-    # Dasar sapuan: set dalam cakupan; bila belum ada, pertanyaan saran materi (sementara).
+    m["lolos lewat jalur topik (semua set)"] = pct(sum(r.topical for r in rows), len(rows))
+
+    # Dasar sapuan: set dalam cakupan + pertanyaan saran (keduanya wajib lolos). Kueri bertopik
+    # lolos tanpa memandang ambang, jadi sapuan hanya memakai kueri TANPA istilah topik.
     pass_rows, report.sweep_basis = (
-        (in_rows, "in_scope.yaml")
+        ([*in_rows, *sug_rows], "in_scope.yaml + pertanyaan saran, tanpa istilah topik")
         if in_rows
         else (
             sug_rows,
             "suggested_questions materi (sementara; in_scope.yaml masih kosong)",
         )
     )
-    pass_scores = [r.top_score for r in pass_rows]
-    block_scores = [r.top_score for r in gate_rows]
+    pass_scores = [r.top_score for r in pass_rows if not r.topical]
+    block_scores = [r.top_score for r in gate_rows if not r.topical]
     report.sweep = sweep(pass_scores, block_scores, min_score)
-    report.separable = separable_range(pass_scores, block_scores)
+    # Luar cakupan yang memuat istilah topik selalu lolos: tidak ada ambang yang memperbaikinya.
+    topical_leak = any(r.topical for r in gate_rows)
+    report.separable = None if topical_leak else separable_range(pass_scores, block_scores)
     return report
 
 
@@ -389,6 +438,9 @@ def add_llm_metrics(report: Report, rows: list[LLMRow], model: str) -> None:
     m["LLM: luar cakupan ditolak dengan benar"] = pct(
         sum(bool(r.correct_refusal) for r in refusal), len(refusal)
     )
+    m["LLM: near_miss dijawab parsial (dihitung benar)"] = str(
+        sum(r.partial and bool(r.correct_refusal) for r in refusal)
+    )
     m["LLM: pelanggaran (harus 0)"] = str(len(report.violations))
 
 
@@ -397,15 +449,13 @@ def print_report(report: Report, warnings: Sequence[str]) -> None:
     print(f" | model {report.model}" if report.model else " | tanpa LLM")
     print(f"Chunk: {report.chunks_total}, {report.chunks_placeholder} masih penanda [PERLU DIISI]")
     if report.chunks_placeholder:
-        print(
-            "  ! Chunk penanda ikut terindeks di mode pengembangan; kalibrasi belum mewakili rilis."
-        )
+        print("  ! Chunk penanda tidak diindeks; isi chunk itu lalu kalibrasi ulang MIN_SCORE.")
     for w in warnings:
         print(f"  ! {w}")
 
     print("\nRetrieval (skor = raw_score BM25 teratas):")
     for r in report.retrieval:
-        mark = "lolos" if r.gate_pass else "tolak"
+        mark = ("topik" if r.topical else "lolos") if r.gate_pass else "tolak"
         extra = ""
         if r.recall_hit is not None:
             extra = " recall:ya" if r.recall_hit else " recall:TIDAK"
@@ -471,6 +521,9 @@ def main(argv: list[str] | None = None, llm: LLM | None = None) -> int:
     parser.add_argument("--llm", action="store_true", help="jalankan alur chat penuh (Gemini)")
     parser.add_argument("--delay", type=float, default=4.0, help="jeda antar panggilan LLM (dtk)")
     parser.add_argument("--json", type=Path, help="simpan laporan lengkap ke berkas JSON")
+    parser.add_argument(
+        "--strict", action="store_true", help="gagal (kode 1) bila gerbang salah memilah kasus"
+    )
     args = parser.parse_args(argv)
 
     if hasattr(sys.stdout, "reconfigure"):
@@ -524,7 +577,13 @@ def main(argv: list[str] | None = None, llm: LLM | None = None) -> int:
             json.dumps(report_json(report), ensure_ascii=False, indent=2), encoding="utf-8"
         )
         print(f"\nLaporan JSON: {args.json}")
-    return 1 if report.violations else 0
+    failed = gate_failures(report.retrieval) if args.strict else []
+    if failed:
+        print(f"\nGerbang salah memilah pada MIN_SCORE {args.min_score} (--strict):")
+        for f in failed:
+            print(f"  {f}")
+        print("Kalibrasi ulang MIN_SCORE dari sapuan ambang, atau perbaiki chunk/pertanyaan.")
+    return 1 if report.violations or failed else 0
 
 
 if __name__ == "__main__":
