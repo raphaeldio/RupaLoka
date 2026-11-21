@@ -1,6 +1,14 @@
 import { describe, expect, it } from 'vitest'
 import {
   AIR_TIME,
+  meetDistance,
+  MEET_CLEAR_AFTER,
+  MEET_CLEAR_BEFORE,
+  metersOf,
+  NPC_MEET_X,
+  visibleNpcs,
+  WORLD_W,
+  type Obstacle,
   clearable,
   collides,
   createGame,
@@ -102,16 +110,18 @@ describe('unlock', () => {
       const ev = r.events.find((x) => x.type === 'UNLOCK')!
       expect(ev).toEqual({ type: 'UNLOCK', index: k - 1, threshold: k * 100 })
       expect(r.state.status).toBe('paused')
-      expect(r.state.score).toBeGreaterThanOrEqual(k * 100)
-      expect(r.state.score).toBeLessThan(k * 100 + 5)
+      // Ambang dalam meter: 100 m = 1000 poin.
+      expect(metersOf(r.state.distance)).toBe(k * 100)
+      expect(r.state.score).toBeGreaterThanOrEqual(k * 1000)
+      expect(r.state.score).toBeLessThan(k * 1000 + 5)
       // Saat dijeda, step tidak mengubah apa pun dan tidak memancarkan ulang.
       expect(step(r.state, 1, false, cfg)).toEqual({ state: r.state, events: [] })
       unlocks.push(ev.index)
       s = noObstacles(resume(r.state))
     }
     expect(unlocks).toEqual([0, 1, 2])
-    // Setelah semua item terbuka, ambang 400/500 tidak menjeda.
-    const r = runUntil(s, cfg, (_, st) => st.score >= 520)
+    // Setelah semua item terbuka, ambang 400/500 m tidak menjeda.
+    const r = runUntil(s, cfg, (_, st) => metersOf(st.distance) >= 520)
     expect(r.state.status).toBe('running')
     expect(r.state.unlocked).toEqual([0, 1, 2])
   })
@@ -128,9 +138,9 @@ describe('unlock', () => {
   })
 
   it('pengali debug mempercepat skor', () => {
-    const c = { ...cfg, scoreMultiplier: 5 }
-    const r = runUntil(noObstacles(start(createGame(c, 1))), c, (e) => e.some((x) => x.type === 'UNLOCK'))
-    expect(r.state.elapsed).toBeLessThan(2)
+    const first = (c: GameConfig) =>
+      runUntil(noObstacles(start(createGame(c, 1))), c, (e) => e.some((x) => x.type === 'UNLOCK')).state.elapsed
+    expect(first({ ...cfg, scoreMultiplier: 10 })).toBeLessThan(first(cfg) / 5)
   })
 })
 
@@ -148,5 +158,56 @@ describe('lompat dan game over', () => {
     const r = runUntil(s, cfg, (e) => e.some((x) => x.type === 'GAME_OVER'))
     expect(r.state.status).toBe('over')
     expect(step(r.state, 1 / 60, true, cfg).events).toEqual([])
+  })
+})
+
+describe('NPC tiap ambang (100 m)', () => {
+  it('ambang ke-k = k × unlockEvery meter (100 m = 1000 poin)', () => {
+    expect(metersOf(meetDistance(1, cfg))).toBe(100)
+    expect(metersOf(meetDistance(3, cfg))).toBe(300)
+    expect(meetDistance(1, cfg) / 10).toBe(1000)
+  })
+
+  it('NPC mendekat dari kanan dan berdiri di depan pelari tepat saat UNLOCK', () => {
+    let s = noObstacles(start(createGame(cfg, 1)))
+    const before = { ...s, distance: meetDistance(1, cfg) - 300 }
+    const ahead = visibleNpcs(before, cfg)
+    expect(ahead).toEqual([{ index: 0, x: NPC_MEET_X + 300, ahead: true }])
+
+    const r = runUntil(s, cfg, (e) => e.some((x) => x.type === 'UNLOCK'))
+    s = r.state
+    const npc = visibleNpcs(s, cfg).find((n) => n.index === 0)
+    expect(npc).toBeDefined()
+    expect(npc!.ahead).toBe(false)
+    // Bertemu: NPC sudah sampai di depan pelari (selisih ≤ satu substep).
+    expect(Math.abs(npc!.x - NPC_MEET_X)).toBeLessThan(10)
+  })
+
+  it('tidak ada NPC setelah semua item terbuka', () => {
+    const s = { ...createGame(cfg, 1), nextUnlock: cfg.itemCount + 2, distance: meetDistance(cfg.itemCount + 1, cfg) }
+    expect(visibleNpcs(s, cfg)).toEqual([])
+  })
+
+  it('rintangan tidak pernah tiba di dekat titik temu NPC', () => {
+    const c = { ...cfg, unlockEvery: 30 }
+    let s = start(createGame(c, 7))
+    const arrivals: number[] = []
+    const seen = new Set<Obstacle>()
+    for (let i = 0; i < 60 * 120 && s.nextUnlock <= c.itemCount + 1; i++) {
+      // Lompat otomatis tidak dibutuhkan: posisi rintangan saat muncul sudah cukup.
+      const r = step(s, 1 / 60, false, c)
+      for (const o of r.state.obstacles) {
+        if (!seen.has(o) && o.x > WORLD_W - 20) {
+          seen.add(o)
+          arrivals.push(r.state.distance + (o.x - PLAYER.x))
+        }
+      }
+      s = r.state.status === 'running' ? r.state : { ...r.state, status: 'running', obstacles: [] }
+    }
+    expect(arrivals.length).toBeGreaterThan(3)
+    for (let k = 1; k <= c.itemCount; k++) {
+      const meet = meetDistance(k, c)
+      for (const a of arrivals) expect(a > meet - MEET_CLEAR_BEFORE - 60 && a < meet + MEET_CLEAR_AFTER - 20).toBe(false)
+    }
   })
 })

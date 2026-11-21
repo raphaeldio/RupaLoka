@@ -12,6 +12,7 @@
  */
 import type { MascotMood } from '../lib/agentStore'
 import './mascot.css'
+import PixelMascot from './mascot/PixelMascot'
 
 const files = import.meta.glob<string>('../assets/maskot/maskot*.{svg,png,webp,gif}', {
   query: '?url',
@@ -24,30 +25,16 @@ function srcFor(mood: MascotMood): string | null {
   return pick(`maskot-${mood}`) ?? pick('maskot') ?? null
 }
 
-/** Wajah sementara (orisinal, sederhana) sampai gambar maskot tersedia. */
-function Placeholder({ mood }: { mood: MascotMood }) {
-  return (
-    <svg viewBox="0 0 64 64" className="size-full" aria-hidden="true">
-      <circle cx="32" cy="34" r="26" fill="#146b68" />
-      <circle cx="32" cy="34" r="26" fill="none" stroke="#e8b64c" strokeWidth="3" />
-      <ellipse cx="23" cy="31" rx="3.2" ry={mood === 'thinking' ? 1.6 : 3.6} fill="#fff" />
-      <ellipse cx="41" cy="31" rx="3.2" ry={mood === 'thinking' ? 1.6 : 3.6} fill="#fff" />
-      {mood === 'talking' ? (
-        <ellipse cx="32" cy="43" rx="5" ry="4" fill="#fff" />
-      ) : (
-        <path d="M24 42c4 4 12 4 16 0" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" />
-      )}
-      <circle cx="17" cy="39" r="3" fill="#e8b64c" opacity=".55" />
-      <circle cx="47" cy="39" r="3" fill="#e8b64c" opacity=".55" />
-    </svg>
-  )
+/** Maskot piksel bawaan (warna tema) bila belum ada berkas gambar di assets/maskot. */
+function Pixel({ mood }: { mood: MascotMood }) {
+  return <PixelMascot face={mood === 'thinking' ? 'thinking' : 'normal'} talking={mood === 'talking'} className="size-full" />
 }
 
 export default function Mascot({ mood = 'idle', className }: { mood?: MascotMood; className?: string }) {
   const src = srcFor(mood)
   return (
     <span data-mood={mood} className={`maskot inline-block ${className ?? ''}`}>
-      {src ? <img src={src} alt="" className="size-full object-contain" draggable={false} /> : <Placeholder mood={mood} />}
+      {src ? <img src={src} alt="" className="size-full object-contain" draggable={false} /> : <Pixel mood={mood} />}
     </span>
   )
 }

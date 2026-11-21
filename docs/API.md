@@ -20,6 +20,8 @@ Sumber kebenaran: kode backend (`backend/app/`). Tipe TypeScript dibuat otomatis
 | GET | `/api/content/sources` | `SourcesResponse` | Halaman `/sumber`: lisensi aset + daftar sumber |
 | GET | `/api/assets/{path}` | berkas | Gambar konten. Pakai `assetUrl(src)` |
 | POST | `/api/chat` | `ChatResponse` | Tanya agen; lihat di bawah |
+| GET | `/api/leaderboard/{id}?player_id=` | `LeaderboardResponse` | Papan peringkat akhir tur (skor = total poin path). `entries[0].title` = gelar juara. `you` diisi bila `player_id` dikirim. 404 bila kota tanpa `rewards.leaderboard`; 503 bila penyimpanan mati. `no-store` |
+| POST | `/api/leaderboard/{id}` | `LeaderboardResponse` | Badan `ScoreSubmit {player_id (UUID), nickname, points}`. Skor terbaik per pemain disimpan. 422: nama 3-20 karakter huruf/angka/spasi/`._-`, kata tidak pantas, atau poin > batas kota; 429 batas laju per IP |
 
 Respons konten di-cache 5 menit (`Cache-Control: public, max-age=300`). Muat `CityDetail` sekali per kota lalu simpan di store.
 
@@ -31,8 +33,8 @@ Respons konten di-cache 5 menit (`Cache-Control: public, max-age=300`). Muat `Ci
 | `agent_script` | Kalimat agen per fase. `item_unlocked` diisi dengan `fillTemplate(t, { item, short_explanation })` |
 | `quiz.intro` | Kuis dasar. `correct` = indeks opsi benar (mulai 0). `chunk` → sumber di `sources[chunk]` |
 | `lessons` | Kartu materi, sudah berurutan. `key_facts[].chunk` → `sources`. `location` boleh `null`; tombol "Lihat lokasi asli" hanya bila `lat` dan `lng` tidak `null` |
-| `items` | Sudah berurutan sesuai `game.items_order`: ambang ke-k (`k × game.unlock_every`) membuka `items[k-1]`. Setelah item habis, game lanjut tanpa jeda |
-| `game` | `unlock_every`, `obstacles` (id sprite), `background`, `speed {start, max, ramp_per_100}` dalam piksel/detik |
+| `items` | Sudah berurutan sesuai `game.items_order`: ambang ke-k (`k × game.unlock_every` meter) membuka `items[k-1]`. Setelah item habis, game lanjut tanpa jeda |
+| `game` | `unlock_every` (meter), `obstacles` (id sprite), `background`, `speed {start, max, ramp_per_100}` dalam piksel/detik |
 | `sources` | Peta `chunk_id → SourceRef` untuk menampilkan rujukan kuis, fakta, dan item; `lesson_id` = materi asal chunk (saran materi F-022). Teks chunk tidak pernah dikirim |
 
 Gambar: `lesson.images[].src` dan `item.image.src` relatif ke `content/`. URL = `assetUrl(src)` → `/api/assets/...`. Selalu pakai `alt`; bila gambar gagal dimuat, tampilkan placeholder (berkas mungkin belum ada selama konten belum lengkap).

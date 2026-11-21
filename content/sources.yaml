@@ -17,14 +17,65 @@ assets:
     license: "[PERLU DIISI]"
     author: "[PERLU DIISI]"
   - path: assets/images/item-angklung.webp
-    license: "[PERLU DIISI]"
-    author: "[PERLU DIISI]"
+    license: "milik sendiri (tim KamiPemenang)"
+    author: "Tim KamiPemenang"
   - path: assets/images/item-wayang.webp
-    license: "[PERLU DIISI]"
-    author: "[PERLU DIISI]"
-  - path: assets/images/item-sri-baduga.webp
-    license: "[PERLU DIISI]"
-    author: "[PERLU DIISI]"
+    license: "milik sendiri (tim KamiPemenang)"
+    author: "Tim KamiPemenang"
+  - path: assets/images/item-cepot.webp
+    license: "milik sendiri (tim KamiPemenang)"
+    author: "Tim KamiPemenang"
+  - path: assets/images/cepot.webp
+    license: "milik sendiri (tim KamiPemenang)"
+    author: "Tim KamiPemenang"
+    note: "Ilustrasi Si Cepot Astrajingga (item game)"
+  - path: assets/images/angklung.webp
+    license: "milik sendiri (tim KamiPemenang)"
+    author: "Tim KamiPemenang"
+    note: "Ilustrasi alat musik angklung (item game)"
+  - path: assets/images/wayang-golek.webp
+    license: "milik sendiri (tim KamiPemenang)"
+    author: "Tim KamiPemenang"
+    note: "Ilustrasi boneka wayang golek (item game)"
+  # Karakter piksel game (folder tim "PIXEL NPC"); dibundel di frontend/src/game/sprites/,
+  # latar gelap dihapus dan dipotong. Path di bawah relatif ke repo, bukan content/.
+  - path: ../frontend/src/game/runnerSprite.ts
+    license: "milik sendiri (tim KamiPemenang)"
+    author: "[PERLU DIISI] pembuat gambar asli"
+    note: "Pelari pangsi tampak samping (peta piksel di kode), diturunkan dari desain tim pangsi2.png"
+  - path: ../frontend/src/game/sprites/npc-angklung.png
+    license: "milik sendiri (tim KamiPemenang)"
+    author: "[PERLU DIISI] pembuat gambar"
+    note: "NPC pemain angklung; asal: Pixel Angklung Character.png"
+  - path: ../frontend/src/game/sprites/npc-angklung-2.png
+    license: "milik sendiri (tim KamiPemenang)"
+    author: "[PERLU DIISI] pembuat gambar"
+    note: "NPC warga Bandung; asal: pixel angklung2.png"
+  - path: ../frontend/src/game/sprites/npc-wayang.png
+    license: "milik sendiri (tim KamiPemenang)"
+    author: "[PERLU DIISI] pembuat gambar"
+    note: "NPC pembawa wayang golek; asal: pixel wayang.png"
+  # Latar game Bandung (folder tim "ASSET GAME/ASSET"); langit dihapus, dipotong, dikompres webp.
+  - path: ../frontend/src/game/sprites/scene/road.webp
+    license: "milik sendiri (tim KamiPemenang)"
+    author: "[PERLU DIISI] pembuat gambar"
+    note: "Jalan berulang (trotoar, kerb, aspal); asal: street pixel.png"
+  - path: ../frontend/src/game/sprites/scene/bandung-bg.webp
+    license: "milik sendiri (tim KamiPemenang)"
+    author: "[PERLU DIISI] pembuat gambar"
+    note: "Latar statis pemandangan kota dengan tulisan BANDUNG; asal: Bandung Pixel Street.png"
+  - path: ../frontend/src/game/sprites/scene/gedung-sate.webp
+    license: "milik sendiri (tim KamiPemenang)"
+    author: "[PERLU DIISI] pembuat gambar"
+    note: "Gedung Sate (latar saja, bukan rintangan); asal: gedung sate.png"
+  - path: ../frontend/src/game/sprites/scene/rumah-adat.webp
+    license: "milik sendiri (tim KamiPemenang)"
+    author: "[PERLU DIISI] pembuat gambar"
+    note: "Rumah adat panggung (latar saja, bukan rintangan); asal: rumah adat.png. Jenis rumah adat: [PERLU DIISI, verifikasi KH]"
+  - path: ../frontend/src/components/mascot/PixelMascot.tsx
+    license: "milik sendiri (tim KamiPemenang)"
+    author: "[PERLU DIISI] pembuat desain maskot"
+    note: "Maskot pemandu (peta piksel di kode), diturunkan dari desain tim (gambar maskot bermahkota, 20 Nov 2026); warna disesuaikan tema. Nama maskot: TODO (T-005)"
 
 # Objek game. Rintangan di city.yaml harus terdaftar di sini dan disetujui KH (approved_by).
 # sensitive: true = objek budaya/sakral/dihormati; validator MENOLAK bila dipakai sebagai rintangan
@@ -51,3 +102,7 @@ objects:
     name: Wayang golek
     sensitive: true
     note: "Objek budaya; hanya sebagai item hadiah"
+  - id: cepot
+    name: Si Cepot
+    sensitive: true
+    note: "Objek budaya (tokoh punakawan wayang golek); hanya sebagai item hadiah"

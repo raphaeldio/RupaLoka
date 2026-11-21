@@ -17,6 +17,7 @@ const rewards: Rewards = {
   points_per_node: 100,
   points_per_correct: 10,
   game_node_points: 100,
+  leaderboard: null,
   badges: [badge('a', 100), badge('b', 300), badge('c', 500)],
 }
 const lessons = ['l1', 'l2', 'l3']

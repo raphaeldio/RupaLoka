@@ -16,6 +16,8 @@ export function QuizCard({
   onAnswer,
   onNext,
   onSkip,
+  kind = 'Kuis awal',
+  finalLabel = 'Lanjut ke materi',
 }: {
   question: QuizQuestion
   number: number
@@ -25,6 +27,10 @@ export function QuizCard({
   onAnswer: (choice: number) => void
   onNext: () => void
   onSkip: () => void
+  /** Nama kuis di atas soal, mis. "Kuis awal" atau "Kuis akhir". */
+  kind?: string
+  /** Label tombol pada soal terakhir. */
+  finalLabel?: string
 }) {
   const answered = answer !== null
   const correct = answer === question.correct
@@ -37,7 +43,7 @@ export function QuizCard({
     <Card>
       <div className="flex items-center justify-between gap-3">
         <p className="text-xs font-extrabold uppercase tracking-[1.6px] text-redup">
-          Soal {number} dari {total}
+          {kind} · Soal {number} dari {total}
         </p>
         <div className="flex gap-1" aria-hidden="true">
           {Array.from({ length: total }, (_, i) => (
@@ -111,7 +117,7 @@ export function QuizCard({
           Lewati kuis
         </Button>
         <Button onClick={onNext} disabled={!answered}>
-          {number < total ? 'Soal berikutnya' : 'Lanjut ke materi'}
+          {number < total ? 'Soal berikutnya' : finalLabel}
         </Button>
       </div>
     </Card>

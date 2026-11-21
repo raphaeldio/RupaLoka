@@ -107,7 +107,7 @@ id: bandung
 phases: [quiz_intro, lessons, game, summary]   # urutan alur
 lessons: [angklung, wayang-golek, museum-sri-baduga]
 game:
-  unlock_every: 1000         # poin game per item
+  unlock_every: 100          # meter lari per item (1 m = 10 poin)
   items_order: [item-angklung, item-wayang, item-sri-baduga]
   obstacles: [batu, pagar, becak]   # [PERLU DIISI & disetujui KH; lihat PRD §7]
   background: bandung-day
@@ -202,7 +202,8 @@ Diperbarui 20 Nov 2026 (keputusan tim): alur linear kuis → materi → game dig
 /kota/:id/game     game runner → ringkasan (+poin titik game, lencana baru)
 ```
 - Titik ke-1 terbuka; titik berikutnya terbuka setelah titik sebelumnya selesai; titik game terbuka setelah semua titik materi selesai. URL titik terkunci dialihkan ke path.
-- Mesin per titik: reducer murni `flow/machine.ts` (`quiz(i) → lesson → done`; kejadian `ANSWER`, `NEXT`, `SKIP_QUIZ`, `FINISH_LESSON`, `RESET`). Titik tanpa soal mulai dari materi.
+- Mesin per titik: reducer murni `flow/machine.ts` (`quiz(i) → lesson → post(i) → done`; kejadian `ANSWER`, `NEXT`, `SKIP_QUIZ`, `FINISH_LESSON`, `RESET`). Titik tanpa soal mulai dari materi. Diperbarui 21 Nov 2026: **kuis akhir** (`post`) setelah materi memakai soal `quiz.outro` milik titik bila ada, bila belum mengulang soal kuis awal dengan urutan terbalik (`postQuestionsFor`). Poin jawaban benar = hasil terbaik kuis awal/akhir. Layar hasil menampilkan tombol "Lanjut: <titik berikutnya>".
+- Media materi (21 Nov 2026): `lesson.videos[]` (YouTube saja, divalidasi skema; `checked_by` kosong = peringatan). Video pertama disematkan via `youtube-nocookie.com` setelah diklik; gambar materi hanya tampil bila tidak ada video.
 - Poin dan lencana: fungsi murni `lib/rewards.ts`. Poin kota = titik selesai × `points_per_node` + jawaban benar (terbaik per titik) × `points_per_correct` + `game_node_points` bila game pernah ditamatkan. Lencana = `rewards.badges` dengan `min_points` ≤ poin. Mengulang titik tidak menambah poin ganda.
 - Progres disimpan (`zustand persist`, v3): titik selesai, jawaban benar terbaik, game selesai, rekor, item koleksi.
 - Agen: tiap halaman memanggil `useAgent().say(skrip fase)` dan `setContext({phase, lesson_id})`; chatbot melayang (`ChatWidget`) menampilkannya.
@@ -214,7 +215,7 @@ Diperbarui 20 Nov 2026 (keputusan tim): alur linear kuis → materi → game dig
 - Input satu aksi: ketuk layar/tombol Spasi/panah atas.
 - Spawner rintangan acak dengan jarak minimum yang selalu dapat dilompati (diuji unit pada rentang kecepatan).
 - Skor = jarak/10 (MVP-0 belum memiliki benda yang dipungut saat berlari). Kecepatan naik per ambang skor sampai maksimum.
-- **Unlock:** saat skor melewati `k × unlock_every` (k=1,2,...), engine memancarkan `UNLOCK(item_k)` sekali, dengan `item_k` = elemen ke-k pada `items_order`. Bila k melebihi panjang `items_order`, tidak ada unlock dan game tidak dijeda; `engine.pause()`, tampil `ItemModal` (gambar, nama, penjelasan singkat bersumber, tombol "Tanya lebih lanjut", "Lanjut"). Saat "Lanjut": hitung mundur 3 detik, lalu `resume()` tanpa mengubah skor.
+- **Unlock:** saat jarak melewati `k × unlock_every` meter (k=1,2,...; 1 m = 100 px), pelari bertemu NPC dan, engine memancarkan `UNLOCK(item_k)` sekali, dengan `item_k` = elemen ke-k pada `items_order`. Bila k melebihi panjang `items_order`, tidak ada unlock dan game tidak dijeda; `engine.pause()`, tampil `ItemModal` (gambar, nama, penjelasan singkat bersumber, tombol "Tanya lebih lanjut", "Lanjut"). Saat "Lanjut": hitung mundur 3 detik, lalu `resume()` tanpa mengubah skor.
 - **Selesai:** tabrakan → game over → `Summary` (skor, item terbuka, rekor, lokasi asli, main lagi). Jika semua item terbuka, tampilkan penyelesaian.
 - Jeda otomatis pada `visibilitychange`; tombol jeda; `prefers-reduced-motion` → kecepatan awal/maks lebih rendah.
 
@@ -370,13 +371,15 @@ Sediakan parameter uji `?debug=1` (hanya non-produksi) untuk mempercepat skor ag
 | 17 | `SourceRef` menyertakan `lesson_id` | Saran materi F-022 (soal salah → chunk → materi) tanpa menebak dari id chunk | Tipe TS dibuat ulang |
 | 18 | Path belajar per kota menggantikan alur linear | Keputusan tim 20 Nov 2026; kemajuan terlihat dan bertahap | Kuis dipecah per titik (soal mengikuti materi chunk-nya); validator memperingatkan titik tanpa soal |
 | 19 | Poin path + lencana di `city.yaml` (`rewards`) | Angka dapat diubah tim tanpa kode; lencana dipindah dari P2 ke MVP atas permintaan tim | Angka DRAF (100/titik, 10/jawaban benar, 100 game; lencana 100/300/500) |
-| 20 | Item game tiap 1000 poin (`unlock_every`) | Keputusan tim 20 Nov 2026 | Mencapai item pertama butuh ±25 dtk berlari; `?debug=1` mempercepat ×10 |
+| 20 | Item game tiap 1000 poin (`unlock_every`) | Keputusan tim 20 Nov 2026 | Digantikan ADR 26 |
 | 21 | Leaflet + GeoJSON OSM tanpa tile | Peta mengikuti batas asli 38 provinsi (geoBoundaries masih 34, data 2017); gaya penuh sesuai palet; tanpa ketergantungan layanan tile | Data ODbL wajib diatribusi; ~detail ±1 km (disederhanakan); bundel +~150 kB, halaman kota dimuat lazy |
 | 22 | Chatbot melayang dengan slot maskot | Permintaan tim; maskot dapat diganti dan dianimasikan tanpa mengubah pemanggil | Status chat di `lib/agentStore.ts` (tidak disimpan) |
 | 23 | Peta: klik provinsi → panel kota; kota aktif → konfirmasi → `map.flyTo` + pesawat (CSS `offset-path`) → path | Permintaan tim (20 Nov 2026); perjalanan terasa seperti "terbang" ke kota | Dialog di-portal ke `body`; animasi dilewati bila `prefers-reduced-motion` |
 | 24 | Mode uji kuis `?demo=1` hanya di dev | Mekanik kuis dapat diuji sebelum soal asli ada, tanpa mengarang fakta budaya | Soal uji ditandai "[Soal uji]" dan spanduk "Mode uji" |
 | 25 | UI: shadcn/ui (AlertDialog, Sheet, Tooltip, Progress, Badge, Sonner, Button) + React Bits (BlurText, CountUp, ClickSpark, SpotlightCard, ShinyText, Magnet, TiltedCard) + `motion` | Permintaan tim (20 Nov 2026): web lebih hidup; animasi ringan tanpa WebGL demi ponsel | Token shadcn dipetakan ke palet (index.css); komponen vendor di `components/ui` dan `components/reactbits` (dikecualikan dari lint); React Bits berlisensi MIT + Commons Clause (lihat `components/reactbits/LICENSE.md`); peta dan halaman sekunder dimuat lazy (bundel awal ±105 kB gzip) |
+| 26 | Item game tiap 100 m (`unlock_every` dalam meter), ditandai pertemuan NPC | Permintaan tim 20 Nov 2026 | Setara 1000 poin; ±35 dtk ke item pertama; rintangan ditunda di sekitar titik temu; `?debug=1` mempercepat ×10 |
 | 18 | IP klien dari kanan `X-Forwarded-For` (`TRUSTED_PROXY_HOPS`) + batas laju global | Entri kiri dapat dipalsukan sehingga batas per IP bisa diakali | Jumlah hop harus cocok dengan rantai proxy; diverifikasi setelah deploy (§12) |
+| 19 | Papan peringkat akhir tur kota (21 Nov 2026) di Supabase, tanpa akun | Tim ingin kompetisi "Si Paling Bandung"; akun masih P2 | Identitas = UUID acak di `localStorage` + nama panggilan (disaring). Skor dari klien tidak bisa dibuktikan; dibatasi poin maksimum kota + batas laju. Tabel/fungsi: `supabase/migrations/20261121000000_leaderboard.sql` + `…000100_leaderboard_tiebreak.sql` (seri: achieved_at lalu player_id), diterapkan ke proyek Supabase `rupaloka` (ap-southeast-1) 21 Nov 2026; tanpa env Supabase memakai memori (hanya pengembangan) |
 
 ## 17. Risiko teknis
 

@@ -6,6 +6,7 @@ Skema hanya memeriksa bentuk satu berkas. Pemeriksaan lintas berkas
 
 from __future__ import annotations
 
+import re
 from datetime import date
 from string import Formatter
 from typing import Annotated, Literal
@@ -63,7 +64,7 @@ class Speed(Strict):
 
 
 class GameConfig(Strict):
-    unlock_every: int = Field(gt=0)
+    unlock_every: int = Field(gt=0)  # meter lari per item (1 m = 10 poin skor)
     items_order: list[Id] = Field(min_length=3)
     obstacles: list[Id] = Field(min_length=1)
     background: Text
@@ -85,6 +86,14 @@ class Badge(Strict):
     description: Text
 
 
+class LeaderboardConfig(Strict):
+    """Papan peringkat akhir tur kota (diputuskan tim 21 Nov 2026). Skor = total poin path."""
+
+    enabled: bool = True
+    champion_title: Text  # gelar peringkat 1, mis. "Si Paling Bandung"
+    size: int = Field(default=10, ge=3, le=50)  # jumlah baris yang ditampilkan
+
+
 class Rewards(Strict):
     """Poin path belajar (titik = materi, titik terakhir = game) dan lencana.
 
@@ -96,6 +105,7 @@ class Rewards(Strict):
     points_per_correct: int = Field(default=10, ge=0)
     game_node_points: int = Field(default=100, ge=0)
     badges: list[Badge] = Field(default_factory=list)
+    leaderboard: LeaderboardConfig | None = None
 
     @model_validator(mode="after")
     def _ordered(self) -> Rewards:
@@ -185,6 +195,29 @@ class ImageRef(Strict):
     license: Text
 
 
+YOUTUBE_ID = re.compile(
+    r"^https://(?:www\.)?(?:youtube\.com/watch\?v=|youtu\.be/)([A-Za-z0-9_-]{11})(?:[&?#].*)?$"
+)
+
+
+class VideoRef(Strict):
+    """Video YouTube pendukung materi (pengganti gambar materi, 21 Nov 2026)."""
+
+    url: Text  # https://www.youtube.com/watch?v=<id> atau https://youtu.be/<id>
+    title: Text
+    channel: Text
+    note: str | None = None  # catatan kurasi, mis. "kanal resmi"
+    checked_by: str | None = None  # nama yang sudah menonton isinya (KH); kosong = tertunda
+
+    @model_validator(mode="after")
+    def _youtube_only(self) -> VideoRef:
+        if not YOUTUBE_ID.match(self.url):
+            raise ValueError(
+                "url video harus tautan YouTube (youtube.com/watch?v=… atau youtu.be/…)"
+            )
+        return self
+
+
 class KeyFact(Strict):
     text: Text
     chunk: Id
@@ -203,6 +236,7 @@ class Lesson(Strict):
     narrative: Text
     key_facts: list[KeyFact] = Field(min_length=1)
     images: list[ImageRef] = Field(default_factory=list)
+    videos: list[VideoRef] = Field(default_factory=list)
     location: Location | None = None
     suggested_questions: list[Text] = Field(default_factory=list)
     tier: Tier = "free"

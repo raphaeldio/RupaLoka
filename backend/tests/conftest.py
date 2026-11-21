@@ -75,7 +75,7 @@ def valid_content() -> dict[str, Any]:
             "phases": ["quiz_intro", "lessons", "game", "summary"],
             "lessons": LESSONS,
             "game": {
-                "unlock_every": 100,
+                "unlock_every": 100,  # meter
                 "items_order": ITEMS,
                 "obstacles": ["batu", "pagar"],
                 "background": "kota-uji-siang",

@@ -124,7 +124,7 @@ function CityList({ cities, onPick, autoFocus = false }: { cities: City[]; onPic
               </span>
               <span className="min-w-0 flex-1">
                 <span className="block font-extrabold">{c.name}</span>
-                <span className="block truncate text-xs text-redup">
+                <span className="mt-0.5 line-clamp-2 text-xs leading-snug text-redup">
                   {active ? (isPlaceholder(c.summary) ? 'Siap dijelajahi' : c.summary) : 'Segera hadir'}
                 </span>
               </span>

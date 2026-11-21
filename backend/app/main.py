@@ -9,6 +9,7 @@ from __future__ import annotations
 import logging
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
+from uuid import UUID
 
 from fastapi import FastAPI, HTTPException, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
@@ -18,12 +19,24 @@ from app.api_schemas import (
     CityDetail,
     CitySummary,
     Health,
+    LeaderboardEntry,
+    LeaderboardResponse,
+    ScoreSubmit,
     SourceRef,
     SourcesResponse,
+    YourRank,
 )
 from app.chat import ChatRequest, ChatResponse, ChatService, RateLimiter, UnknownContext
 from app.config import Settings
 from app.content_loader import CityContent, Content, load_content
+from app.leaderboard import (
+    LeaderboardStore,
+    NicknameError,
+    StoreError,
+    build_store,
+    clean_nickname,
+    max_points,
+)
 from app.llm import LLM, GeminiLLM, LLMError
 from app.retrieval import Retriever
 from app.schemas import City
@@ -61,10 +74,15 @@ def build_llm(settings: Settings) -> LLM | None:
     return GeminiLLM(settings.gemini_api_key, settings.gemini_model, settings.llm_timeout_s)
 
 
-def create_app(settings: Settings | None = None, llm: LLM | None = None) -> FastAPI:
+def create_app(
+    settings: Settings | None = None,
+    llm: LLM | None = None,
+    leaderboard: LeaderboardStore | None = None,
+) -> FastAPI:
     settings = settings or Settings.from_env()
     limiter = RateLimiter(settings.rate_limit_per_min)
     global_limiter = RateLimiter(settings.global_rate_limit_per_min)
+    board_limiter = RateLimiter(settings.leaderboard_rate_limit_per_min)
 
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
@@ -75,6 +93,9 @@ def create_app(settings: Settings | None = None, llm: LLM | None = None) -> Fast
             app.state.retriever,
             llm if llm is not None else build_llm(settings),
             settings,
+        )
+        app.state.leaderboard = leaderboard or build_store(
+            settings.supabase_url, settings.supabase_service_role_key
         )
         yield
 
@@ -182,6 +203,77 @@ def create_app(settings: Settings | None = None, llm: LLM | None = None) -> Fast
         except LLMError as exc:
             logger.warning("chat: LLM tidak tersedia: %s", exc)
             raise HTTPException(status_code=503, detail="agen sedang tidak tersedia") from exc
+
+    def board_city(request: Request, city_id: str) -> tuple[CityContent, str, int]:
+        cc = content(request).city_content.get(city_id)
+        cfg = cc.config.rewards.leaderboard if cc else None
+        if cc is None or cfg is None or not cfg.enabled:
+            raise HTTPException(status_code=404, detail="papan peringkat kota ini belum tersedia")
+        return cc, cfg.champion_title, cfg.size
+
+    def board_response(
+        request: Request, city_id: str, player_id: str | None
+    ) -> LeaderboardResponse:
+        cc, title, size = board_city(request, city_id)
+        store: LeaderboardStore = request.app.state.leaderboard
+        try:
+            rows = store.top(city_id, size)
+            you = store.rank_of(city_id, player_id) if player_id else None
+        except StoreError as exc:
+            logger.warning("leaderboard: penyimpanan gagal: %s", exc)
+            raise HTTPException(
+                status_code=503, detail="papan peringkat sedang tidak tersedia"
+            ) from exc
+        return LeaderboardResponse(
+            city_id=city_id,
+            champion_title=title,
+            max_points=max_points(cc),
+            entries=[
+                LeaderboardEntry(
+                    rank=i,
+                    nickname=r.nickname,
+                    points=r.points,
+                    title=title if i == 1 else None,
+                )
+                for i, r in enumerate(rows, start=1)
+            ],
+            you=YourRank(rank=you[0], points=you[1]) if you else None,
+        )
+
+    @app.get("/api/leaderboard/{city_id}", response_model=LeaderboardResponse)
+    def get_leaderboard(
+        city_id: str, request: Request, response: Response, player_id: UUID | None = None
+    ) -> LeaderboardResponse:
+        response.headers["Cache-Control"] = "no-store"
+        return board_response(request, city_id, str(player_id) if player_id else None)
+
+    @app.post("/api/leaderboard/{city_id}", response_model=LeaderboardResponse)
+    def submit_score(
+        city_id: str, body: ScoreSubmit, request: Request, response: Response
+    ) -> LeaderboardResponse:
+        response.headers["Cache-Control"] = "no-store"
+        cc, _, _ = board_city(request, city_id)
+        if not board_limiter.allow(client_ip(request, settings.trusted_proxy_hops)):
+            raise HTTPException(
+                status_code=429,
+                detail="terlalu sering mengirim skor; coba lagi nanti",
+                headers={"Retry-After": "60"},
+            )
+        try:
+            nickname = clean_nickname(body.nickname)
+        except NicknameError as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
+        if body.points > max_points(cc):
+            raise HTTPException(status_code=422, detail="poin melebihi batas kota ini")
+        store: LeaderboardStore = request.app.state.leaderboard
+        try:
+            store.submit(city_id, str(body.player_id), nickname, body.points)
+        except StoreError as exc:
+            logger.warning("leaderboard: gagal menyimpan: %s", exc)
+            raise HTTPException(
+                status_code=503, detail="papan peringkat sedang tidak tersedia"
+            ) from exc
+        return board_response(request, city_id, str(body.player_id))
 
     return app
 

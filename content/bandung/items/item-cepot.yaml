@@ -1,0 +1,11 @@
+# Item koleksi yang terbuka di game (F-043, F-044). Penjelasan maksimal 60 kata, dibacakan agen.
+id: item-cepot
+name: "Si Cepot"
+rarity: tidak umum
+short_explanation: "Si Cepot (Astrajingga) adalah tokoh punakawan wayang golek Sunda berwajah merah yang cerdik dan humoris. Kehadirannya melambangkan kejujuran dan suara rakyat kecil yang menghibur sekaligus memberi pesan bijak."
+image:
+  src: assets/images/cepot.webp
+  alt: "Si Cepot (Astrajingga), tokoh punakawan wayang golek Sunda berwajah merah"
+  license: "milik sendiri (tim KamiPemenang)"
+chunk: wayang-golek-004
+lesson: wayang-golek

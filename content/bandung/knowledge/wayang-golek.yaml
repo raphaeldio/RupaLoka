@@ -37,4 +37,15 @@
   verified_by: null         # nama pemeriksa (KH)
   verified_at: null
 
-# Tambahkan wayang-golek-004 dan seterusnya sampai minimal 8 chunk.
+- id: wayang-golek-004
+  lesson_id: wayang-golek
+  text: "Si Cepot atau Astrajingga adalah tokoh punakawan wayang golek Sunda berwajah merah yang melambangkan kecerdikan, keberanian, dan kejujuran rakyat kecil."
+  source:
+    title: "Dinas Pariwisata dan Kebudayaan Jawa Barat"
+    url: https://disparbud.jabarprov.go.id/
+    type: web
+    accessed: 2026-11-20
+  verified_by: "Tim Budaya"
+  verified_at: 2026-11-20
+
+# Tambahkan wayang-golek-005 dan seterusnya sampai minimal 8 chunk.

@@ -1,65 +1,101 @@
 # Kuis per titik path (F-020). Ditulis tim, BUKAN oleh AI saat runtime (T-033).
-# Disusun dari draf "Materi dan Item Game Rupaloka: Edisi Bandung" (tim budaya, 20 Nov 2026).
+# Diperbarui 21 Nov 2026 dari "Materi Pengenalan Bandung v2" (tim budaya): soal A1-A5, B1, B3, B4, B5, C1, C2.
+# Soal untuk butir "Perlu verifikasi" (A6, B2, C4, D1) dan cadangan kujang (C3) SENGAJA tidak dimasukkan.
 # correct = indeks opsi yang benar, mulai dari 0. chunk = id chunk di knowledge/ yang menjadi sumbernya;
 # soal tampil di titik path milik lesson_id chunk tersebut.
 # Jawaban benar WAJIB diperiksa dua orang (KH) sebelum rilis.
-# [VERIFIKASI] q1-q2 (Gedung Sate/Merdeka) baru bersumber satu halaman; q4 (Saung Angklung Udjo) perlu dicek KH.
 intro:
-  # --- Titik 1: Pengenalan Bandung ---
+  # --- Titik 1: Pengenalan Bandung (sejarah kota, bangunan) ---
   - id: q1
-    question: "Hiasan di puncak Gedung Sate bentuknya mirip apa?"
-    options: ["Tusuk sate", "Payung", "Mahkota", "Kujang"]
-    correct: 0
-    explanation: "Hiasan di puncak Gedung Sate mirip tusuk sate dengan enam bulatan. Enam bulatan itu dipercaya melambangkan enam juta gulden biaya pembangunannya."
-    chunk: pengenalan-bandung-003
+    question: "Siapa pendiri Kota Bandung?"
+    options: ["Herman Willem Daendels", "R.A. Wiranatakusumah II", "Ir. J. Gerber", "Mang Udjo Ngalagena"]
+    correct: 1
+    explanation: "Pendiri Kota Bandung adalah Bupati R.A. Wiranatakusumah II. Daendels adalah gubernur jenderal yang meminta ibu kota kabupaten dipindah mendekati Jalan Raya Pos."
+    chunk: pengenalan-bandung-001
   - id: q2
-    question: "Konferensi Asia-Afrika tahun 1955 berlangsung di gedung apa di Bandung?"
+    question: "Jalan Raya Pos dibangun dari Anyer sampai di mana?"
+    options: ["Cirebon", "Semarang", "Panarukan", "Surabaya"]
+    correct: 2
+    explanation: "Jalan Raya Pos dibangun dari Anyer sampai Panarukan, sekitar 1.000 km. Ibu kota Kabupaten Bandung lalu dipindah mendekati jalan itu."
+    chunk: pengenalan-bandung-002
+  - id: q3
+    question: "Apa yang terjadi pada 1 April 1906?"
+    options: ["Konferensi Asia Afrika dibuka", "Gemeente Bandung berdiri", "Gedung Sate selesai", "Museum Sri Baduga diresmikan"]
+    correct: 1
+    explanation: "Pada 1 April 1906 berdiri Gemeente Bandung sebagai kota otonom. Tanggal itu bukan hari jadi kota; hari jadi Bandung adalah 25 September."
+    chunk: pengenalan-bandung-003
+  - id: q4
+    question: "Di gedung mana Konferensi Asia Afrika 1955 berlangsung?"
     options: ["Gedung Sate", "Gedung Merdeka", "Museum Sri Baduga", "Saung Angklung Udjo"]
     correct: 1
-    explanation: "Konferensi Asia-Afrika 1955 berlangsung di Gedung Merdeka. Kini gedung itu menjadi museum yang menyimpan koleksi dan foto konferensi tersebut."
+    explanation: "Konferensi Asia Afrika berlangsung pada 18-24 April 1955 di Gedung Merdeka, Bandung."
     chunk: pengenalan-bandung-004
+  - id: q5
+    question: "Julukan Paris van Java dikaitkan dengan jalan apa?"
+    options: ["Jalan Braga", "Jalan Dago", "Jalan Cihampelas", "Jalan Setiabudi"]
+    correct: 0
+    explanation: "Julukan Paris van Java disebut muncul di Jalan Braga, seiring masuknya budaya Eropa pada masa kolonial."
+    chunk: pengenalan-bandung-005
+  - id: q6
+    question: "Siapa arsitek Gedung Sate?"
+    options: ["Ir. J. Gerber", "C.P. Wolff Schoemaker", "Daeng Soetigna", "R.A. Wiranatakusumah II"]
+    correct: 0
+    explanation: "Gedung Sate dirancang arsitek Ir. J. Gerber dan dibangun mulai 27 Juli 1920 sampai 1924."
+    chunk: pengenalan-bandung-006
+  - id: q7
+    question: "Bioskop pertama di Bandung yang berada di Braga bernama?"
+    options: ["Majestic", "Dago Theater", "Palaguna", "Concordia"]
+    correct: 0
+    explanation: "Majestic, yang berdiri di Jalan Braga, adalah bioskop pertama di Bandung."
+    chunk: pengenalan-bandung-008
 
   # --- Titik 2: Angklung ---
-  - id: q3
-    question: "Angklung tercatat dalam daftar Warisan Budaya Takbenda UNESCO pada tahun berapa?"
-    options: ["2008", "2009", "2010", "2012"]
-    correct: 2
-    explanation: "Angklung, alat musik bambu yang dimainkan dengan cara digoyangkan, tercatat dalam Daftar Representatif Warisan Budaya Takbenda UNESCO pada 2010."
-    chunk: angklung-001
-  - id: q4
-    question: "Di wilayah mana di Bandung Saung Angklung Udjo berada?"
-    options: ["Dago", "Padasuka", "Braga", "Cihampelas"]
+  - id: q8
+    question: "Tahun berapa angklung diakui UNESCO?"
+    options: ["2008", "2010", "1938", "1966"]
     correct: 1
-    explanation: "Saung Angklung Udjo didirikan pada 1966 di Padasuka, Bandung, oleh Mang Udjo Ngalagena dan istrinya, Uum Sumiati."
+    explanation: "Angklung diakui UNESCO sebagai warisan budaya takbenda pada 2010. Tahun 1938 adalah saat Daeng Soetigna mengembangkan angklung diatonis."
+    chunk: angklung-001
+  - id: q9
+    question: "Tahun berapa Saung Angklung Udjo berdiri?"
+    options: ["1938", "1966", "1980", "2010"]
+    correct: 1
+    explanation: "Saung Angklung Udjo berdiri pada 1966 di Padasuka, Bandung, dirintis Mang Udjo Ngalagena dan Uum Sumiati."
     chunk: angklung-003
 
   # --- Titik 3: Wayang golek ---
-  - id: q5
+  - id: q10
+    question: "Tahun berapa wayang diakui UNESCO?"
+    options: ["2008", "2010", "1938", "1980"]
+    correct: 0
+    explanation: "Wayang diakui UNESCO sebagai warisan budaya takbenda pada 2008."
+    chunk: wayang-golek-001
+  - id: q11
     question: "Tokoh wayang golek berupa apa?"
     options: ["Boneka kulit pipih", "Boneka kayu tiga dimensi", "Lukisan di atas kain", "Topeng kayu"]
     correct: 1
-    explanation: "Wayang golek adalah wayang berupa boneka kayu tiga dimensi."
+    explanation: "Wayang golek berupa boneka kayu tiga dimensi."
     chunk: wayang-golek-002
-  - id: q6
-    question: "Wayang tercatat dalam daftar Warisan Budaya Takbenda UNESCO pada tahun berapa?"
-    options: ["2003", "2008", "2010", "2015"]
-    correct: 1
-    explanation: "Wayang secara umum tercatat dalam Daftar Representatif Warisan Budaya Takbenda UNESCO pada 2008."
-    chunk: wayang-golek-001
 
   # --- Titik 4: Museum Sri Baduga ---
-  - id: q7
-    question: "Koleksi Museum Sri Baduga disusun sebagai alur sejarah apa?"
-    options: ["Sejarah kereta api Indonesia", "Alam dan budaya Jawa Barat", "Perang kemerdekaan saja", "Kerajaan-kerajaan di Bali"]
-    correct: 1
-    explanation: "Koleksi Museum Sri Baduga disusun sebagai alur sejarah alam dan budaya Jawa Barat, dari masa prasejarah hingga masa kolonial."
-    chunk: museum-sri-baduga-003
-  - id: q8
+  - id: q12
+    question: "Pada tahun berapa Museum Sri Baduga diresmikan?"
+    options: ["1955", "1966", "1980", "2010"]
+    correct: 2
+    explanation: "Museum Sri Baduga diresmikan pada 5 Juni 1980 dan memakai nama Sri Baduga sejak 1990."
+    chunk: museum-sri-baduga-002
+  - id: q13
     question: "Museum Sri Baduga adalah museum negeri milik provinsi mana?"
     options: ["Jawa Tengah", "Banten", "Jawa Barat", "DKI Jakarta"]
     correct: 2
     explanation: "Museum Sri Baduga adalah Museum Negeri Provinsi Jawa Barat, berada di Jl. BKR No.185, Bandung."
     chunk: museum-sri-baduga-001
+  - id: q14
+    question: "Koleksi Museum Sri Baduga disusun sebagai alur sejarah apa?"
+    options: ["Sejarah kereta api Indonesia", "Alam dan budaya Jawa Barat", "Perang kemerdekaan saja", "Kerajaan-kerajaan di Bali"]
+    correct: 1
+    explanation: "Koleksi Museum Sri Baduga disusun sebagai alur sejarah alam dan budaya Jawa Barat, dari masa prasejarah hingga masa kolonial."
+    chunk: museum-sri-baduga-003
 
 # Kuis penutup (P1, F-023). Kosongkan dulu.
 outro: []

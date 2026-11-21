@@ -296,3 +296,23 @@ def test_rewards_default_and_badge_order() -> None:
         Rewards(badges=[badge, {**badge, "id": "b", "min_points": 100}])
     with pytest.raises(ValidationError):
         Rewards(badges=[badge, {**badge, "id": "b"}])
+
+
+def test_video_materi_harus_youtube(make_content: Any) -> None:
+    root = make_content(
+        lambda f: f[LESSON_A].update(
+            videos=[{"url": "https://vimeo.com/1", "title": "V", "channel": "K"}]
+        )
+    )
+    assert_error(root, "url video harus tautan YouTube")
+
+
+def test_video_belum_diperiksa_jadi_tertunda(make_content: Any) -> None:
+    root = make_content(
+        lambda f: f[LESSON_A].update(
+            videos=[
+                {"url": "https://www.youtube.com/watch?v=gxwPUVEXPtI", "title": "V", "channel": "K"}
+            ]
+        )
+    )
+    assert_pending(root, "videos[0]: isi video belum ditonton/diperiksa")

@@ -9,9 +9,9 @@ phases: [quiz_intro, lessons, game, summary]
 lessons: [pengenalan-bandung, angklung, wayang-golek, museum-sri-baduga]
 
 game:
-  unlock_every: 1000           # poin game per item (F-043; keputusan tim 20 Nov 2026)
-  # Item ke-k terbuka di ambang ke-k (1000, 2000, 3000). Setelah habis, game lanjut tanpa jeda.
-  items_order: [item-angklung, item-wayang, item-sri-baduga]
+  unlock_every: 100            # METER lari per item; tiap ambang pelari bertemu NPC (F-043; diubah 20 Nov 2026 dari 1000 poin)
+  # Item ke-k terbuka di ambang ke-k (100, 200, 300 m). 1 m = 10 poin skor. Setelah habis, game lanjut tanpa jeda.
+  items_order: [item-angklung, item-wayang, item-cepot]
   # Rintangan: harus terdaftar di sources.yaml (objects) dan disetujui KH. [PERLU DIISI daftar final]
   obstacles: [batu, pagar, becak]
   background: bandung-day      # id latar di assets/sprites (T-054)
@@ -23,6 +23,9 @@ rewards:
   points_per_node: 100
   points_per_correct: 10
   game_node_points: 100
+  # Papan peringkat akhir tur (21 Nov 2026): skor = total poin path; peringkat 1 bergelar champion_title.
+  leaderboard:
+    champion_title: "Si Paling Bandung"
   badges:
     - id: penjelajah-pemula
       name: "Penjelajah Pemula"

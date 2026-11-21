@@ -39,6 +39,8 @@ services:
       - key: MASCOT_NAME
         sync: false
       - key: SUPABASE_URL
-        sync: false
+        value: https://wsolgzmnqccvdbsmymuf.supabase.co   # proyek Supabase "rupaloka" (bukan rahasia)
       - key: SUPABASE_SERVICE_ROLE_KEY
-        sync: false
+        sync: false                 # RAHASIA: isi manual di dashboard Render
+      - key: LEADERBOARD_RATE_LIMIT_PER_MIN
+        value: "10"                 # per IP, untuk POST /api/leaderboard

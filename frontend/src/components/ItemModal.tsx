@@ -13,6 +13,7 @@ import ClickSpark from './reactbits/ClickSpark'
  */
 export default function ItemModal({
   item,
+  npc,
   number,
   total,
   template,
@@ -21,6 +22,8 @@ export default function ItemModal({
   onContinue,
 }: {
   item: Item
+  /** NPC yang ditemui di game dan menjelaskan item ini (opsional). */
+  npc?: { label: string; sprite: string }
   number: number
   total: number
   template: string
@@ -64,9 +67,26 @@ export default function ItemModal({
             </motion.div>
           </Pop>
         </ClickSpark>
-        <p id="item-teks" className="mt-3 text-[15px] leading-relaxed">
-          {text}
-        </p>
+        {npc ? (
+          <div className="mt-3 flex items-end gap-3">
+            <img
+              src={npc.sprite}
+              alt={npc.label}
+              className="h-20 w-auto shrink-0 [image-rendering:pixelated]"
+              onError={(e) => (e.currentTarget.style.display = 'none')}
+            />
+            <div className="relative rounded-2xl rounded-bl-sm bg-teal-50 px-3 py-2">
+              <p className="text-xs font-extrabold text-teal">{npc.label} bercerita:</p>
+              <p id="item-teks" className="mt-1 text-[15px] leading-relaxed">
+                {text}
+              </p>
+            </div>
+          </div>
+        ) : (
+          <p id="item-teks" className="mt-3 text-[15px] leading-relaxed">
+            {text}
+          </p>
+        )}
         <div className="mt-3">
           <SourceChip source={source} label="Sumber" />
         </div>

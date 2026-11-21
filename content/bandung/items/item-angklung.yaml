@@ -2,10 +2,10 @@
 id: item-angklung
 name: "Angklung"
 rarity: umum
-short_explanation: "[PERLU DIISI] maksimal 60 kata, bersumber dari chunk di bawah"
+short_explanation: "Angklung adalah alat musik multitonal berbahan bambu khas Jawa Barat yang diakui UNESCO sebagai Warisan Budaya Takbenda pada 2010."
 image:
-  src: assets/images/item-angklung.webp
-  alt: "[PERLU DIISI] deskripsi gambar"
-  license: "[PERLU DIISI]"
+  src: assets/images/angklung.webp
+  alt: "Alat musik bambu angklung khas Sunda"
+  license: "milik sendiri (tim KamiPemenang)"
 chunk: angklung-001
 lesson: angklung

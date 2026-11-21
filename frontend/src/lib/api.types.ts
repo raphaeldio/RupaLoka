@@ -127,12 +127,35 @@ export interface KeyFact {
   chunk: string
 }
 
+/** Papan peringkat akhir tur kota (diputuskan tim 21 Nov 2026). Skor = total poin path. */
+export interface LeaderboardConfig {
+  enabled: boolean
+  champion_title: string
+  size: number
+}
+
+export interface LeaderboardEntry {
+  rank: number
+  nickname: string
+  points: number
+  title: string | null
+}
+
+export interface LeaderboardResponse {
+  city_id: string
+  champion_title: string
+  max_points: number
+  entries: LeaderboardEntry[]
+  you: YourRank | null
+}
+
 export interface Lesson {
   id: string
   title: string
   narrative: string
   key_facts: KeyFact[]
   images: ImageRef[]
+  videos: VideoRef[]
   location: Location | null
   suggested_questions: string[]
   tier: "free" | "premium"
@@ -169,6 +192,13 @@ export interface Rewards {
   points_per_correct: number
   game_node_points: number
   badges: Badge[]
+  leaderboard: LeaderboardConfig | null
+}
+
+export interface ScoreSubmit {
+  player_id: string
+  nickname: string
+  points: number
 }
 
 export interface Source {
@@ -197,4 +227,18 @@ export interface Speed {
   start: number
   max: number
   ramp_per_100: number
+}
+
+/** Video YouTube pendukung materi (pengganti gambar materi, 21 Nov 2026). */
+export interface VideoRef {
+  url: string
+  title: string
+  channel: string
+  note: string | null
+  checked_by: string | null
+}
+
+export interface YourRank {
+  rank: number
+  points: number
 }

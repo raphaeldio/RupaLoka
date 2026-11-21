@@ -55,7 +55,7 @@ export default function AboutPage() {
         <h2 id="tim" className="text-xl font-extrabold text-tinta">
           Tim
         </h2>
-        <p className="mt-2">Tim Kami Siap, Bandung. Dibuat untuk BUDAYA GO! 2026, cabang Inovasi Digital.</p>
+        <p className="mt-2">Tim KamiPemenang, Bandung. Dibuat untuk BUDAYA GO! 2026, cabang Inovasi Digital.</p>
       </section>
     </main>
   )

@@ -82,11 +82,11 @@ describe('path kota', () => {
 })
 
 describe('titik path', () => {
-  it('kuis → materi → hasil: poin bertambah dan lencana baru (F-021, F-030)', async () => {
+  it('kuis awal → materi → kuis akhir → hasil: poin bertambah dan lencana baru (F-021, F-030)', async () => {
     const user = userEvent.setup()
     renderAt('/kota/kota-a/titik/a')
     // Titik A hanya punya soal q1 (chunk a-001).
-    expect(await screen.findByText('Soal 1 dari 1')).toBeInTheDocument()
+    expect(await screen.findByText('Kuis awal · Soal 1 dari 1')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Lanjut ke materi' })).toBeDisabled()
     await user.click(screen.getByRole('button', { name: /Benar/ }))
     expect(screen.getByText('Penjelasan satu.')).toBeInTheDocument()
@@ -97,15 +97,20 @@ describe('titik path', () => {
       'href',
       'https://www.google.com/maps/dir/?api=1&destination=-6.9,107.6',
     )
-    await user.click(screen.getByRole('button', { name: 'Selesaikan titik' }))
+    await user.click(screen.getByRole('button', { name: 'Lanjut ke kuis akhir' }))
+
+    // Kuis akhir: soal yang sama diulang setelah materi (belum ada soal outro).
+    expect(screen.getByText('Kuis akhir · Soal 1 dari 1')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: /Benar/ }))
+    await user.click(screen.getByRole('button', { name: 'Lihat hasil' }))
 
     expect(screen.getByLabelText('Bertambah 110 poin')).toBeInTheDocument()
     expect(screen.getByText('Lencana baru!')).toBeInTheDocument()
     expect(screen.getByText('Lencana Satu')).toBeInTheDocument()
     expect(useProgress.getState().cities['kota-a']).toMatchObject({ completed: ['a'], correct: { a: 1 } })
     // Pindah ke titik berikutnya memulai titik baru (bukan layar hasil titik sebelumnya).
-    await user.click(screen.getByRole('button', { name: 'Titik berikutnya' }))
-    expect(await screen.findByText('Soal 1 dari 1')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Lanjut: Materi B →' }))
+    expect(await screen.findByText('Kuis awal · Soal 1 dari 1')).toBeInTheDocument()
     expect(screen.getByText('Titik 2: Materi B')).toBeInTheDocument()
   })
 
@@ -114,7 +119,8 @@ describe('titik path', () => {
     const user = userEvent.setup()
     renderAt('/kota/kota-a/titik/a')
     await user.click(await screen.findByRole('button', { name: 'Lewati kuis' }))
-    await user.click(screen.getByRole('button', { name: 'Selesaikan titik' }))
+    await user.click(screen.getByRole('button', { name: 'Lanjut ke kuis akhir' }))
+    await user.click(screen.getByRole('button', { name: 'Lewati kuis' }))
     expect(screen.getByLabelText('Bertambah 0 poin')).toBeInTheDocument()
     expect(useProgress.getState().cities['kota-a'].correct.a).toBe(1)
   })

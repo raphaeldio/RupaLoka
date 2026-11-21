@@ -2,10 +2,10 @@
 id: item-wayang
 name: "Wayang Golek"
 rarity: umum
-short_explanation: "[PERLU DIISI] maksimal 60 kata, bersumber dari chunk di bawah"
+short_explanation: "Wayang golek adalah seni pertunjukan boneka kayu tiga dimensi khas tanah Sunda yang diakui UNESCO sebagai Warisan Budaya Takbenda Dunia pada 2008."
 image:
   src: assets/images/item-wayang.webp
-  alt: "[PERLU DIISI] deskripsi gambar"
-  license: "[PERLU DIISI]"
+  alt: "Boneka wayang golek kayu tiga dimensi khas Sunda"
+  license: "milik sendiri (tim KamiPemenang)"
 chunk: wayang-golek-001
 lesson: wayang-golek

@@ -1,21 +1,76 @@
-# Chunk pengetahuan titik "Pengenalan Bandung" (RAG). Target minimal 8 chunk (T-031).
-# Satu chunk = satu gagasan, 1-3 kalimat. Setiap chunk wajib punya sumber dan diverifikasi.
+# Chunk pengetahuan titik "Pengenalan Bandung" (RAG). Satu chunk = satu gagasan, 1-3 kalimat.
 # source.type: web (wajib url) | buku | jurnal | wawancara | museum
-# Chunk 001-004 diambil dari draf "Materi dan Item Game Rupaloka: Edisi Bandung" (tim budaya).
-# [VERIFIKASI] Gedung Sate dan Gedung Merdeka baru bersumber satu halaman; cek sumber kedua sebelum rilis.
+# Diperbarui 21 Nov 2026 dari "Materi Pengenalan Bandung v2" (tim budaya): hanya butir berstatus
+# "Bersumber" (A1-A5, B1, B4). Butir "Perlu verifikasi" (A6 Bandung Lautan Api, B2 tahun/arsitek
+# Gedung Merdeka, julukan Kota Kembang) SENGAJA belum dimasukkan. verified_by tetap null sampai KH memeriksa.
 
 - id: pengenalan-bandung-001
   lesson_id: pengenalan-bandung
-  text: "Gedung Sate mulai dibangun pada 27 Juli 1920 dan selesai pada 1924. Perancangnya arsitek Belanda Ir. J. Gerber bersama Eh. de Roo dan G. Hendriks."
+  text: "Bandung berulang tahun setiap 25 September. Tanggal itu mengacu pada tahun 1810 dan ditetapkan lewat Perda No. 35 Tahun 1998. Pendiri Kota Bandung adalah Bupati R.A. Wiranatakusumah II, yang memerintah pada 1794-1829."
+  source:
+    title: "Pemerintah Kota Bandung. Sejarah Bandung"
+    url: https://www.bandung.go.id/sejarah?lang=en
+    type: web
+    accessed: 2026-11-21
+  verified_by: null         # nama pemeriksa (KH)
+  verified_at: null
+
+- id: pengenalan-bandung-002
+  lesson_id: pengenalan-bandung
+  text: "Dulu ibu kota Kabupaten Bandung berada di Krapyak (sekarang Dayeuhkolot), sekitar 11 km di selatan pusat kota. Gubernur Jenderal Daendels membangun Jalan Raya Pos dari Anyer sampai Panarukan, sekitar 1.000 km, lalu lewat surat 25 Mei 1810 meminta ibu kota dipindah mendekati jalan itu."
+  source:
+    title: "Pemerintah Kota Bandung. Sejarah Bandung"
+    url: https://www.bandung.go.id/sejarah?lang=en
+    type: web
+    accessed: 2026-11-21
+  verified_by: null         # nama pemeriksa (KH)
+  verified_at: null
+
+- id: pengenalan-bandung-003
+  lesson_id: pengenalan-bandung
+  text: "Sejak 7 Agustus 1864 Bandung menjadi ibu kota Keresidenan Priangan, menggantikan Cianjur yang rusak akibat letusan Gunung Gede. Pada 1 April 1906 berdiri Gemeente Bandung sebagai kota otonom, lalu menjadi stadsgemeente pada 1 Oktober 1926. Tanggal 1 April 1906 bukan hari jadi kota."
+  source:
+    title: "Pemerintah Kota Bandung. Sejarah Bandung"
+    url: https://www.bandung.go.id/sejarah?lang=en
+    type: web
+    accessed: 2026-11-21
+  verified_by: null         # nama pemeriksa (KH)
+  verified_at: null
+
+- id: pengenalan-bandung-004
+  lesson_id: pengenalan-bandung
+  text: "Konferensi Asia Afrika berlangsung pada 18-24 April 1955 di Gedung Merdeka, Bandung."
+  source:
+    title: "detik.com (2015). Sejarah Gedung Merdeka tempat KAA, dulunya warung kopi"
+    url: https://news.detik.com/berita/d-2885993/sejarah-gedung-merdeka-tempat-kaa-dulunya-warung-kopi
+    type: web
+    accessed: 2026-11-21
+  verified_by: null         # nama pemeriksa (KH); jumlah negara peserta belum bersumber; jangan ditambahkan
+  verified_at: null
+
+- id: pengenalan-bandung-005
+  lesson_id: pengenalan-bandung
+  text: "Julukan Paris van Java disebut muncul di Jalan Braga, seiring masuknya budaya Eropa pada masa kolonial."
+  source:
+    title: "detikJabar (2025). Kisah Braga Bandung: pedati, Jalan Culik, hingga bangunan ikonik"
+    url: https://www.detik.com/jabar/berita/d-7942730/kisah-braga-bandung-pedati-jalan-culik-hingga-bangunan-ikonik
+    type: web
+    accessed: 2026-11-21
+  verified_by: null         # nama pemeriksa (KH); sumber tidak menyebut tahun julukan mulai dipakai
+  verified_at: null
+
+- id: pengenalan-bandung-006
+  lesson_id: pengenalan-bandung
+  text: "Gedung Sate dibangun mulai 27 Juli 1920 sampai 1924 dan dirancang arsitek Ir. J. Gerber. Hiasan di puncaknya mirip tusuk sate dengan enam bulatan, yang dipercaya melambangkan enam juta gulden biaya pembangunannya."
   source:
     title: "Good News from Indonesia. Melacak jejak sejarah Gedung Sate Bandung"
     url: https://www.goodnewsfromindonesia.id/indonesiana/wisata/melacak-jejak-sejarah-gedung-sate-bandung
     type: web
-    accessed: 2026-11-20
-  verified_by: null         # nama pemeriksa (KH); butuh sumber kedua
+    accessed: 2026-11-21
+  verified_by: null         # nama pemeriksa (KH); cerita enam juta gulden baru dari satu sumber; tetap ditulis "dipercaya"
   verified_at: null
 
-- id: pengenalan-bandung-002
+- id: pengenalan-bandung-007
   lesson_id: pengenalan-bandung
   text: "Gedung Sate awalnya menjadi pusat administrasi pemerintah kolonial. Kini gedung ini menjadi kantor Pemerintah Provinsi Jawa Barat dan memuat Museum Gedung Sate."
   source:
@@ -26,68 +81,13 @@
   verified_by: null         # nama pemeriksa (KH); butuh sumber kedua
   verified_at: null
 
-- id: pengenalan-bandung-003
-  lesson_id: pengenalan-bandung
-  text: "Hiasan di puncak Gedung Sate mirip tusuk sate dengan enam bulatan. Enam bulatan itu dipercaya melambangkan enam juta gulden biaya pembangunan."
-  source:
-    title: "Good News from Indonesia. Melacak jejak sejarah Gedung Sate Bandung"
-    url: https://www.goodnewsfromindonesia.id/indonesiana/wisata/melacak-jejak-sejarah-gedung-sate-bandung
-    type: web
-    accessed: 2026-11-20
-  verified_by: null         # nama pemeriksa (KH); butuh sumber kedua
-  verified_at: null
-
-- id: pengenalan-bandung-004
-  lesson_id: pengenalan-bandung
-  text: "Gedung Merdeka dirancang pada 1926 dengan gaya art deco oleh Van Galen dan C.P. Wolff Schoemaker. Di gedung ini berlangsung Konferensi Asia-Afrika pada 1955, dan kini gedung ini menjadi museum yang menyimpan koleksi dan foto konferensi tersebut."
-  source:
-    title: "Pemerintah Kota Bandung. Gedung Merdeka Bandung"
-    url: https://www.bandung.go.id/index.php/features/detail/19/gedung-merdeka-bandung?lang=en
-    type: web
-    accessed: 2026-11-20
-  verified_by: null         # nama pemeriksa (KH); butuh sumber kedua
-  verified_at: null
-
-- id: pengenalan-bandung-005
-  lesson_id: pengenalan-bandung
-  text: "[PERLU DIISI]"
-  source:
-    title: "[PERLU DIISI]"
-    url: null
-    type: "[PERLU DIISI]"
-    accessed: null          # tanggal akses, format 2026-11-19
-  verified_by: null         # nama pemeriksa (KH)
-  verified_at: null
-
-- id: pengenalan-bandung-006
-  lesson_id: pengenalan-bandung
-  text: "[PERLU DIISI]"
-  source:
-    title: "[PERLU DIISI]"
-    url: null
-    type: "[PERLU DIISI]"
-    accessed: null          # tanggal akses, format 2026-11-19
-  verified_by: null         # nama pemeriksa (KH)
-  verified_at: null
-
-- id: pengenalan-bandung-007
-  lesson_id: pengenalan-bandung
-  text: "[PERLU DIISI]"
-  source:
-    title: "[PERLU DIISI]"
-    url: null
-    type: "[PERLU DIISI]"
-    accessed: null          # tanggal akses, format 2026-11-19
-  verified_by: null         # nama pemeriksa (KH)
-  verified_at: null
-
 - id: pengenalan-bandung-008
   lesson_id: pengenalan-bandung
-  text: "[PERLU DIISI]"
+  text: "Jalan Braga dulu jalan kecil yang dilalui pedati pengangkut hasil bumi, bahkan pernah disebut Jalan Culik. Masa kejayaannya sekitar 1920-1940. Di sana berdiri Majestic, bioskop pertama di Bandung."
   source:
-    title: "[PERLU DIISI]"
-    url: null
-    type: "[PERLU DIISI]"
-    accessed: null          # tanggal akses, format 2026-11-19
-  verified_by: null         # nama pemeriksa (KH)
+    title: "detikJabar (2025). Kisah Braga Bandung: pedati, Jalan Culik, hingga bangunan ikonik"
+    url: https://www.detik.com/jabar/berita/d-7942730/kisah-braga-bandung-pedati-jalan-culik-hingga-bangunan-ikonik
+    type: web
+    accessed: 2026-11-21
+  verified_by: null         # nama pemeriksa (KH); sumber tidak menyebut tahun berdiri Majestic
   verified_at: null

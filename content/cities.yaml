@@ -8,7 +8,8 @@
   status: active
   lat: null            # [PERLU DIISI] sumber koordinat dicatat di docs/decisions.md
   lng: null
-  summary: "[PERLU DIISI] ringkasan kota untuk kartu kota, 1-2 kalimat"
+  # Ringkasan hanya dari chunk bersumber (pengenalan-bandung-001/004/005/006, angklung-001, wayang-golek-002).
+  summary: "Kota yang berulang tahun setiap 25 September, rumah Gedung Sate dan Gedung Merdeka tempat Konferensi Asia Afrika 1955. Kenali juga angklung dan wayang golek di sini!"
 
 # Kota lain (contoh dari SDD §5.1). Tambah/hapus sesuai rencana tim.
 - id: yogyakarta

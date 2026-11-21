@@ -1,10 +1,11 @@
 import { motion } from 'motion/react'
 import type { Lesson, SourceRef } from '../lib/api.types'
 import { labelOr } from '../lib/cities'
+import LessonVideos from './LessonVideos'
 import LocationButton from './LocationButton'
 import { Button, Card, ContentText, SafeImage, SourceChip } from './primitives'
 
-/** Kartu materi (F-030–F-032): narasi, fakta kunci bersumber, gambar, tanya agen, lokasi asli. */
+/** Kartu materi (F-030–F-032): video, narasi, fakta kunci bersumber, tanya agen, lokasi asli. Gambar hanya bila tak ada video. */
 export default function LessonCard({
   lesson,
   eyebrow,
@@ -21,9 +22,11 @@ export default function LessonCard({
   onFinish: () => void
   finishLabel?: string
 }) {
-  const image = lesson.images[0]
+  const hasVideo = lesson.videos.length > 0
+  const image = hasVideo ? undefined : lesson.images[0]
   return (
     <Card className="overflow-hidden p-0 sm:p-0">
+      {hasVideo && <LessonVideos videos={lesson.videos} />}
       {image && <SafeImage image={image} className="aspect-[16/9] w-full" />}
       <div className="p-5 sm:p-6">
         <p className="text-xs font-extrabold uppercase tracking-[1.6px] text-redup">

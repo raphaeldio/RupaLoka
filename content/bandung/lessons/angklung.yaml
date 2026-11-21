@@ -3,19 +3,40 @@
 id: angklung
 title: "Angklung"
 narrative: |
-  [PERLU DIISI] narasi 100-200 kata.
+  Pernahkah kamu mendengar bunyi bambu yang bergetar merdu? Itulah angklung! Angklung adalah alat musik dari bambu yang dimainkan dengan cara digoyangkan, bukan dipukul atau ditiup.
+
+  Angklung sangat berharga bagi Indonesia. Pada 2010, UNESCO mencatat angklung dalam Daftar Representatif Warisan Budaya Takbenda. Artinya, dunia mengakui angklung sebagai warisan budaya yang perlu dijaga. Pengetahuan tentang angklung diwariskan secara lisan dari generasi ke generasi, dan kini makin banyak diajarkan di sekolah.
+
+  Angklung juga terus berkembang. Pada 1938, Daeng Soetigna memperkenalkan angklung diatonis, yang sering disebut angklung padaeng. Angklung ini bisa memainkan tangga nada Barat, yaitu susunan nada do-re-mi.
+
+  Di Bandung ada tempat yang terkenal untuk mengenal angklung, yaitu Saung Angklung Udjo. Tempat ini berdiri pada 1966 di Padasuka, Bandung, dirintis Mang Udjo Ngalagena dan Uum Sumiati. Di sana ada pertunjukan angklung, dan anak-anak bisa belajar budaya Sunda.
 key_facts:
-  - text: "Angklung tercatat UNESCO pada 2010."   # dari PRD §9; sumber chunk masih [PERLU DIISI]
+  - text: "Angklung dimainkan dengan cara digoyangkan."
     chunk: angklung-001
-images:
-  - src: assets/images/angklung-1.webp
-    alt: "[PERLU DIISI] deskripsi gambar"
-    license: "[PERLU DIISI]"
+  - text: "Angklung diakui UNESCO sebagai warisan budaya takbenda pada 2010."
+    chunk: angklung-001
+  - text: "Angklung diatonis dikembangkan Daeng Soetigna pada 1938."
+    chunk: angklung-002
+  - text: "Saung Angklung Udjo berdiri pada 1966 di Padasuka, Bandung."
+    chunk: angklung-003
+# Video YouTube pengganti gambar materi (21 Nov 2026), dari docs/review/materi-bandung-draft.md.
+# Video pertama disematkan di kartu materi; checked_by diisi setelah isinya ditonton dan diperiksa KH.
+videos:
+  - url: https://www.youtube.com/watch?v=CNhLfbH3Nlc
+    title: "Indonesian Angklung"
+    channel: "UNESCO"
+    note: "kanal resmi; ditautkan di halaman inskripsi UNESCO; berbahasa Inggris"
+    checked_by: null
+  - url: https://www.youtube.com/watch?v=sQZHILO1Fqo
+    title: "Bohemian Rhapsody & November Rain Cover by Saung Angklung Udjo"
+    channel: "Saung Angklung Udjo"
+    note: "contoh angklung diatonis; pastikan kanal resmi"
+    checked_by: null
 # Lokasi untuk tombol "Lihat lokasi asli" (F-032). Hapus blok ini (location: null) bila tidak ada.
 # Kaitan dengan Saung Angklung Udjo HARUS diverifikasi dulu (T-035).
 location:
-  name: "[PERLU DIISI]"
-  address: "[PERLU DIISI]"
+  name: "Saung Angklung Udjo"         # angklung-003 (angklung-udjo.co.id)
+  address: "Padasuka, Bandung"        # alamat lengkap [PERLU DIISI] dari sumber
   lat: null
   lng: null
 suggested_questions:

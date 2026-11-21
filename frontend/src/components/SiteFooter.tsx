@@ -33,7 +33,7 @@ export default function SiteFooter() {
         </nav>
       </div>
       <p className="border-t border-white/10 px-6 py-4 text-center text-xs text-white/60">
-        Tim Kami Siap, Bandung · BUDAYA GO! 2026
+        Tim KamiPemenang, Bandung · BUDAYA GO! 2026
       </p>
     </footer>
   )

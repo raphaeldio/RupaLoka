@@ -1,5 +1,5 @@
-import { lazy, Suspense, useEffect, useMemo, useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { lazy, Suspense, useEffect, useMemo, useState, type MouseEvent } from 'react'
+import { useLocation } from 'react-router-dom'
 import kursorUrl from '../assets/figma-map/kursor.svg'
 import CityCard from '../components/CityCard'
 // Peta (Leaflet ±150 kB) dimuat terpisah; ada di bawah lipatan layar.
@@ -9,7 +9,8 @@ import ClickSpark from '../components/reactbits/ClickSpark'
 import Magnet from '../components/reactbits/Magnet'
 import ShinyText from '../components/reactbits/ShinyText'
 import FeatureCards from '../components/landing/FeatureCards'
-import HeroIllustration from '../components/landing/HeroIllustration'
+import CityRotator from '../components/landing/CityRotator'
+import HeroMascot from '../components/mascot/HeroMascot'
 import JourneySteps from '../components/landing/JourneySteps'
 import SwirlCloud from '../components/landing/SwirlCloud'
 import { bundledCities, loadCities, placeCity, type City, type CitySource } from '../lib/cities'
@@ -23,6 +24,9 @@ const legendUrls = import.meta.glob<string>('../assets/figma-map/legend-*.svg', 
 })
 
 /** Pengantar beranda (F-004): ≤60 kata, tiga langkah. */
+/** Nama kota tambahan untuk rotator judul hero. */
+const EXTRA_CITIES = ['Jakarta', 'Yogyakarta', 'Surabaya', 'Medan', 'Makassar', 'Denpasar']
+
 const STEPS = ['Pilih kota', 'Belajar bersama pemandu AI', 'Main game, kumpulkan item']
 
 const Arrow = ({ className = 'size-4' }: { className?: string }) => (
@@ -97,11 +101,22 @@ export default function HomePage() {
     document.getElementById(location.hash.slice(1))?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }, [location.hash])
 
+  const scrollToMap = (e: MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault()
+    document.getElementById('peta')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    window.history.pushState(null, '', '#peta')
+  }
+
   const placed = useMemo(() => cities.flatMap((c) => placeCity(c) ?? []), [cities])
   const selected = cities.find((c) => c.id === selectedId) ?? null
   const unplaced = cities.filter((c) => !placed.some((p) => p.city.id === c.id))
   const firstActive = cities.find((c) => c.status === 'active') ?? null
   const activeCount = cities.filter((c) => c.status === 'active').length
+  // Rotator judul: kota aktif dulu, lalu kota lain (hanya nama; tanpa klaim konten).
+  const rotatorWords = useMemo(() => {
+    const names = [firstActive?.name ?? 'Bandung', ...cities.map((c) => c.name), ...EXTRA_CITIES]
+    return [...new Set(names.filter(Boolean))]
+  }, [cities, firstActive])
 
   const [statsRef, statsShown] = useReveal<HTMLDListElement>()
   const provinsi = useCountUp(PROVINCES.length, statsShown)
@@ -126,8 +141,8 @@ export default function HomePage() {
               className="mt-4 text-balance text-[40px] font-black leading-[1.05] tracking-[-1.2px] text-teal sm:text-[56px] lg:text-[64px]"
             >
               <BlurText text="Jelajahi Budaya, Mulai dari" animateBy="words" delay={110} className="inline" />{' '}
-              <span className="relative inline-block text-emas">
-                {firstActive?.name ?? 'Bandung'}
+              <span className="relative block w-fit text-emas" aria-hidden="true">
+                <CityRotator words={rotatorWords} />
                 <svg
                   viewBox="0 0 200 16"
                   preserveAspectRatio="none"
@@ -151,17 +166,19 @@ export default function HomePage() {
             <div className="mt-7 flex flex-wrap items-center gap-3">
               <ClickSpark sparkColor={['#e8b64c', '#146b68']} sparkCount={12} sparkRadius={34} className="!h-auto !w-auto rounded-full">
               <Magnet padding={40} magnetStrength={6}>
-              <Link
-                to={firstActive ? `/kota/${firstActive.id}` : '/#peta'}
+              <a
+                href="#peta"
+                onClick={scrollToMap}
                 className="group inline-flex items-center gap-2.5 rounded-full bg-emas px-6 py-3.5 text-[15px] font-extrabold text-teal-800 shadow-[0_10px_24px_-10px_rgb(232_182_76/0.9)] transition hover:-translate-y-0.5 hover:shadow-[0_14px_28px_-10px_rgb(232_182_76/1)] active:translate-y-0"
               >
                 Mulai Jelajah Sekarang
                 <Arrow className="size-4 transition-transform group-hover:translate-x-1" />
-              </Link>
+              </a>
               </Magnet>
               </ClickSpark>
               <a
                 href="#peta"
+                onClick={scrollToMap}
                 className="inline-flex items-center gap-2 rounded-full border-2 border-teal/15 bg-white/70 px-5 py-3 text-[15px] font-bold text-teal transition hover:border-teal/40 hover:bg-white"
               >
                 Lihat peta
@@ -184,7 +201,7 @@ export default function HomePage() {
           </div>
 
           <div className="relative -mx-4 sm:mx-0">
-            <HeroIllustration />
+            <HeroMascot className="mx-auto w-[min(72vw,340px)] lg:w-[380px]" />
           </div>
         </div>
 

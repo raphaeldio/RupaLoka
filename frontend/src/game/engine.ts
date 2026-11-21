@@ -56,7 +56,7 @@ export interface GameState {
   obstacles: Obstacle[]
   /** Jarak tersisa sampai rintangan berikutnya muncul di tepi kanan. */
   gapLeft: number
-  /** Ambang berikutnya (k, mulai 1): unlock saat skor ≥ k × unlockEvery. */
+  /** Ambang berikutnya (k, mulai 1): unlock saat jarak ≥ k × unlockEvery meter. */
   nextUnlock: number
   /** Indeks item (0-based) yang sudah terbuka di sesi ini, berurutan. */
   unlocked: number[]
@@ -65,16 +65,18 @@ export interface GameState {
 }
 
 export interface GameConfig {
+  /** Jarak antar-item dalam meter (city.yaml game.unlock_every). */
   unlockEvery: number
   itemCount: number
   obstacles: string[]
   speed: { start: number; max: number; ramp_per_100: number }
   /** prefers-reduced-motion → kecepatan lebih rendah (F-046). */
   reducedMotion?: boolean
-  /** ?debug=1 (non-produksi): skor naik lebih cepat (T-055). */
+  /** ?debug=1 (non-produksi): skor dan meter ambang naik lebih cepat (T-055). */
   scoreMultiplier?: number
 }
 
+/** threshold = ambang dalam meter. */
 export type GameEvent = { type: 'UNLOCK'; index: number; threshold: number } | { type: 'GAME_OVER' } | { type: 'JUMP' }
 
 const REDUCED_FACTOR = 0.75
@@ -113,6 +115,67 @@ export function clearable(spec: ObstacleSpec, speed: number): boolean {
   const effH = spec.h - HITBOX_INSET
   const span = spec.w + PLAYER.w - 4 * HITBOX_INSET
   return effH <= MAX_OBSTACLE_H && speed * timeAbove(effH) >= span
+}
+
+// --- Jarak (meter) dan pertemuan NPC -------------------------------------------------
+
+/** 1 meter = 100 px dunia (skor = jarak/10, jadi 1 m = 10 poin). */
+export const PX_PER_METER = 100
+export const metersOf = (distance: number): number => Math.floor(distance / PX_PER_METER)
+
+/** NPC berdiri tepat di depan pelari saat bertemu. */
+export const NPC_MEET_X = PLAYER.x + PLAYER.w + 6
+/** Ruang bebas rintangan di sekitar titik temu (px jarak), sebelum dan sesudahnya. */
+export const MEET_CLEAR_BEFORE = 200
+export const MEET_CLEAR_AFTER = 260
+
+/** Meter yang dihitung untuk ambang unlock (pengali debug ikut mempercepat). */
+export const unlockMeters = (distance: number, cfg: GameConfig): number =>
+  metersOf(distance) * (cfg.scoreMultiplier ?? 1)
+
+/** Jarak (px) saat pelari pertama kali mencapai ambang ke-k (k mulai 1). */
+export function meetDistance(k: number, cfg: GameConfig): number {
+  const mult = cfg.scoreMultiplier ?? 1
+  return Math.ceil((k * cfg.unlockEvery) / mult) * PX_PER_METER
+}
+
+export interface NpcView {
+  /** Indeks item (0-based) yang dijelaskan NPC ini. */
+  index: number
+  /** Posisi kiri NPC di dunia (px). */
+  x: number
+  /** true = belum ditemui (pelari sedang mendekat). */
+  ahead: boolean
+}
+
+/**
+ * NPC yang terlihat: NPC ambang berikutnya saat mendekat dari kanan, dan NPC yang baru
+ * ditemui saat tertinggal ke kiri. Murni dari state, tidak memengaruhi tabrakan.
+ */
+export function visibleNpcs(s: Pick<GameState, 'distance' | 'nextUnlock'>, cfg: GameConfig): NpcView[] {
+  if (cfg.unlockEvery <= 0) return []
+  const out: NpcView[] = []
+  for (const k of [s.nextUnlock - 1, s.nextUnlock]) {
+    if (k < 1 || k > cfg.itemCount) continue
+    const x = NPC_MEET_X + meetDistance(k, cfg) - s.distance
+    if (x < WORLD_W + 40 && x > -120) out.push({ index: k - 1, x, ahead: k === s.nextUnlock })
+  }
+  return out
+}
+
+/** Apakah rintangan yang muncul sekarang akan tiba di dekat titik temu NPC berikutnya. */
+function nearMeet(s: GameState, cfg: GameConfig, spec: ObstacleSpec): number | null {
+  if (cfg.unlockEvery <= 0) return null
+  // Rintangan muncul di x = WORLD_W; tiba di pelari setelah menempuh WORLD_W - PLAYER.x.
+  const arrive = s.distance + WORLD_W - PLAYER.x
+  for (const k of [s.nextUnlock - 1, s.nextUnlock]) {
+    if (k < 1 || k > cfg.itemCount) continue
+    const meet = meetDistance(k, cfg)
+    if (arrive + spec.w > meet - MEET_CLEAR_BEFORE && arrive < meet + MEET_CLEAR_AFTER) {
+      return meet + MEET_CLEAR_AFTER - arrive
+    }
+  }
+  return null
 }
 
 /** Pilih rintangan dan jarak berikutnya. Jarak selalu ≥ minGap(speed). */
@@ -221,8 +284,14 @@ export function step(
     s.gapLeft -= dx
     if (s.gapLeft <= 0) {
       const sp = spawn(s.seed, s.speed, cfg.obstacles)
-      s.obstacles.push(sp.obstacle)
-      s.gapLeft = sp.gap
+      const delay = nearMeet(s, cfg, sp.obstacle)
+      if (delay !== null) {
+        // Jangan menaruh rintangan di dekat NPC: tunda sampai lewat titik temu.
+        s.gapLeft = delay
+      } else {
+        s.obstacles.push(sp.obstacle)
+        s.gapLeft = sp.gap
+      }
       s.seed = sp.seed
     }
 
@@ -239,7 +308,7 @@ export function step(
 
     // Unlock: satu ambang per kejadian; game dijeda sampai pemain menekan "Lanjut".
     const threshold = s.nextUnlock * cfg.unlockEvery
-    if (cfg.unlockEvery > 0 && s.score >= threshold) {
+    if (cfg.unlockEvery > 0 && unlockMeters(s.distance, cfg) >= threshold) {
       if (s.nextUnlock <= cfg.itemCount) {
         const index = s.nextUnlock - 1
         s.unlocked.push(index)

@@ -1,14 +1,33 @@
 id: museum-sri-baduga
 title: "Museum Sri Baduga"
 narrative: |
-  [PERLU DIISI] narasi 100-200 kata.
+  Mau melihat sejarah Jawa Barat dalam satu tempat? Datanglah ke Museum Sri Baduga! Museum ini adalah Museum Negeri Provinsi Jawa Barat dan berada di Jl. BKR No.185, Bandung.
+
+  Museum Sri Baduga diresmikan pada 5 Juni 1980. Nama Sri Baduga sendiri baru dipakai sejak 1990. Jadi, kalau kamu menemukan catatan lama dengan nama berbeda, itu wajar.
+
+  Koleksinya banyak sekali. Pada 2017, museum ini menyimpan 6.979 koleksi tentang sejarah dan budaya Sunda. Koleksi itu disusun sebagai alur sejarah alam dan budaya Jawa Barat, mulai dari masa prasejarah sampai masa kolonial. Saat berjalan dari ruang ke ruang, kamu seperti membaca buku sejarah yang bisa dilihat langsung.
+
+  Sebelum berkunjung, ajak teman atau keluarga dan siapkan pertanyaan. Benda apa yang paling tua? Bagaimana kehidupan orang Sunda zaman dulu? Kalau ada yang belum jelas, kamu juga bisa bertanya kepada pemandu Rupaloka. Setelah selesai belajar di sini, kamu siap untuk petualangan keliling kota!
 key_facts:
-  - text: "Museum Sri Baduga berada di Jl. BKR No.185, Bandung."   # dari PRD §9; sumber [PERLU DIISI]
+  - text: "Museum Sri Baduga adalah Museum Negeri Provinsi Jawa Barat di Jl. BKR No.185, Bandung."
     chunk: museum-sri-baduga-001
-images:
-  - src: assets/images/museum-sri-baduga-1.webp
-    alt: "[PERLU DIISI] deskripsi gambar"
-    license: "[PERLU DIISI]"
+  - text: "Diresmikan 5 Juni 1980; memakai nama Sri Baduga sejak 1990."
+    chunk: museum-sri-baduga-002
+  - text: "Pada 2017 menyimpan 6.979 koleksi sejarah dan budaya Sunda."
+    chunk: museum-sri-baduga-003
+# Video YouTube pengganti gambar materi (21 Nov 2026), dari docs/review/materi-bandung-draft.md.
+# Video pertama disematkan di kartu materi; checked_by diisi setelah isinya ditonton dan diperiksa KH.
+videos:
+  - url: https://www.youtube.com/watch?v=VRAXz6ayIeY
+    title: "Video Profil Museum Sri Baduga"
+    channel: "Museum Sri Baduga Official"
+    note: "kanal resmi museum; pendek (3:48)"
+    checked_by: null
+  - url: https://www.youtube.com/watch?v=RdtEbTyp3vo
+    title: "Museum Sri Baduga dan Koleksinya"
+    channel: "Prodi Ilmu Sejarah Unpad"
+    note: "kanal akademik"
+    checked_by: null
 location:
   name: "Museum Sri Baduga"
   address: "Jl. BKR No.185, Bandung"   # verifikasi ulang + jam buka (T-034, T-035)

@@ -4,11 +4,11 @@ Konteks proyek untuk Claude Code. Baca ini dulu, lalu `docs/PRD.md`, `docs/SDD.m
 
 ## Proyek
 
-**RUPALOKA** — web edukasi budaya Nusantara berbasis gamifikasi dengan pemandu AI dan peta situs sejarah. Tim Kami Siap (Bandung), untuk BUDAYA GO! 2026, cabang Inovasi Digital, subtema 04 Pembelajaran dan Edukasi Digital Berbasis Budaya.
+**RUPALOKA** — web edukasi budaya Nusantara berbasis gamifikasi dengan pemandu AI dan peta situs sejarah. Tim KamiPemenang (Bandung), untuk BUDAYA GO! 2026, cabang Inovasi Digital, subtema 04 Pembelajaran dan Edukasi Digital Berbasis Budaya.
 
-**Alur (diperbarui 20 Nov 2026):** Beranda = peta Indonesia Leaflet (batas 38 provinsi, titik kota) → pilih kota (MVP: **Bandung**; lainnya "segera hadir") → **path belajar**: titik berurutan (1. Pengenalan Bandung, 2. Angklung, …), tiap titik = **kuis topik → kartu materi**, titik terakhir = **game runner keliling kota** (tiap kelipatan **1000** poin game: pause → item budaya → penjelasan singkat → lanjut) → ringkasan + "Lihat lokasi asli". Titik selesai memberi **poin path**; poin melewati ambang memberi **lencana** (`city.yaml` → `rewards`). Agen AI = **chatbot melayang** dengan maskot (`src/components/Mascot.tsx`).
+**Alur (diperbarui 20 Nov 2026):** Beranda = peta Indonesia Leaflet (batas 38 provinsi, titik kota) → pilih kota (MVP: **Bandung**; lainnya "segera hadir") → **path belajar**: titik berurutan (1. Pengenalan Bandung, 2. Angklung, …), tiap titik = **kuis awal → kartu materi (video YouTube) → kuis akhir**, titik terakhir = **game runner keliling kota** (tiap **100 m** lari bertemu NPC: pause → item budaya → penjelasan singkat → lanjut) → ringkasan + "Lihat lokasi asli". Titik selesai memberi **poin path**; poin melewati ambang memberi **lencana** (`city.yaml` → `rewards`). Agen AI = **chatbot melayang** dengan maskot (`src/components/Mascot.tsx`).
 
-**Ditunda (jangan dibangun di MVP-0):** penampil 3D, langganan/pembayaran, mode kelas, akun, papan peringkat, portal museum. Siapkan hanya `feature_flags`.
+**Ditunda (jangan dibangun di MVP-0):** penampil 3D, langganan/pembayaran, mode kelas, akun, portal museum. **Papan peringkat akhir tur kota** disetujui tim 21 Nov 2026 (tanpa akun: nama panggilan + id acak perangkat, skor = total poin path, gelar juara dari `city.yaml` → `rewards.leaderboard`, data di Supabase). Siapkan hanya `feature_flags`.
 
 **Rencana bisnis (hipotesis):** mitra = museum se-Indonesia; pengguna berbayar = sekolah dan individu (akses model 3D + fitur khusus).
 
@@ -82,7 +82,7 @@ python scripts/validate_content.py --release   # sebelum rilis
 3. Implementasi minimal; jalankan lint, uji, dan `validate_content.py`.
 4. Verifikasi UI di peramban (lebar 360 px dan desktop); gunakan `?debug=1` untuk mempercepat skor saat menguji item. Laporkan hal yang tidak bisa diuji.
 5. Perbarui `docs/TASKS.md` dan dokumen terdampak; keputusan arsitektur masuk SDD §16.
-6. Bila waktu mepet, pangkas sesuai urutan di TASKS. Jangan memangkas: peta di beranda, agen bersumber, kuis dasar, ≥3 materi bersumber, path belajar, game dengan item tiap `unlock_every` poin, deploy.
+6. Bila waktu mepet, pangkas sesuai urutan di TASKS. Jangan memangkas: peta di beranda, agen bersumber, kuis dasar, ≥3 materi bersumber, path belajar, game dengan item tiap `unlock_every` meter, deploy.
 
 ## Definisi selesai
 
@@ -98,7 +98,7 @@ python scripts/validate_content.py --release   # sebelum rilis
 
 ## Mekanik unlock (ringkas)
 
-`city.game.unlock_every` (Bandung: 1000). Saat skor melewati `k × unlock_every`, engine memancarkan `UNLOCK(item_k)` **tepat sekali**, game `pause()`, `ItemModal` tampil (nama, gambar, penjelasan singkat bersumber, "Tanya lebih lanjut"), tombol "Lanjut" memulai hitung mundur 3 dtk lalu `resume()` tanpa mengubah skor. Item masuk Koleksi (localStorage). Ambang diberi nomor urut sesuai `items_order`; setelah semua item terbuka, ambang berikutnya tidak memicu apa pun dan game berjalan terus sampai game over. Skor = jarak/10 (belum ada benda yang dipungut saat berlari).
+`city.game.unlock_every` dalam **meter** (Bandung: 100 m; 1 m = 100 px = 10 poin). Saat jarak melewati `k × unlock_every` m, pelari bertemu NPC (`src/game/npcs.ts`), engine memancarkan `UNLOCK(item_k)` **tepat sekali**, game `pause()`, `ItemModal` tampil dengan NPC yang menjelaskan item (nama, gambar, penjelasan singkat bersumber, "Tanya lebih lanjut"), tombol "Lanjut" memulai hitung mundur 3 dtk lalu `resume()` tanpa mengubah skor. Item masuk Koleksi (localStorage). Ambang diberi nomor urut sesuai `items_order`; setelah semua item terbuka, ambang berikutnya tidak memicu apa pun dan game berjalan terus sampai game over. Skor = jarak/10 (belum ada benda yang dipungut saat berlari).
 
 ## Hal yang masih terbuka (jangan diasumsikan)
 

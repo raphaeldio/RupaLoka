@@ -1,0 +1,37 @@
+/* Animasi maskot piksel (PixelMascot/HeroMascot). */
+@keyframes maskot-ngambang {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3%); }
+}
+@keyframes maskot-bayang {
+  0%, 100% { transform: scaleX(1); opacity: 1; }
+  50% { transform: scaleX(0.86); opacity: 0.7; }
+}
+@keyframes maskot-lompat {
+  0% { transform: translateY(0) scale(1, 1); }
+  20% { transform: translateY(0) scale(1.08, 0.9); }
+  45% { transform: translateY(-14%) scale(0.94, 1.06) rotate(-4deg); }
+  70% { transform: translateY(0) scale(1.05, 0.95) rotate(2deg); }
+  100% { transform: translateY(0) scale(1, 1); }
+}
+@keyframes maskot-lambai {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-55deg); }
+  50% { transform: rotate(-30deg); }
+  75% { transform: rotate(-55deg); }
+}
+@keyframes maskot-kibas {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(-8deg); }
+}
+
+.maskot-hero { animation: maskot-ngambang 3s ease-in-out infinite; transform-origin: 50% 100%; }
+.maskot-hero.maskot-lompat { animation: maskot-lompat 600ms cubic-bezier(0.3, 0.7, 0.3, 1) both, maskot-ngambang 3s ease-in-out 600ms infinite; }
+.maskot-bayangan { animation: maskot-bayang 3s ease-in-out infinite; }
+.maskot-lambai { transform-box: fill-box; transform-origin: 0% 20%; animation: maskot-lambai 900ms ease-in-out infinite; }
+.maskot-ekor { transform-box: fill-box; transform-origin: 0% 60%; animation: maskot-kibas 1.6s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .maskot-hero, .maskot-bayangan, .maskot-lambai, .maskot-ekor { animation: none !important; }
+  .maskot-gelembung { transition: none !important; }
+}

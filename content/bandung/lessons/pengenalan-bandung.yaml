@@ -3,14 +3,46 @@
 id: pengenalan-bandung
 title: "Pengenalan Bandung"
 narrative: |
-  [PERLU DIISI] narasi 100-200 kata tentang Bandung: letak, sebutan kota, budaya Sunda secara umum.
+  Selamat datang di Bandung! Kota ini berulang tahun setiap 25 September. Tanggal itu mengacu pada tahun 1810, dan pendiri kotanya adalah Bupati R.A. Wiranatakusumah II.
+
+  Dulu ibu kota Kabupaten Bandung ada di Krapyak, yang sekarang bernama Dayeuhkolot, sekitar 11 km di selatan pusat kota. Gubernur Jenderal Daendels membangun Jalan Raya Pos dari Anyer sampai Panarukan, lalu meminta ibu kota dipindah mendekati jalan itu.
+
+  Sejak 1864 Bandung menjadi ibu kota Keresidenan Priangan. Pada 1 April 1906 berdiri Gemeente Bandung sebagai kota otonom, tetapi tanggal itu bukan hari jadi kota.
+
+  Kota ini punya banyak bangunan bersejarah. Gedung Sate dibangun pada 1920 sampai 1924 dan dirancang Ir. J. Gerber. Enam bulatan di puncaknya dipercaya melambangkan enam juta gulden biaya pembangunannya. Di Gedung Merdeka, Konferensi Asia Afrika berlangsung pada 18 sampai 24 April 1955. Jalan Braga juga terkenal: julukan Paris van Java disebut muncul di sana, dan di Braga berdiri Majestic, bioskop pertama di Bandung.
 key_facts:
-  - text: "[PERLU DIISI]"
+  - text: "Hari jadi Bandung 25 September, mengacu pada tahun 1810."
     chunk: pengenalan-bandung-001
-images:
-  - src: assets/images/pengenalan-bandung-1.webp
-    alt: "[PERLU DIISI] deskripsi gambar"
-    license: "[PERLU DIISI]"
+  - text: "Pendiri Kota Bandung adalah Bupati R.A. Wiranatakusumah II."
+    chunk: pengenalan-bandung-001
+  - text: "Jalan Raya Pos membentang dari Anyer sampai Panarukan, sekitar 1.000 km."
+    chunk: pengenalan-bandung-002
+  - text: "1 April 1906: Gemeente Bandung berdiri (bukan hari jadi kota)."
+    chunk: pengenalan-bandung-003
+  - text: "Gedung Sate dibangun 1920-1924, dirancang Ir. J. Gerber."
+    chunk: pengenalan-bandung-006
+  - text: "Konferensi Asia Afrika: 18-24 April 1955 di Gedung Merdeka."
+    chunk: pengenalan-bandung-004
+  - text: "Majestic di Jalan Braga adalah bioskop pertama di Bandung."
+    chunk: pengenalan-bandung-008
+# Video YouTube pengganti gambar materi (21 Nov 2026), dari docs/review/materi-bandung-draft.md.
+# Video pertama disematkan di kartu materi; checked_by diisi setelah isinya ditonton dan diperiksa KH.
+videos:
+  - url: https://www.youtube.com/watch?v=gxwPUVEXPtI
+    title: "Asal Usul Kota Bandung Dijuluki Paris van Java"
+    channel: "MerdekaDotCom"
+    note: "media berita; pendek (3:23)"
+    checked_by: null
+  - url: https://www.youtube.com/watch?v=fi1fUBCbFm8
+    title: "Museum Gedung Sate Bandung Jelajah Wisata Sejarah Bandung 2022"
+    channel: "Endanesia"
+    note: "tur museum; kanal vlog wisata, bukan kanal resmi"
+    checked_by: null
+  - url: https://www.youtube.com/watch?v=225xAxFqlrI
+    title: "Menelusuri Sejarah di Gedung Merdeka Bandung (Museum KAA)"
+    channel: "MojangTulolo"
+    note: "kanal pribadi; tonton dulu sebelum rilis"
+    checked_by: null
 location: null
 suggested_questions:
   - "Bandung ada di provinsi apa?"

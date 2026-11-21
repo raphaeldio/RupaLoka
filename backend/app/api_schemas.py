@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
-from pydantic import BaseModel
+from uuid import UUID
+
+from pydantic import BaseModel, Field
 
 from app.schemas import (
     AgentScript,
@@ -53,3 +55,32 @@ class CityDetail(BaseModel):
 class SourcesResponse(BaseModel):
     assets: list[AssetEntry]
     references: list[Source]  # sumber unik dari seluruh chunk
+
+
+# --- papan peringkat (akhir tur kota) ----------------------------------------
+
+
+class LeaderboardEntry(BaseModel):
+    rank: int
+    nickname: str
+    points: int
+    title: str | None = None  # gelar juara (peringkat 1), mis. "Si Paling Bandung"
+
+
+class YourRank(BaseModel):
+    rank: int
+    points: int
+
+
+class LeaderboardResponse(BaseModel):
+    city_id: str
+    champion_title: str
+    max_points: int
+    entries: list[LeaderboardEntry]
+    you: YourRank | None = None  # posisi pemain yang meminta (bila player_id dikirim)
+
+
+class ScoreSubmit(BaseModel):
+    player_id: UUID  # dibuat acak di perangkat; bukan data pribadi
+    nickname: str = Field(min_length=1, max_length=40)
+    points: int = Field(ge=0)

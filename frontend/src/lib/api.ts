@@ -11,6 +11,8 @@ import type {
   Citation,
   CityDetail,
   CitySummary,
+  LeaderboardResponse,
+  ScoreSubmit,
   SourcesResponse,
 } from './api.types'
 
@@ -64,6 +66,22 @@ export function getCity(cityId: string, signal?: AbortSignal): Promise<CityDetai
 
 export function getSources(signal?: AbortSignal): Promise<SourcesResponse> {
   return request('/api/content/sources', { signal })
+}
+
+/** Papan peringkat akhir tur kota. 404 bila kota tidak punya papan; 503 bila penyimpanan mati. */
+export function getLeaderboard(cityId: string, playerId?: string, signal?: AbortSignal): Promise<LeaderboardResponse> {
+  const q = playerId ? `?player_id=${encodeURIComponent(playerId)}` : ''
+  return request(`/api/leaderboard/${encodeURIComponent(cityId)}${q}`, { signal })
+}
+
+/** Kirim skor (total poin path). 422 nama/poin ditolak (pesan di `detail`), 429 terlalu sering. */
+export function submitScore(cityId: string, body: ScoreSubmit, signal?: AbortSignal): Promise<LeaderboardResponse> {
+  return request(`/api/leaderboard/${encodeURIComponent(cityId)}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+    signal,
+  })
 }
 
 /**

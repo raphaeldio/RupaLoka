@@ -1,15 +1,33 @@
 id: wayang-golek
 title: "Wayang Golek"
 narrative: |
-  [PERLU DIISI] narasi 100-200 kata.
+  Kenalan dulu dengan wayang golek! Sebelum itu, kita mulai dari wayang secara umum. Pada 2008, UNESCO mencatat wayang dalam Daftar Representatif Warisan Budaya Takbenda. Artinya, dunia mengakui wayang sebagai warisan budaya yang perlu dijaga bersama.
+
+  Lalu, apa itu wayang golek? Wayang golek adalah boneka kayu tiga dimensi. Kata "tiga dimensi" berarti bonekanya punya panjang, lebar, dan tebal, seperti patung kecil. Coba bayangkan boneka itu dilihat dari depan, lalu dari samping: bentuknya tetap utuh.
+
+  Salah satu tokoh wayang golek Sunda yang paling dikenal adalah Si Cepot, yang juga bernama Astrajingga. Cepot adalah tokoh punakawan. Wajahnya merah, dan ia melambangkan kecerdikan, keberanian, dan kejujuran rakyat kecil.
+
+  Nanti di game, kamu bisa menemukan wayang golek dan Si Cepot sebagai item koleksi. Kumpulkan dan pelajari ceritanya!
 key_facts:
-  # PRD §9: wayang tercantum UNESCO 2008. Kaitan wayang golek dengan Bandung HARUS diverifikasi (T-035).
-  - text: "Wayang tercantum dalam daftar UNESCO pada 2008."
+  - text: "Wayang diakui UNESCO sebagai warisan budaya takbenda pada 2008."
     chunk: wayang-golek-001
-images:
-  - src: assets/images/wayang-golek-1.webp
-    alt: "[PERLU DIISI] deskripsi gambar"
-    license: "[PERLU DIISI]"
+  - text: "Wayang golek berupa boneka kayu tiga dimensi."
+    chunk: wayang-golek-002
+  - text: "Si Cepot (Astrajingga) adalah tokoh punakawan wayang golek Sunda."
+    chunk: wayang-golek-004
+# Video YouTube pengganti gambar materi (21 Nov 2026), dari docs/review/materi-bandung-draft.md.
+# Video pertama disematkan di kartu materi; checked_by diisi setelah isinya ditonton dan diperiksa KH.
+videos:
+  - url: https://www.youtube.com/watch?v=pfydro4X2t0
+    title: "The Wayang Puppet Theatre"
+    channel: "UNESCO"
+    note: "kanal resmi; ditautkan di halaman inskripsi UNESCO; berbahasa Inggris"
+    checked_by: null
+  - url: https://www.youtube.com/watch?v=XP-TBPp_hl0
+    title: "WAYANG GOLEK: Asli Sunda atau Pengaruh Jawa? Mengungkap Fakta Sejarahnya"
+    channel: "Bogor Tempo Doeloe"
+    note: "kanal sejarah lokal; klaim di dalamnya perlu diperiksa KH"
+    checked_by: null
 location: null      # [PERLU DIISI] isi bila ada lokasi yang terverifikasi
 suggested_questions:
   - "Apa itu wayang golek?"

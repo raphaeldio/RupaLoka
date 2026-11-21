@@ -2,6 +2,7 @@ import { motion } from 'motion/react'
 import { Fragment, useEffect, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import BadgeIcon from '../../components/BadgeIcon'
+import Leaderboard from '../../components/Leaderboard'
 import { ContentText, GlowCard } from '../../components/primitives'
 import BlurText from '../../components/reactbits/BlurText'
 import CountUp from '../../components/reactbits/CountUp'
@@ -13,17 +14,9 @@ import { questionsFor } from '../../flow/machine'
 import { useAgent } from '../../lib/agentStore'
 import type { CityDetail } from '../../lib/api.types'
 import { labelOr } from '../../lib/cities'
-import {
-  earnedBadges,
-  GAME_NODE,
-  maxPathPoints,
-  nextBadge,
-  nextNode,
-  pathNodes,
-  pathPoints,
-  type PathNode,
-} from '../../lib/rewards'
+import { earnedBadges, GAME_NODE, maxPathPoints, nextBadge, nextNode, pathNodes, pathPoints, type PathNode } from '../../lib/rewards'
 import { useCityProgress, useProgress } from '../../lib/store'
+import { Bamboo, CloudOrnament, NodeScene } from './pathScene'
 import { useCity } from './useCity'
 
 /** Geser horizontal titik (px) agar path berkelok; pola berulang. */
@@ -67,7 +60,7 @@ function nodeMeta(detail: CityDetail, node: PathNode) {
   if (node.id === GAME_NODE) {
     return {
       title: `Keliling ${detail.city.name}`,
-      meta: `Game · item tiap ${detail.game.unlock_every.toLocaleString('id-ID')} poin`,
+      meta: `Game · item tiap ${detail.game.unlock_every.toLocaleString('id-ID')} m`,
       to: `/kota/${detail.city.id}/game`,
     }
   }
@@ -92,9 +85,7 @@ function PathStep({ detail, node, isNext, offset }: { detail: CityDetail; node: 
         : node.id === GAME_NODE
           ? 'bg-emas text-tinta shadow-[0_6px_0_#a8761a]'
           : 'bg-white text-teal ring-4 ring-teal shadow-[0_6px_0_#146b68]'
-  const label = `Titik ${node.index + 1}: ${title}. ${meta}. ${
-    locked ? 'Terkunci' : node.status === 'done' ? 'Selesai' : 'Terbuka'
-  }`
+  const label = `Titik ${node.index + 1}: ${title}. ${meta}. ${locked ? 'Terkunci' : node.status === 'done' ? 'Selesai' : 'Terbuka'}`
 
   const circle = (
     <span
@@ -116,20 +107,28 @@ function PathStep({ detail, node, isNext, offset }: { detail: CityDetail; node: 
     >
       {isNext && (
         <span className="mb-2 rounded-xl bg-teal px-3 py-1 text-xs font-extrabold shadow-kartu motion-safe:animate-bounce">
-          <ShinyText text={node.status === 'open' && node.index === 0 ? 'Mulai' : 'Lanjut'} color="#ffffff" shineColor="#f8e9c4" speed={2.4} />
+          <ShinyText
+            text={node.status === 'open' && node.index === 0 ? 'Mulai' : 'Lanjut'}
+            color="#ffffff"
+            shineColor="#f8e9c4"
+            speed={2.4}
+          />
         </span>
       )}
-      {locked ? (
-        <div aria-label={label} role="img" className="cursor-not-allowed">
-          {circle}
-        </div>
-      ) : (
-        <Magnet padding={50} magnetStrength={5} disabled={!isNext}>
-          <Link to={to} aria-label={label} className="group block rounded-[28px]">
+      <div className="relative">
+        <NodeScene nodeId={node.id} />
+        {locked ? (
+          <div aria-label={label} role="img" className="cursor-not-allowed">
             {circle}
-          </Link>
-        </Magnet>
-      )}
+          </div>
+        ) : (
+          <Magnet padding={50} magnetStrength={5} disabled={!isNext}>
+            <Link to={to} aria-label={label} className="group block rounded-[28px]">
+              {circle}
+            </Link>
+          </Magnet>
+        )}
+      </div>
       <p className={`mt-3 max-w-[200px] text-center text-[15px] font-extrabold leading-tight ${locked ? 'text-redup' : 'text-tinta'}`}>
         {title}
       </p>
@@ -189,11 +188,13 @@ export default function PathPage() {
       </Link>
 
       <div className="mt-3 grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start">
-        <div>
+        <div className="relative">
+          {/* Bambu di samping spanduk (hiasan) */}
+          <Bamboo className="pointer-events-none absolute -right-6 -top-6 z-10 hidden h-[190px] w-auto lg:block" />
           {/* Spanduk kota */}
           <section
             aria-labelledby="judul-kota"
-            className="relative overflow-hidden rounded-[32px] bg-teal px-6 py-6 text-white shadow-melayang sm:px-8"
+            className="relative overflow-hidden rounded-[32px] bg-teal px-6 py-6 text-white shadow-melayang sm:px-8 lg:mr-14"
           >
             <svg aria-hidden="true" viewBox="0 0 400 120" className="pointer-events-none absolute -right-10 bottom-0 w-[420px] opacity-20">
               <path d="M0 120 C60 40 120 60 170 90 S280 20 400 70 V120Z" fill="#e8b64c" />
@@ -222,7 +223,7 @@ export default function PathPage() {
           </section>
 
           {/* Path */}
-          <ol className="mt-10 flex flex-col items-center" aria-label="Path belajar">
+          <ol className="relative mt-10 flex flex-col items-center" aria-label="Path belajar">
             {nodes.map((node, i) => (
               <Fragment key={node.id}>
                 {i > 0 && (
@@ -250,38 +251,45 @@ export default function PathPage() {
 
         {/* Panel samping: poin, lencana, koleksi */}
         <aside className="grid gap-4 lg:sticky lg:top-24" aria-label="Poin dan lencana">
-          <GlowCard>
-            <p className="text-xs font-extrabold uppercase tracking-[1.6px] text-redup">Poin {detail.city.name}</p>
-            <p className="mt-1 text-4xl font-extrabold tabular-nums text-teal">
-              <CountUp to={points} duration={1.2} trigger="load" />
-              <span className="text-base text-redup"> / {max}</span>
-            </p>
-            {upcoming ? (
-              <>
-                <Progress
-                  value={toNext}
-                  // Radix menganggap 0 sebagai indeterminate; 0% tetap nilai yang sah.
-                  aria-valuenow={toNext}
-                  aria-label={`Menuju lencana ${upcoming.name}`}
-                  className="mt-3 h-2.5 bg-pasir [&>[data-slot=progress-indicator]]:bg-emas [&>[data-slot=progress-indicator]]:duration-700"
-                />
-                <p className="mt-2 text-sm text-redup">
-                  {upcoming.min_points - points} poin lagi untuk <strong className="text-tinta">{upcoming.name}</strong>.
-                </p>
-              </>
-            ) : (
-              badges.length > 0 && <p className="mt-2 text-sm font-bold text-teal">Semua lencana kota ini sudah kamu dapat!</p>
-            )}
-            <p className="mt-3 text-xs text-redup">
-              +{detail.rewards.points_per_node} per titik selesai, +{detail.rewards.points_per_correct} per jawaban benar, +
-              {detail.rewards.game_node_points} saat menamatkan game.
-            </p>
-          </GlowCard>
+          <div className="relative">
+            <CloudOrnament className="pointer-events-none absolute -right-3 -top-5 z-10 w-24" />
+            <GlowCard>
+              <p className="text-xs font-extrabold uppercase tracking-[1.6px] text-redup">Poin {detail.city.name}</p>
+              <p className="mt-1 text-4xl font-extrabold tabular-nums text-teal">
+                <CountUp to={points} duration={1.2} trigger="load" />
+                <span className="text-base text-redup"> / {max}</span>
+              </p>
+              {upcoming ? (
+                <>
+                  <Progress
+                    value={toNext}
+                    // Radix menganggap 0 sebagai indeterminate; 0% tetap nilai yang sah.
+                    aria-valuenow={toNext}
+                    aria-label={`Menuju lencana ${upcoming.name}`}
+                    className="mt-3 h-2.5 bg-pasir [&>[data-slot=progress-indicator]]:bg-emas [&>[data-slot=progress-indicator]]:duration-700"
+                  />
+                  <p className="mt-2 text-sm text-redup">
+                    {upcoming.min_points - points} poin lagi untuk <strong className="text-tinta">{upcoming.name}</strong>.
+                  </p>
+                </>
+              ) : (
+                badges.length > 0 && <p className="mt-2 text-sm font-bold text-teal">Semua lencana kota ini sudah kamu dapat!</p>
+              )}
+              <p className="mt-3 text-xs text-redup">
+                +{detail.rewards.points_per_node} per titik selesai, +{detail.rewards.points_per_correct} per jawaban benar, +
+                {detail.rewards.game_node_points} saat menamatkan game.
+              </p>
+            </GlowCard>
+          </div>
 
           {badges.length > 0 && (
-            <section className="rounded-3xl border border-garis bg-white p-5 shadow-kartu" aria-labelledby="judul-lencana">
+            <section className="relative rounded-3xl border border-garis bg-white p-5 shadow-kartu" aria-labelledby="judul-lencana">
+              <CloudOrnament className="pointer-events-none absolute -right-3 -top-5 w-20" />
               <h2 id="judul-lencana" className="font-extrabold">
-                Lencana <span className="text-sm text-redup">({earned.length}/{badges.length})</span>
+                Lencana{' '}
+                <span className="text-sm text-redup">
+                  ({earned.length}/{badges.length})
+                </span>
               </h2>
               <ul className="mt-3 grid gap-3">
                 {badges.map((b, i) => {
@@ -312,7 +320,17 @@ export default function PathPage() {
             </section>
           )}
 
-          <section className="rounded-3xl border border-garis bg-white p-5 shadow-kartu">
+          {detail.rewards.leaderboard?.enabled && (
+            <div>
+              {!progress.gameDone && (
+                <p className="mb-2 text-xs font-bold text-redup">Tamatkan semua titik dan game untuk masuk papan peringkat.</p>
+              )}
+              <Leaderboard cityId={cityId} points={points} canSubmit={progress.gameDone} />
+            </div>
+          )}
+
+          <section className="relative rounded-3xl border border-garis bg-white p-5 shadow-kartu">
+            <CloudOrnament className="pointer-events-none absolute -right-3 -top-5 w-20" />
             <h2 className="font-extrabold">Koleksi item</h2>
             <p className="mt-1 text-sm text-redup">
               {collected?.length ?? 0}/{detail.items.length} item budaya ditemukan di game.

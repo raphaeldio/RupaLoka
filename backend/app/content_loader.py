@@ -321,6 +321,11 @@ class _Loader:
                 self.pending(path, "location: lat/lng belum diisi (tombol lokasi butuh koordinat)")
             for i, image in enumerate(lesson.images):
                 self._check_image(path, f"images[{i}]", image, sources)
+            for i, video in enumerate(lesson.videos):
+                if not video.checked_by:
+                    self.pending(
+                        path, f"videos[{i}]: isi video belum ditonton/diperiksa (checked_by)"
+                    )
 
         # Item
         for item in c.items.values():

@@ -49,8 +49,20 @@ class Settings:
     enable_docs: bool = True
     mascot_name: str = "Pemandu Rupaloka"  # [PERLU DIISI] nama maskot final
 
+    # Papan peringkat (data runtime di Supabase, SDD §16). Tanpa keduanya: simpanan memori
+    # (hilang saat restart; hanya untuk pengembangan).
+    supabase_url: str | None = None
+    supabase_service_role_key: str | None = None
+    leaderboard_rate_limit_per_min: int = 10
+
     @classmethod
     def from_env(cls) -> Settings:
+        try:
+            from dotenv import load_dotenv
+
+            load_dotenv(REPO_ROOT / ".env")
+        except Exception:
+            pass
         env = os.environ.get
         content_dir = env("CONTENT_DIR")
         return cls(
@@ -66,4 +78,7 @@ class Settings:
             trusted_proxy_hops=max(0, int(env("TRUSTED_PROXY_HOPS") or 0)),
             enable_docs=_bool(env("ENABLE_DOCS"), default=True),
             mascot_name=_str(env("MASCOT_NAME")) or "Pemandu Rupaloka",
+            supabase_url=_str(env("SUPABASE_URL")),
+            supabase_service_role_key=_str(env("SUPABASE_SERVICE_ROLE_KEY")),
+            leaderboard_rate_limit_per_min=int(env("LEADERBOARD_RATE_LIMIT_PER_MIN") or 10),
         )

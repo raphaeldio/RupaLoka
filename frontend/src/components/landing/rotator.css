@@ -1,0 +1,11 @@
+/* Rotator nama kota di judul hero (CityRotator.tsx). */
+@keyframes rotator-masuk {
+  from { transform: translateY(90%); opacity: 0; filter: blur(4px); }
+  to { transform: translateY(0); opacity: 1; filter: blur(0); }
+}
+@keyframes rotator-keluar {
+  from { transform: translateY(0); opacity: 1; filter: blur(0); }
+  to { transform: translateY(-90%); opacity: 0; filter: blur(4px); }
+}
+.rotator-masuk { animation: rotator-masuk 520ms cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+.rotator-keluar { animation: rotator-keluar 420ms cubic-bezier(0.5, 0, 0.8, 0.4) both; }

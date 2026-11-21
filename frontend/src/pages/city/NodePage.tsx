@@ -8,7 +8,7 @@ import CountUp from '../../components/reactbits/CountUp'
 import { celebrateBadges } from '../../lib/celebrate'
 import { QuizCard } from '../../components/QuizCard'
 import { Button, Card } from '../../components/primitives'
-import { initialNode, nodeReducer, questionsFor, quizScore } from '../../flow/machine'
+import { initialNode, nodeReducer, postQuestionsFor, questionsFor, quizScore, type NodeStage } from '../../flow/machine'
 import { useAgent } from '../../lib/agentStore'
 import type { Badge } from '../../lib/api.types'
 import { labelOr } from '../../lib/cities'
@@ -16,10 +16,10 @@ import { GAME_NODE, newBadges, nextNode, pathNodes, pathPoints } from '../../lib
 import { useCityProgress, useProgress } from '../../lib/store'
 import { useCity } from './useCity'
 
-function Steps({ stage, hasQuiz }: { stage: 'quiz' | 'lesson' | 'done'; hasQuiz: boolean }) {
-  const steps = [...(hasQuiz ? (['quiz'] as const) : []), 'lesson', 'done'] as const
-  const names = { quiz: 'Kuis', lesson: 'Materi', done: 'Hasil' }
-  const current = steps.indexOf(stage as never)
+function Steps({ stage, hasQuiz, hasPost }: { stage: NodeStage; hasQuiz: boolean; hasPost: boolean }) {
+  const steps: NodeStage[] = [...(hasQuiz ? (['quiz'] as const) : []), 'lesson', ...(hasPost ? (['post'] as const) : []), 'done']
+  const names: Record<NodeStage, string> = { quiz: 'Kuis awal', lesson: 'Materi', post: 'Kuis akhir', done: 'Hasil' }
+  const current = steps.indexOf(stage)
   return (
     <ol className="flex items-center gap-1.5 text-xs font-bold" aria-label="Tahap titik">
       {steps.map((s, i) => (
@@ -61,15 +61,20 @@ function NodePage() {
     () => (lesson ? questionsFor(lesson.id, detail.quiz.intro, detail.sources) : []),
     [lesson, detail],
   )
-  const reducer = useMemo(() => nodeReducer(questions.length), [questions.length])
-  const [state, dispatch] = useReducer(reducer, questions.length, initialNode)
+  const postQuestions = useMemo(() => (lesson ? postQuestionsFor(lesson.id, detail.quiz, detail.sources) : []), [lesson, detail])
+  const reducer = useMemo(() => nodeReducer(questions.length, postQuestions.length), [questions.length, postQuestions.length])
+  const [state, dispatch] = useReducer(reducer, undefined, () => initialNode(questions.length, postQuestions.length))
 
   const [result, setResult] = useState<{ before: number; after: number; badges: Badge[] } | null>(null)
-  const correct = quizScore(questions, state.answers)
+  const preCorrect = quizScore(questions, state.answers)
+  const postCorrect = quizScore(postQuestions, state.postAnswers)
+  // Poin jawaban benar memakai hasil terbaik dari kuis awal dan akhir, dibatasi jumlah soal titik ini
+  // (agar cocok dengan maxPathPoints yang menghitung soal kuis awal).
+  const correct = Math.min(Math.max(preCorrect, postCorrect), questions.length || postQuestions.length)
 
   useEffect(() => {
     if (!lesson) return
-    setContext({ phase: state.stage === 'quiz' ? 'quiz_intro' : 'lessons', lesson_id: lesson.id })
+    setContext({ phase: state.stage === 'quiz' || state.stage === 'post' ? 'quiz_intro' : 'lessons', lesson_id: lesson.id })
     if (state.stage === 'lesson') say(detail.agent_script.lessons_start)
   }, [lesson, state.stage, detail, say, setContext])
 
@@ -83,8 +88,13 @@ function NodePage() {
     const badges = newBadges(before, after, detail.rewards.badges)
     setResult({ before, after, badges })
     celebrateBadges(badges)
-    dispatch({ type: 'FINISH_LESSON' })
   }
+
+  // Simpan progres tepat sekali saat titik mencapai tahap hasil (dari materi atau dari kuis akhir).
+  useEffect(() => {
+    if (state.stage === 'done' && !result) finish()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.stage])
 
   if (!lesson) return <Navigate to={`/kota/${cityId}`} replace />
   const node = pathNodes(lessonIds, progress).find((n) => n.id === lesson.id)
@@ -109,6 +119,23 @@ function NodePage() {
         onSkip={() => dispatch({ type: 'SKIP_QUIZ' })}
       />
     )
+  } else if (state.stage === 'post') {
+    const q = postQuestions[state.index]
+    body = (
+      <QuizCard
+        key={`post-${q.id}`}
+        kind="Kuis akhir"
+        finalLabel="Lihat hasil"
+        question={q}
+        number={state.index + 1}
+        total={postQuestions.length}
+        answer={state.postAnswers[state.index]}
+        source={detail.sources[q.chunk]}
+        onAnswer={(choice) => dispatch({ type: 'ANSWER', choice })}
+        onNext={() => dispatch({ type: 'NEXT' })}
+        onSkip={() => dispatch({ type: 'SKIP_QUIZ' })}
+      />
+    )
   } else if (state.stage === 'lesson') {
     body = (
       <LessonCard
@@ -116,8 +143,8 @@ function NodePage() {
         eyebrow={`Titik ${position} · Materi`}
         sources={detail.sources}
         onAsk={(q) => ask(q, lesson.id)}
-        onFinish={finish}
-        finishLabel="Selesaikan titik"
+        onFinish={() => dispatch({ type: 'FINISH_LESSON' })}
+        finishLabel={postQuestions.length > 0 ? 'Lanjut ke kuis akhir' : 'Selesaikan titik'}
       />
     )
   } else {
@@ -125,6 +152,7 @@ function NodePage() {
     const gained = r ? r.after - r.before : 0
     const next = nextNode(pathNodes(lessonIds, progress))
     const nextTo = next ? (next.id === GAME_NODE ? `/kota/${cityId}/game` : `/kota/${cityId}/titik/${next.id}`) : null
+    const nextTitle = labelOr(detail.lessons.find((l) => l.id === next?.id)?.title, 'titik berikutnya')
     body = (
       <Card className="text-center">
         <p className="text-xs font-extrabold uppercase tracking-[1.6px] text-redup">Titik {position} selesai</p>
@@ -138,8 +166,27 @@ function NodePage() {
         </Pop>
         <p className="text-sm text-redup">
           poin · total {r?.after ?? 0}
-          {questions.length > 0 && ` · kuis ${correct}/${questions.length} benar`}
         </p>
+        {(questions.length > 0 || postQuestions.length > 0) && (
+          <div className="mx-auto mt-4 grid max-w-xs grid-cols-2 gap-2 text-sm">
+            {questions.length > 0 && (
+              <p className="rounded-2xl bg-kertas p-3">
+                <span className="block text-xs font-bold text-redup">Kuis awal</span>
+                <strong className="text-lg tabular-nums">
+                  {preCorrect}/{questions.length}
+                </strong>
+              </p>
+            )}
+            {postQuestions.length > 0 && (
+              <p className="rounded-2xl bg-teal-50 p-3">
+                <span className="block text-xs font-bold text-redup">Kuis akhir</span>
+                <strong className="text-lg tabular-nums text-teal">
+                  {postCorrect}/{postQuestions.length}
+                </strong>
+              </p>
+            )}
+          </div>
+        )}
         {gained === 0 && <p className="mt-2 text-xs text-redup">Titik ini sudah pernah diselesaikan; poin dihitung dari hasil terbaik.</p>}
 
         {r && r.badges.length > 0 && (
@@ -173,7 +220,7 @@ function NodePage() {
           </Button>
           {nextTo && (
             <Button autoFocus onClick={() => navigate(nextTo)}>
-              {next?.id === GAME_NODE ? 'Main game' : 'Titik berikutnya'}
+              {next?.id === GAME_NODE ? `Lanjut: main game keliling ${detail.city.name} →` : `Lanjut: ${nextTitle} →`}
             </Button>
           )}
         </div>
@@ -187,7 +234,7 @@ function NodePage() {
         <Link to={`/kota/${cityId}`} className="text-sm font-bold text-redup hover:text-teal">
           ← Path {detail.city.name}
         </Link>
-        <Steps stage={state.stage} hasQuiz={questions.length > 0} />
+        <Steps stage={state.stage} hasQuiz={questions.length > 0} hasPost={postQuestions.length > 0} />
       </div>
       <p className="mb-2 text-xs font-extrabold uppercase tracking-[1.6px] text-redup">
         Titik {position}: {title}

@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { labelOr } from '../lib/cities'
 import type { Badge, CityDetail } from '../lib/api.types'
 import BadgeIcon from './BadgeIcon'
+import Leaderboard from './Leaderboard'
 import LocationButton from './LocationButton'
 import { Pop } from './motion'
 import CountUp from './reactbits/CountUp'
@@ -19,6 +20,7 @@ export default function Summary({
   pointsGained,
   badges,
   badgeTier,
+  pathTotal,
 }: {
   detail: CityDetail
   score: number
@@ -32,6 +34,8 @@ export default function Summary({
   /** Lencana baru dari poin tersebut. */
   badges: Badge[]
   badgeTier: (b: Badge) => number
+  /** Total poin path kota setelah game; skor papan peringkat. */
+  pathTotal: number
 }) {
   const unlocked = detail.items.filter((i) => unlockedIds.includes(i.id))
   const allCollected = detail.items.length > 0 && detail.items.every((i) => collectedIds.includes(i.id))
@@ -90,7 +94,7 @@ export default function Summary({
         <h3 className="text-sm font-extrabold">Item yang kamu temukan</h3>
         {unlocked.length === 0 ? (
           <p className="mt-1 text-sm text-redup">
-            Belum ada. Capai {detail.game.unlock_every} poin untuk menemukan item pertama!
+            Belum ada. Lari sejauh {detail.game.unlock_every} m untuk menemukan item pertama!
           </p>
         ) : (
           <ul className="mt-2 grid grid-cols-3 gap-2">
@@ -105,6 +109,12 @@ export default function Summary({
           </ul>
         )}
       </section>
+
+      {detail.rewards.leaderboard?.enabled && (
+        <div className="mt-5">
+          <Leaderboard cityId={detail.city.id} points={pathTotal} canSubmit />
+        </div>
+      )}
 
       {sites.length > 0 && (
         <section className="mt-5 grid gap-2" aria-label="Lokasi asli">

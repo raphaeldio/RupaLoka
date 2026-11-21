@@ -14,6 +14,7 @@ interface Result {
   unlocked: string[]
   gained: number
   badges: Badge[]
+  total: number
 }
 
 /** Titik terakhir path: game runner keliling kota, lalu ringkasan (F-040–F-045). */
@@ -47,7 +48,7 @@ export default function GamePage() {
       const after = pathPoints(lessonIds, { ...p, gameDone: true }, detail.rewards)
       finishGame(cityId, score)
       const badges = newBadges(before, after, detail.rewards.badges)
-      setResult({ score, unlocked, gained: after - before, badges })
+      setResult({ score, unlocked, gained: after - before, badges, total: after })
       celebrateBadges(badges)
     },
     [cityId, progress, lessonIds, detail, finishGame],
@@ -74,6 +75,7 @@ export default function GamePage() {
           pointsGained={result.gained}
           badges={result.badges}
           badgeTier={(b) => detail.rewards.badges.indexOf(b)}
+          pathTotal={result.total}
           onReplay={() => {
             setResult(null)
             setRound((r) => r + 1)
@@ -81,7 +83,14 @@ export default function GamePage() {
           onBack={() => navigate(`/kota/${cityId}`)}
         />
       ) : (
-        <GameView key={round} detail={detail} onUnlock={onUnlock} onFinish={onFinish} onAsk={onAsk} />
+        <GameView
+          key={round}
+          detail={detail}
+          onUnlock={onUnlock}
+          onFinish={onFinish}
+          onAsk={onAsk}
+          onExit={() => navigate(`/kota/${cityId}`)}
+        />
       )}
     </main>
   )
