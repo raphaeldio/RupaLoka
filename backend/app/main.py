@@ -40,7 +40,7 @@ from app.leaderboard import (
 from app.llm import LLM, GeminiLLM, LLMError
 from app.retrieval import Retriever
 from app.schemas import City
-from app.security import add_security_headers, client_ip
+from app.security import add_security_headers, client_ip, describe_client_chain
 
 logger = logging.getLogger("rupaloka")
 
@@ -135,6 +135,12 @@ def create_app(
             cities=len(c.cities),
             active_cities=sum(1 for city in c.cities if city.status == "active"),
         )
+
+    @app.get("/api/debug/client-chain", include_in_schema=False)
+    def debug_client_chain(request: Request, response: Response) -> dict[str, object]:
+        # SEMENTARA: bentuk rantai X-Forwarded-For tanpa IP (app/security.py).
+        response.headers["Cache-Control"] = "no-store"
+        return describe_client_chain(request, settings.trusted_proxy_hops)
 
     @app.get("/api/content/cities", response_model=list[CitySummary])
     def list_cities(request: Request, response: Response) -> list[CitySummary]:

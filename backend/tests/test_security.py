@@ -169,3 +169,24 @@ def test_scan_finds_real_value_without_printing_it(tmp_path: Path, capsys: Any) 
 
 def test_scan_missing_target(tmp_path: Path) -> None:
     assert check_main([str(tmp_path / "tidak-ada")]) == 2
+
+
+def test_debug_client_chain_reveals_no_ip_addresses(make_content: Any) -> None:
+    from fastapi.testclient import TestClient
+
+    from app.config import Settings
+    from app.main import create_app
+
+    app = create_app(Settings(content_dir=make_content(), trusted_proxy_hops=2), llm=None)
+    with TestClient(app) as c:
+        r = c.get(
+            "/api/debug/client-chain",
+            headers={"X-Forwarded-For": "1.2.3.4, 10.0.0.5", "X-Real-IP": "1.2.3.4"},
+        )
+    body = r.json()
+    assert r.status_code == 200
+    assert body["xff_count"] == 2
+    assert body["xff_private"] == [False, True]
+    assert body["other_headers"]["x-real-ip"]["xff_index"] == 0
+    assert body["derived_tag"] == body["xff_tags"][0]
+    assert "1.2.3.4" not in r.text and "10.0.0.5" not in r.text
