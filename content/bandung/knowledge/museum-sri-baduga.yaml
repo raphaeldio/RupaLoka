@@ -37,3 +37,70 @@
   verified_at: null
 
 # Tambahkan museum-sri-baduga-004 dan seterusnya sampai minimal 8 chunk.
+
+- id: museum-sri-baduga-004
+  lesson_id: museum-sri-baduga
+  text: "Museum Sri Baduga mulai didirikan pada 1974 di lahan bekas bangunan Kawedanan Tegallega. Museum ini diresmikan pada 5 Juni 1980 oleh Menteri Pendidikan dan Kebudayaan saat itu, Dr. Daoed Joesoef."
+  source:
+    title: "Kementerian Pariwisata RI, indonesia.travel. Sri Baduga State Museum"
+    url: https://www.indonesia.travel/gb/en/destination/java/west-java/sri-baduga-state-museum--national-museum-collections--west-java-culture
+    type: web
+    accessed: 2026-11-21
+  verified_by: null         # nama pemeriksa (KH)
+  verified_at: null
+
+- id: museum-sri-baduga-005
+  lesson_id: museum-sri-baduga
+  text: "Nama museum diambil dari Sri Baduga Maharaja, raja terkemuka dalam sejarah Sunda yang dikenang karena membawa Kerajaan Pajajaran menuju kemakmuran."
+  source:
+    title: "Kementerian Pariwisata RI, indonesia.travel. Sri Baduga State Museum"
+    url: https://www.indonesia.travel/gb/en/destination/java/west-java/sri-baduga-state-museum--national-museum-collections--west-java-culture
+    type: web
+    accessed: 2026-11-21
+  verified_by: null         # nama pemeriksa (KH)
+  verified_at: null
+
+- id: museum-sri-baduga-006
+  # detikJabar 2025 menyebut dikelola Kementerian Kebudayaan; KH pastikan pengelola terkini
+  lesson_id: museum-sri-baduga
+  text: "Museum Sri Baduga dimiliki Pemerintah Provinsi Jawa Barat dan dikelola Dinas Pariwisata dan Kebudayaan provinsi, dengan fokus pada perawatan koleksi, pameran, dan program edukasi."
+  source:
+    title: "Kementerian Pariwisata RI, indonesia.travel. Sri Baduga State Museum"
+    url: https://www.indonesia.travel/gb/en/destination/java/west-java/sri-baduga-state-museum--national-museum-collections--west-java-culture
+    type: web
+    accessed: 2026-11-21
+  verified_by: null         # nama pemeriksa (KH)
+  verified_at: null
+
+- id: museum-sri-baduga-007
+  lesson_id: museum-sri-baduga
+  text: "Museum Sri Baduga menyimpan lebih dari 6.000 artefak dari berbagai bidang: geologi, biologi, etnografi, arkeologi, sejarah, numismatik (mata uang), filologi (naskah), keramik, seni rupa, dan teknologi."
+  source:
+    title: "Kementerian Pariwisata RI, indonesia.travel. Sri Baduga State Museum"
+    url: https://www.indonesia.travel/gb/en/destination/java/west-java/sri-baduga-state-museum--national-museum-collections--west-java-culture
+    type: web
+    accessed: 2026-11-21
+  verified_by: null         # nama pemeriksa (KH)
+  verified_at: null
+
+- id: museum-sri-baduga-008
+  lesson_id: museum-sri-baduga
+  text: "Museum Sri Baduga tergolong museum umum tipe A, terdaftar dalam registrasi museum nasional dengan nomor 32.73.U.03.0029, dan termasuk jaringan Museum Indonesia."
+  source:
+    title: "Kementerian Pariwisata RI, indonesia.travel. Sri Baduga State Museum"
+    url: https://www.indonesia.travel/gb/en/destination/java/west-java/sri-baduga-state-museum--national-museum-collections--west-java-culture
+    type: web
+    accessed: 2026-11-21
+  verified_by: null         # nama pemeriksa (KH)
+  verified_at: null
+
+- id: museum-sri-baduga-009
+  lesson_id: museum-sri-baduga
+  text: "Di Museum Sri Baduga pengunjung dapat mempelajari sejarah alam, budaya tradisional, dan sejarah Jawa Barat dari masa prasejarah hingga masa kini."
+  source:
+    title: "Kementerian Pariwisata RI, indonesia.travel. Sri Baduga State Museum"
+    url: https://www.indonesia.travel/gb/en/destination/java/west-java/sri-baduga-state-museum--national-museum-collections--west-java-culture
+    type: web
+    accessed: 2026-11-21
+  verified_by: null         # nama pemeriksa (KH)
+  verified_at: null

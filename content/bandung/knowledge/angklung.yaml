@@ -38,3 +38,118 @@
   verified_at: null
 
 # Tambahkan angklung-004 dan seterusnya sampai minimal 8 chunk.
+
+- id: angklung-004
+  lesson_id: angklung
+  text: "Satu angklung terdiri atas dua sampai empat tabung bambu yang digantung pada rangka bambu dan diikat dengan tali rotan. Tabung-tabungnya diraut dan dipotong oleh perajin ahli agar menghasilkan nada tertentu."
+  source:
+    title: "UNESCO (2010). Indonesian Angklung"
+    url: https://ich.unesco.org/en/RL/00393
+    type: web
+    accessed: 2026-11-21
+  verified_by: null         # nama pemeriksa (KH)
+  verified_at: null
+
+- id: angklung-005
+  lesson_id: angklung
+  text: "Angklung berbunyi ketika rangka bambunya digoyangkan atau diketuk. Setiap angklung hanya menghasilkan satu nada atau satu akor, sehingga beberapa pemain harus bekerja sama untuk memainkan sebuah melodi."
+  source:
+    title: "UNESCO (2010). Indonesian Angklung"
+    url: https://ich.unesco.org/en/RL/00393
+    type: web
+    accessed: 2026-11-21
+  verified_by: null         # nama pemeriksa (KH)
+  verified_at: null
+
+- id: angklung-006
+  lesson_id: angklung
+  text: "Angklung tradisional memakai tangga nada pentatonis (lima nada). Angklung bertangga nada diatonis baru diperkenalkan Daeng Soetigna pada 1938."
+  source:
+    title: "UNESCO (2010). Indonesian Angklung"
+    url: https://ich.unesco.org/en/RL/00393
+    type: web
+    accessed: 2026-11-21
+  verified_by: null         # nama pemeriksa (KH)
+  verified_at: null
+
+- id: angklung-007
+  # UNESCO: 'black bamboo', 'when the cicadas sing'; terjemahan cicada = tonggeret, periksa KH
+  lesson_id: angklung
+  text: "Angklung dibuat dari bambu hitam khusus yang dipanen pada dua minggu dalam setahun ketika tonggeret berbunyi. Bambu dipotong sedikitnya tiga ruas di atas tanah agar akarnya terus tumbuh."
+  source:
+    title: "UNESCO (2010). Indonesian Angklung"
+    url: https://ich.unesco.org/en/RL/00393
+    type: web
+    accessed: 2026-11-21
+  verified_by: null         # nama pemeriksa (KH)
+  verified_at: null
+
+- id: angklung-008
+  lesson_id: angklung
+  text: "Angklung erat kaitannya dengan adat, seni, dan identitas budaya di Indonesia. Angklung dimainkan dalam upacara seperti menanam padi, panen, dan khitanan."
+  source:
+    title: "UNESCO (2010). Indonesian Angklung"
+    url: https://ich.unesco.org/en/RL/00393
+    type: web
+    accessed: 2026-11-21
+  verified_by: null         # nama pemeriksa (KH)
+  verified_at: null
+
+- id: angklung-009
+  lesson_id: angklung
+  text: "Karena dimainkan bersama-sama, bermain angklung melatih kerja sama dan saling menghormati, juga disiplin, tanggung jawab, konsentrasi, imajinasi, daya ingat, serta rasa seni dan musik."
+  source:
+    title: "UNESCO (2010). Indonesian Angklung"
+    url: https://ich.unesco.org/en/RL/00393
+    type: web
+    accessed: 2026-11-21
+  verified_by: null         # nama pemeriksa (KH)
+  verified_at: null
+
+- id: angklung-010
+  # artikel opini peneliti independen di situs Setneg; periksa KH
+  lesson_id: angklung
+  text: "Nama angklung diambil dari bunyinya, \"klung, klung\". Angklung adalah alat musik masyarakat Sunda yang berasal dari Jawa Barat."
+  source:
+    title: "Kementerian Sekretariat Negara RI (2024, 25 Maret). Angklung Sebagai Representasi Diplomasi Budaya Indonesia"
+    url: https://setneg.go.id/baca/index/angklung_sebagai_representasi_diplomasi_budaya_indonesia
+    type: web
+    accessed: 2026-11-21
+  verified_by: null         # nama pemeriksa (KH)
+  verified_at: null
+
+- id: angklung-011
+  # artikel opini peneliti independen di situs Setneg; periksa KH
+  lesson_id: angklung
+  text: "Dahulu angklung dipakai dalam upacara untuk Nyai Sri Pohaci (Dewi Padi) dan dalam Seren Taun, sebagai doa bagi padi dan ungkapan syukur atas panen. Kini angklung digunakan secara luas sebagai hiburan."
+  source:
+    title: "Kementerian Sekretariat Negara RI (2024, 25 Maret). Angklung Sebagai Representasi Diplomasi Budaya Indonesia"
+    url: https://setneg.go.id/baca/index/angklung_sebagai_representasi_diplomasi_budaya_indonesia
+    type: web
+    accessed: 2026-11-21
+  verified_by: null         # nama pemeriksa (KH)
+  verified_at: null
+
+- id: angklung-012
+  # CLAUDE.md: peran Saung Angklung Udjo wajib diverifikasi; sumber mengeja 'Udjo Ngalegena' dan 'Daeng Sutigna'
+  lesson_id: angklung
+  text: "Udjo Ngalagena adalah murid Daeng Soetigna. Saung Angklung Udjo di Bandung sering diundang tampil di dalam dan luar negeri, sehingga ikut menyebarkan budaya angklung ke mancanegara."
+  source:
+    title: "Kementerian Sekretariat Negara RI (2024, 25 Maret). Angklung Sebagai Representasi Diplomasi Budaya Indonesia"
+    url: https://setneg.go.id/baca/index/angklung_sebagai_representasi_diplomasi_budaya_indonesia
+    type: web
+    accessed: 2026-11-21
+  verified_by: null         # nama pemeriksa (KH)
+  verified_at: null
+
+- id: angklung-013
+  # artikel opini peneliti independen di situs Setneg; periksa KH
+  lesson_id: angklung
+  text: "Pada 1908, utusan Kerajaan Thailand datang ke Indonesia untuk belajar angklung dan membawa pulang satu set berisi 10 angklung. Di Thailand angklung dikenal luas dengan nama angkalung."
+  source:
+    title: "Kementerian Sekretariat Negara RI (2024, 25 Maret). Angklung Sebagai Representasi Diplomasi Budaya Indonesia"
+    url: https://setneg.go.id/baca/index/angklung_sebagai_representasi_diplomasi_budaya_indonesia
+    type: web
+    accessed: 2026-11-21
+  verified_by: null         # nama pemeriksa (KH)
+  verified_at: null

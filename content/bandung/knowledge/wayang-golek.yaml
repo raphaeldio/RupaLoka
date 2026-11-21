@@ -28,12 +28,12 @@
 
 - id: wayang-golek-003
   lesson_id: wayang-golek
-  text: "[PERLU DIISI]"
+  text: "Dalam pertunjukan wayang, dalang menggerakkan lengan boneka yang dapat berputar dengan tongkat-tongkat ramping. Pertunjukan diiringi penyanyi dan pemusik yang memainkan alat musik perunggu dan kendang gamelan."
   source:
-    title: "[PERLU DIISI]"
-    url: null
-    type: "[PERLU DIISI]"
-    accessed: null          # tanggal akses, format 2026-11-19
+    title: "UNESCO (2008). Wayang puppet theatre (Indonesia)"
+    url: https://ich.unesco.org/en/RL/wayang-puppet-theatre-00063
+    type: web
+    accessed: 2026-11-21
   verified_by: null         # nama pemeriksa (KH)
   verified_at: null
 
@@ -48,4 +48,80 @@
   verified_by: "Tim Budaya"
   verified_at: 2026-11-20
 
-# Tambahkan wayang-golek-005 dan seterusnya sampai minimal 8 chunk.
+- id: wayang-golek-005
+  lesson_id: wayang-golek
+  text: "Ada dua jenis utama wayang: boneka kayu tiga dimensi yang disebut wayang klitik atau wayang golek, dan wayang kulit pipih yang dimainkan di depan layar yang diterangi dari belakang. Keduanya punya kostum, raut wajah khas, dan bagian tubuh yang bisa digerakkan."
+  source:
+    title: "UNESCO (2008). Wayang puppet theatre (Indonesia)"
+    url: https://ich.unesco.org/en/RL/wayang-puppet-theatre-00063
+    type: web
+    accessed: 2026-11-21
+  verified_by: null         # nama pemeriksa (KH)
+  verified_at: null
+
+- id: wayang-golek-006
+  lesson_id: wayang-golek
+  text: "Wayang adalah bentuk bercerita kuno yang berasal dari Pulau Jawa. Selama sepuluh abad wayang berkembang di istana kerajaan Jawa dan Bali serta di pedesaan, lalu menyebar ke Lombok, Madura, Sumatra, dan Kalimantan."
+  source:
+    title: "UNESCO (2008). Wayang puppet theatre (Indonesia)"
+    url: https://ich.unesco.org/en/RL/wayang-puppet-theatre-00063
+    type: web
+    accessed: 2026-11-21
+  verified_by: null         # nama pemeriksa (KH)
+  verified_at: null
+
+- id: wayang-golek-007
+  lesson_id: wayang-golek
+  text: "Cerita wayang mengambil tokoh dari mitos asli Nusantara, epos India, dan kisah pahlawan dari Persia."
+  source:
+    title: "UNESCO (2008). Wayang puppet theatre (Indonesia)"
+    url: https://ich.unesco.org/en/RL/wayang-puppet-theatre-00063
+    type: web
+    accessed: 2026-11-21
+  verified_by: null         # nama pemeriksa (KH)
+  verified_at: null
+
+- id: wayang-golek-008
+  lesson_id: wayang-golek
+  text: "Dahulu dalang dihormati sebagai ahli sastra yang menyampaikan nilai moral dan keindahan. Dalang harus menghafal banyak sekali cerita serta membawakan narasi kuno dan tembang puitis."
+  source:
+    title: "UNESCO (2008). Wayang puppet theatre (Indonesia)"
+    url: https://ich.unesco.org/en/RL/wayang-puppet-theatre-00063
+    type: web
+    accessed: 2026-11-21
+  verified_by: null         # nama pemeriksa (KH)
+  verified_at: null
+
+- id: wayang-golek-009
+  # UNESCO tidak menyebut nama tokoh; jangan dikaitkan ke Cepot tanpa sumber
+  lesson_id: wayang-golek
+  text: "Tokoh-tokoh lucu yang mewakili rakyat biasa dalam wayang sering menjadi sarana untuk mengkritik masalah sosial dan politik yang peka."
+  source:
+    title: "UNESCO (2008). Wayang puppet theatre (Indonesia)"
+    url: https://ich.unesco.org/en/RL/wayang-puppet-theatre-00063
+    type: web
+    accessed: 2026-11-21
+  verified_by: null         # nama pemeriksa (KH)
+  verified_at: null
+
+- id: wayang-golek-010
+  lesson_id: wayang-golek
+  text: "Cerita dan teknik pertunjukan wayang diwariskan secara lisan di dalam keluarga dalang, pemusik, dan pembuat wayang. Kini wayang harus bersaing dengan hiburan modern seperti video, televisi, dan karaoke."
+  source:
+    title: "UNESCO (2008). Wayang puppet theatre (Indonesia)"
+    url: https://ich.unesco.org/en/RL/wayang-puppet-theatre-00063
+    type: web
+    accessed: 2026-11-21
+  verified_by: null         # nama pemeriksa (KH)
+  verified_at: null
+
+- id: wayang-golek-011
+  lesson_id: wayang-golek
+  text: "Wayang pertama kali diproklamasikan UNESCO sebagai warisan budaya pada 2003, lalu tercatat dalam Daftar Representatif Warisan Budaya Takbenda pada 2008."
+  source:
+    title: "UNESCO (2008). Wayang puppet theatre (Indonesia)"
+    url: https://ich.unesco.org/en/RL/wayang-puppet-theatre-00063
+    type: web
+    accessed: 2026-11-21
+  verified_by: null         # nama pemeriksa (KH)
+  verified_at: null
