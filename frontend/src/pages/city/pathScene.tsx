@@ -1,14 +1,27 @@
 /**
- * Hiasan latar path belajar (referensi desain Bandung, 21 Nov 2026): ilustrasi piksel milik tim
- * di kiri/kanan titik, bambu di samping spanduk, dan ornamen awan di sudut kartu.
- * Semua hiasan bersifat dekoratif (aria-hidden), tidak bisa diklik, dan disembunyikan di layar sempit.
- * Aset: content/sources.yaml (rumah adat, Gedung Sate, NPC angklung/wayang). Objek budaya hanya hiasan.
+ * Hiasan latar path belajar (referensi desain Bandung, 21 Nov 2026).
+ * - Bingkai: sudut dan sisi batik menempel di tepi kartu dan spanduk (tombol titik polos) (src/assets/budaya/).
+ * - Adegan: pagar bambu + tanaman di dasar spanduk (di dalam, terpotong tepinya), elemen budaya per titik.
+ * - Satu elemen budaya per titik (rumah Sunda, pemain angklung, wayang golek, gamelan).
+ * - Penari merayakan saat semua titik selesai.
+ * Semua hiasan dekoratif (aria-hidden), tidak bisa diklik; objek budaya hanya hiasan, bukan rintangan.
+ * Aset tercatat di content/sources.yaml.
  */
-import npcAngklung from '../../game/sprites/npc-angklung.png'
-import npcAngklung2 from '../../game/sprites/npc-angklung-2.png'
-import npcWayang from '../../game/sprites/npc-wayang.png'
+import batikSisiKanan from '../../assets/budaya/batik-sisi-kanan.webp'
+import batikSisiKiri from '../../assets/budaya/batik-sisi-kiri.webp'
+import sudutKananAtas from '../../assets/budaya/batik-sudut-kanan-atas.webp'
+import sudutKananBawah from '../../assets/budaya/batik-sudut-kanan-bawah.webp'
+import sudutKiriAtas from '../../assets/budaya/batik-sudut-kiri-atas.webp'
+import sudutKiriBawah from '../../assets/budaya/batik-sudut-kiri-bawah.webp'
+import gamelan from '../../assets/budaya/gamelan.webp'
+import pemainAngklung from '../../assets/budaya/pemain-angklung.webp'
+import penari1 from '../../assets/budaya/penari-1.webp'
+import penari2 from '../../assets/budaya/penari-2.webp'
+import rumahSunda from '../../assets/budaya/rumah-sunda.webp'
+import tanaman from '../../assets/budaya/tanaman.webp'
+import wayangGolek from '../../assets/budaya/wayang-golek.webp'
+import type { SyntheticEvent } from 'react'
 import gedungSate from '../../game/sprites/scene/gedung-sate.webp'
-import rumahAdat from '../../game/sprites/scene/rumah-adat.webp'
 
 interface Decor {
   src: string
@@ -29,15 +42,17 @@ interface NodeDecor {
 /** Hiasan per id titik path. Titik tanpa entri tampil polos. */
 const PATH_DECOR: Record<string, NodeDecor> = {
   'pengenalan-bandung': {
-    left: [{ src: rumahAdat, height: 170, dy: 36, gap: 40 }],
-    right: [{ src: gedungSate, height: 96, dy: 10, gap: 56 }],
+    left: [{ src: rumahSunda, height: 132, dy: 30, gap: 36 }],
+    right: [{ src: gedungSate, height: 92, dy: 10, gap: 48 }],
   },
   angklung: {
-    left: [{ src: npcAngklung, height: 96, dy: 8, gap: 14 }],
-    right: [{ src: npcAngklung2, height: 96, dy: 8, gap: 14, flip: true }],
+    left: [{ src: pemainAngklung, height: 110, dy: 14, gap: 26 }],
   },
   'wayang-golek': {
-    right: [{ src: npcWayang, height: 104, dy: 8, gap: 10 }],
+    right: [{ src: wayangGolek, height: 118, dy: 14, gap: 24 }],
+  },
+  'museum-sri-baduga': {
+    left: [{ src: gamelan, height: 92, dy: 8, gap: 26 }],
   },
 }
 
@@ -55,7 +70,7 @@ function DecorImg({ d, side }: { d: Decor; side: 'left' | 'right' }) {
         // Gagal dengan anggun: hiasan hilang, path tetap utuh.
         e.currentTarget.style.display = 'none'
       }}
-      className="pointer-events-none absolute w-auto max-w-none select-none [image-rendering:pixelated]"
+      className="pointer-events-none absolute w-auto max-w-none select-none pixel-art"
       style={{
         height: d.height,
         bottom: -(d.dy ?? 0),
@@ -117,18 +132,102 @@ export function Bamboo({ className }: { className?: string }) {
   )
 }
 
-/** Ornamen awan berulir untuk sudut kartu (digambar sendiri, bukan salinan motif tertentu). */
-export function CloudOrnament({ className }: { className?: string }) {
+/** Ornamen piksel: tidak bisa diklik/dipilih, tetap tajam (`.pixel-art` = crisp-edges + pixelated). */
+const PIXEL = 'pointer-events-none select-none pixel-art'
+
+function hideOnError(e: SyntheticEvent<HTMLImageElement>) {
+  // Gagal dengan anggun: hiasan hilang, path tetap utuh.
+  e.currentTarget.style.display = 'none'
+}
+
+/**
+ * Sudut batik untuk bingkai kartu/spanduk. Dipasang DI DALAM kartu (`relative overflow-hidden/clip`)
+ * dengan posisi 0 di sudutnya, sehingga ikut terpotong lengkung border; konten kartu diberi `relative z-10`.
+ */
+export function BatikCorner({
+  corner = 'kanan-atas',
+  className,
+}: {
+  corner?: 'kanan-atas' | 'kiri-atas' | 'kanan-bawah' | 'kiri-bawah'
+  className?: string
+}) {
+  const src = {
+    'kanan-atas': sudutKananAtas,
+    'kiri-atas': sudutKiriAtas,
+    'kanan-bawah': sudutKananBawah,
+    'kiri-bawah': sudutKiriBawah,
+  }[corner]
   return (
-    <svg aria-hidden="true" viewBox="0 0 120 70" className={className}>
-      <g fill="#f1e3cf" stroke="#8a5534" strokeWidth="3" strokeLinejoin="round">
-        <path d="M8 58 C8 44 22 38 32 44 C34 28 54 22 64 34 C70 20 94 20 98 38 C112 36 118 52 108 60 Z" />
-        <path d="M24 58 C24 50 32 46 40 50 C44 40 58 40 62 50 C68 44 80 46 82 56 Z" fill="#e7d2b4" />
-      </g>
-      <g fill="none" stroke="#8a5534" strokeWidth="2.5" strokeLinecap="round">
-        <path d="M44 34 c6 -6 14 -2 12 5 c-1 4 -7 4 -7 0" />
-        <path d="M76 32 c6 -6 14 -2 12 5 c-1 4 -7 4 -7 0" />
-      </g>
-    </svg>
+    <img
+      src={src}
+      alt=""
+      aria-hidden="true"
+      draggable={false}
+      onError={hideOnError}
+      className={`${PIXEL} absolute z-0 ${className ?? ''}`}
+    />
+  )
+}
+
+/** Potongan sisi batik yang menempel di tepi kiri/kanan kartu. */
+export function BatikEdge({ side, className }: { side: 'kiri' | 'kanan'; className?: string }) {
+  return (
+    <img
+      src={side === 'kiri' ? batikSisiKiri : batikSisiKanan}
+      alt=""
+      aria-hidden="true"
+      draggable={false}
+      onError={hideOnError}
+      className={`${PIXEL} absolute z-10 ${className ?? ''}`}
+    />
+  )
+}
+
+/**
+ * Ilustrasi adegan (bukan border): deret pagar bambu dan tanaman hias, berulang mendatar.
+ * Dipasang di dalam area yang memotongnya (mis. dasar spanduk), di bawah lapisan konten.
+ */
+export function PlantScene({ className }: { className?: string }) {
+  return (
+    <span
+      aria-hidden="true"
+      className={`${PIXEL} block bg-bottom bg-repeat-x ${className ?? ''}`}
+      style={{ backgroundImage: `url(${tanaman})`, backgroundSize: 'auto 100%' }}
+    />
+  )
+}
+
+/** Perayaan akhir: penari menari setelah semua titik (termasuk game) selesai. */
+export function DancerFinale({ cityName }: { cityName: string }) {
+  return (
+    <section aria-labelledby="judul-tamat" className="mt-8 flex flex-col items-center text-center">
+      <div aria-hidden="true" className="flex items-end justify-center gap-2 sm:gap-6">
+        <img
+          src={penari1}
+          alt=""
+          draggable={false}
+          onError={hideOnError}
+          className={`${PIXEL} anim-menari h-[130px] w-auto sm:h-[170px]`}
+        />
+        <img
+          src={penari2}
+          alt=""
+          draggable={false}
+          onError={hideOnError}
+          className={`${PIXEL} anim-menari-2 h-[128px] w-auto sm:h-[166px]`}
+        />
+        <img
+          src={penari1}
+          alt=""
+          draggable={false}
+          onError={hideOnError}
+          className={`${PIXEL} anim-menari-3 h-[130px] w-auto sm:h-[170px]`}
+        />
+      </div>
+      <h2 id="judul-tamat" className="mt-3 text-xl font-extrabold text-teal">
+        Hore, path {cityName} tamat!
+      </h2>
+      <p className="mt-1 max-w-sm text-sm text-redup">Para penari ikut merayakan. Semua titik dan game sudah kamu selesaikan.</p>
+    </section>
   )
 }

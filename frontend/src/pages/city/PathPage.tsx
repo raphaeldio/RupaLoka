@@ -14,9 +14,21 @@ import { questionsFor } from '../../flow/machine'
 import { useAgent } from '../../lib/agentStore'
 import type { CityDetail } from '../../lib/api.types'
 import { labelOr } from '../../lib/cities'
-import { earnedBadges, GAME_NODE, maxPathPoints, nextBadge, nextNode, pathNodes, pathPoints, type PathNode } from '../../lib/rewards'
+import {
+  earnedBadges,
+  GAME_NODE,
+  gamePoints,
+  lessonPoints,
+  maxPathPoints,
+  nextBadge,
+  nextNode,
+  pathNodes,
+  pathPoints,
+  type PathNode,
+} from '../../lib/rewards'
 import { useCityProgress, useProgress } from '../../lib/store'
-import { Bamboo, CloudOrnament, NodeScene } from './pathScene'
+import { Bamboo, BatikCorner, BatikEdge, DancerFinale, NodeScene, PlantScene } from './pathScene'
+import { featureFlags } from '../../lib/flags'
 import { useCity } from './useCity'
 
 /** Geser horizontal titik (px) agar path berkelok; pola berulang. */
@@ -34,7 +46,14 @@ function NodeIcon({ node }: { node: PathNode }) {
   if (node.status === 'done') {
     return (
       <svg viewBox="0 0 24 24" className="size-8" aria-hidden="true">
-        <path d="m5 12.5 4.5 4.5L19 7.5" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+        <path
+          d="m5 12.5 4.5 4.5L19 7.5"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="3"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
       </svg>
     )
   }
@@ -87,13 +106,20 @@ function PathStep({ detail, node, isNext, offset }: { detail: CityDetail; node: 
           : 'bg-white text-teal ring-4 ring-teal shadow-[0_6px_0_#146b68]'
   const label = `Titik ${node.index + 1}: ${title}. ${meta}. ${locked ? 'Terkunci' : node.status === 'done' ? 'Selesai' : 'Terbuka'}`
 
+  // Pembungkus tombol: menampung efek gerak hover/tekan.
   const circle = (
     <span
-      className={`relative grid size-[76px] place-items-center rounded-[28px] transition ${tone} ${
-        locked ? '' : 'group-hover:-translate-y-0.5 group-active:translate-y-1 group-active:shadow-none'
+      className={`relative inline-flex items-center justify-center transition ${
+        locked ? '' : 'group-hover:-translate-y-0.5 group-active:translate-y-1'
       }`}
     >
-      <NodeIcon node={node} />
+      <span
+        className={`relative grid size-[76px] place-items-center rounded-[28px] transition ${tone} ${
+          locked ? '' : 'group-active:shadow-none'
+        }`}
+      >
+        <NodeIcon node={node} />
+      </span>
     </span>
   )
 
@@ -129,7 +155,9 @@ function PathStep({ detail, node, isNext, offset }: { detail: CityDetail; node: 
           </Magnet>
         )}
       </div>
-      <p className={`mt-3 max-w-[200px] text-center text-[15px] font-extrabold leading-tight ${locked ? 'text-redup' : 'text-tinta'}`}>
+      <p
+        className={`mt-3 max-w-[200px] text-center text-[15px] font-extrabold leading-tight ${locked ? 'text-redup' : 'text-tinta'}`}
+      >
         {title}
       </p>
       <p className="text-xs font-semibold text-redup">{meta}</p>
@@ -189,52 +217,72 @@ export default function PathPage() {
 
       <div className="mt-3 grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start">
         <div className="relative">
-          {/* Bambu di samping spanduk (hiasan) */}
-          <Bamboo className="pointer-events-none absolute -right-6 -top-6 z-10 hidden h-[190px] w-auto lg:block" />
-          {/* Spanduk kota */}
-          <section
-            aria-labelledby="judul-kota"
-            className="relative overflow-hidden rounded-[32px] bg-teal px-6 py-6 text-white shadow-melayang sm:px-8 lg:mr-14"
-          >
-            <svg aria-hidden="true" viewBox="0 0 400 120" className="pointer-events-none absolute -right-10 bottom-0 w-[420px] opacity-20">
-              <path d="M0 120 C60 40 120 60 170 90 S280 20 400 70 V120Z" fill="#e8b64c" />
-              <path d="M0 120 C80 80 150 100 220 110 S330 80 400 100 V120Z" fill="#8bb9a0" />
-            </svg>
-            <div className="relative flex items-center gap-5">
-              <div
-                className="grid size-16 shrink-0 place-items-center rounded-full border-4 border-white/30 text-lg font-extrabold"
-                aria-label={`${doneCount} dari ${nodes.length} titik selesai`}
+          <div className="relative">
+            {/* Spanduk kota: ornamen di dalam, terpotong tepi lengkung (overflow-clip); konten z-10 */}
+            <section
+              aria-labelledby="judul-kota"
+              className="relative overflow-hidden rounded-[32px] bg-teal px-6 py-6 pb-14 text-white shadow-melayang [overflow:clip] sm:px-8 sm:pb-16 sm:pr-28"
+            >
+              <BatikCorner corner="kiri-atas" className="left-0 top-0 w-12 sm:w-14" />
+              <BatikEdge side="kiri" className="left-0 top-14 h-12 w-auto sm:top-16" />
+              {/* Bambu di dalam spanduk (kanan), di belakang tanaman dan konten */}
+              <Bamboo className="pointer-events-none absolute bottom-0 right-3 z-0 hidden h-[88%] w-auto select-none sm:block" />
+              <PlantScene className="absolute inset-x-0 bottom-0 z-0 h-10 opacity-95 sm:h-12" />
+              <svg
+                aria-hidden="true"
+                viewBox="0 0 400 120"
+                className="pointer-events-none absolute -right-10 bottom-0 w-[420px] opacity-20"
               >
-                {doneCount}/{nodes.length}
+                <path d="M0 120 C60 40 120 60 170 90 S280 20 400 70 V120Z" fill="#e8b64c" />
+                <path d="M0 120 C80 80 150 100 220 110 S330 80 400 100 V120Z" fill="#8bb9a0" />
+              </svg>
+              <div className="relative z-10 flex items-center gap-5">
+                <div
+                  className="grid size-16 shrink-0 place-items-center rounded-full border-4 border-white/30 text-lg font-extrabold"
+                  aria-label={`${doneCount} dari ${nodes.length} titik selesai`}
+                >
+                  {doneCount}/{nodes.length}
+                </div>
+                <div className="min-w-0">
+                  <p className="text-[11px] font-extrabold uppercase tracking-[2px] text-white/70">{detail.city.province}</p>
+                  <h1
+                    id="judul-kota"
+                    className="text-3xl font-extrabold tracking-tight"
+                    aria-label={`Jelajah ${detail.city.name}`}
+                  >
+                    <BlurText text={`Jelajah ${detail.city.name}`} animateBy="words" delay={90} className="inline-flex" />
+                  </h1>
+                  <p className="mt-0.5 text-sm text-white/80">
+                    {detail.lessons.length} titik materi · 1 game · {detail.items.length} item budaya
+                  </p>
+                </div>
               </div>
-              <div className="min-w-0">
-                <p className="text-[11px] font-extrabold uppercase tracking-[2px] text-white/70">{detail.city.province}</p>
-                <h1 id="judul-kota" className="text-3xl font-extrabold tracking-tight" aria-label={`Jelajah ${detail.city.name}`}>
-                  <BlurText text={`Jelajah ${detail.city.name}`} animateBy="words" delay={90} className="inline-flex" />
-                </h1>
-                <p className="mt-0.5 text-sm text-white/80">
-                  {detail.lessons.length} titik materi · 1 game · {detail.items.length} item budaya
-                </p>
-              </div>
-            </div>
-            <p className="relative mt-4 max-w-xl text-sm leading-relaxed text-white/85">
-              <ContentText text={detail.city.summary} fallback="Ringkasan kota sedang disiapkan tim konten." className="text-white/85" />
-            </p>
-          </section>
+              <p className="relative z-10 mt-4 max-w-xl text-sm leading-relaxed text-white/85">
+                <ContentText
+                  text={detail.city.summary}
+                  fallback="Ringkasan kota sedang disiapkan tim konten."
+                  className="text-white/85"
+                />
+              </p>
+            </section>
+          </div>
 
           {/* Path */}
-          <ol className="relative mt-10 flex flex-col items-center" aria-label="Path belajar">
-            {nodes.map((node, i) => (
-              <Fragment key={node.id}>
-                {i > 0 && (
-                  <li aria-hidden="true" className="list-none">
-                    <Connector from={OFFSETS[(i - 1) % OFFSETS.length]} to={OFFSETS[i % OFFSETS.length]} />
-                  </li>
-                )}
-                <PathStep detail={detail} node={node} isNext={next?.id === node.id} offset={OFFSETS[i % OFFSETS.length]} />
-              </Fragment>
-            ))}
-          </ol>
+          <div className="mt-4">
+            <ol className="relative mt-6 flex flex-col items-center" aria-label="Path belajar">
+              {nodes.map((node, i) => (
+                <Fragment key={node.id}>
+                  {i > 0 && (
+                    <li aria-hidden="true" className="list-none">
+                      <Connector from={OFFSETS[(i - 1) % OFFSETS.length]} to={OFFSETS[i % OFFSETS.length]} />
+                    </li>
+                  )}
+                  <PathStep detail={detail} node={node} isNext={next?.id === node.id} offset={OFFSETS[i % OFFSETS.length]} />
+                </Fragment>
+              ))}
+            </ol>
+            {nodes.length > 0 && doneCount === nodes.length && <DancerFinale cityName={detail.city.name} />}
+          </div>
 
           {doneCount > 0 && (
             <p className="mt-10 text-center">
@@ -251,14 +299,26 @@ export default function PathPage() {
 
         {/* Panel samping: poin, lencana, koleksi */}
         <aside className="grid gap-4 lg:sticky lg:top-24" aria-label="Poin dan lencana">
-          <div className="relative">
-            <CloudOrnament className="pointer-events-none absolute -right-3 -top-5 z-10 w-24" />
-            <GlowCard>
+          {/* GlowCard sudah relative + overflow-hidden + rounded: sudut batik menempel di sudutnya */}
+          <GlowCard>
+            <BatikCorner corner="kanan-atas" className="right-0 top-0 w-14" />
+            <div className="relative z-10">
               <p className="text-xs font-extrabold uppercase tracking-[1.6px] text-redup">Poin {detail.city.name}</p>
               <p className="mt-1 text-4xl font-extrabold tabular-nums text-teal">
                 <CountUp to={points} duration={1.2} trigger="load" />
-                <span className="text-base text-redup"> / {max}</span>
               </p>
+              <dl className="mt-2 grid grid-cols-2 gap-2 text-xs">
+                <div className="rounded-xl bg-kertas px-2.5 py-1.5">
+                  <dt className="font-bold text-redup">Materi & kuis</dt>
+                  <dd className="font-extrabold tabular-nums text-tinta">
+                    {lessonPoints(lessonIds, progress, detail.rewards)} <span className="font-semibold text-redup">/ {max}</span>
+                  </dd>
+                </div>
+                <div className="rounded-xl bg-emas-100 px-2.5 py-1.5">
+                  <dt className="font-bold text-redup">Skor game terbaik</dt>
+                  <dd className="font-extrabold tabular-nums text-tinta">{gamePoints(progress, detail.rewards)}</dd>
+                </div>
+              </dl>
               {upcoming ? (
                 <>
                   <Progress
@@ -277,21 +337,26 @@ export default function PathPage() {
               )}
               <p className="mt-3 text-xs text-redup">
                 +{detail.rewards.points_per_node} per titik selesai, +{detail.rewards.points_per_correct} per jawaban benar, +
-                {detail.rewards.game_node_points} saat menamatkan game.
+                {detail.rewards.game_node_points} saat menamatkan game, ditambah skor game terbaikmu.
+                {featureFlags.strict_node_requirements &&
+                  ' Poin titik hanya didapat bila kuis dikerjakan dan video ditonton minimal 3 menit pertama.'}
               </p>
-            </GlowCard>
-          </div>
+            </div>
+          </GlowCard>
 
           {badges.length > 0 && (
-            <section className="relative rounded-3xl border border-garis bg-white p-5 shadow-kartu" aria-labelledby="judul-lencana">
-              <CloudOrnament className="pointer-events-none absolute -right-3 -top-5 w-20" />
-              <h2 id="judul-lencana" className="font-extrabold">
+            <section
+              className="relative overflow-hidden rounded-3xl border border-garis bg-white p-5 shadow-kartu [overflow:clip]"
+              aria-labelledby="judul-lencana"
+            >
+              <BatikCorner corner="kanan-atas" className="right-0 top-0 w-12" />
+              <h2 id="judul-lencana" className="relative z-10 font-extrabold">
                 Lencana{' '}
                 <span className="text-sm text-redup">
                   ({earned.length}/{badges.length})
                 </span>
               </h2>
-              <ul className="mt-3 grid gap-3">
+              <ul className="relative z-10 mt-3 grid gap-3">
                 {badges.map((b, i) => {
                   const got = points >= b.min_points
                   return (
@@ -329,13 +394,13 @@ export default function PathPage() {
             </div>
           )}
 
-          <section className="relative rounded-3xl border border-garis bg-white p-5 shadow-kartu">
-            <CloudOrnament className="pointer-events-none absolute -right-3 -top-5 w-20" />
-            <h2 className="font-extrabold">Koleksi item</h2>
-            <p className="mt-1 text-sm text-redup">
+          <section className="relative overflow-hidden rounded-3xl border border-garis bg-white p-5 shadow-kartu [overflow:clip]">
+            <BatikCorner corner="kanan-atas" className="right-0 top-0 w-12" />
+            <h2 className="relative z-10 font-extrabold">Koleksi item</h2>
+            <p className="relative z-10 mt-1 text-sm text-redup">
               {collected?.length ?? 0}/{detail.items.length} item budaya ditemukan di game.
             </p>
-            <Link to="/koleksi" className="mt-3 inline-block text-sm font-extrabold text-teal hover:underline">
+            <Link to="/koleksi" className="relative z-10 mt-3 inline-block text-sm font-extrabold text-teal hover:underline">
               Lihat koleksi →
             </Link>
           </section>

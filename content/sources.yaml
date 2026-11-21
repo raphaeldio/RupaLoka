@@ -72,6 +72,67 @@ assets:
     license: "milik sendiri (tim KamiPemenang)"
     author: "[PERLU DIISI] pembuat gambar"
     note: "Rumah adat panggung (latar saja, bukan rintangan); asal: rumah adat.png. Jenis rumah adat: [PERLU DIISI, verifikasi KH]"
+  # Lembar aset path belajar (diberikan tim, 21 Nov 2026); dipotong per sprite, latar dibuat transparan, webp lossless.
+  - path: ../frontend/src/assets/budaya/rumah-sunda.webp
+    license: "[PERLU DIISI] konfirmasi lisensi/asal lembar aset (milik sendiri atau alat generatif)"
+    author: "[PERLU DIISI] pembuat gambar"
+    note: "Hiasan path belajar (rumah-sunda); dekoratif saja, bukan rintangan. Perlu persetujuan KH."
+  - path: ../frontend/src/assets/budaya/wayang-golek.webp
+    license: "[PERLU DIISI] konfirmasi lisensi/asal lembar aset (milik sendiri atau alat generatif)"
+    author: "[PERLU DIISI] pembuat gambar"
+    note: "Hiasan path belajar (wayang-golek); dekoratif saja, bukan rintangan. Perlu persetujuan KH."
+  - path: ../frontend/src/assets/budaya/pemain-angklung.webp
+    license: "[PERLU DIISI] konfirmasi lisensi/asal lembar aset (milik sendiri atau alat generatif)"
+    author: "[PERLU DIISI] pembuat gambar"
+    note: "Hiasan path belajar (pemain-angklung); dekoratif saja, bukan rintangan. Perlu persetujuan KH."
+  - path: ../frontend/src/assets/budaya/gamelan.webp
+    license: "[PERLU DIISI] konfirmasi lisensi/asal lembar aset (milik sendiri atau alat generatif)"
+    author: "[PERLU DIISI] pembuat gambar"
+    note: "Hiasan path belajar (gamelan); dekoratif saja, bukan rintangan. Perlu persetujuan KH."
+  - path: ../frontend/src/assets/budaya/penari-1.webp
+    license: "[PERLU DIISI] konfirmasi lisensi/asal lembar aset (milik sendiri atau alat generatif)"
+    author: "[PERLU DIISI] pembuat gambar"
+    note: "Hiasan path belajar (penari-1); dekoratif saja, bukan rintangan. Perlu persetujuan KH."
+  - path: ../frontend/src/assets/budaya/penari-2.webp
+    license: "[PERLU DIISI] konfirmasi lisensi/asal lembar aset (milik sendiri atau alat generatif)"
+    author: "[PERLU DIISI] pembuat gambar"
+    note: "Hiasan path belajar (penari-2); dekoratif saja, bukan rintangan. Perlu persetujuan KH."
+  - path: ../frontend/src/assets/budaya/tanaman.webp
+    license: "[PERLU DIISI] konfirmasi lisensi/asal lembar aset (milik sendiri atau alat generatif)"
+    author: "[PERLU DIISI] pembuat gambar"
+    note: "Hiasan path belajar (tanaman); dekoratif saja, bukan rintangan. Perlu persetujuan KH."
+  - path: ../frontend/src/assets/budaya/batik-sudut-kiri-atas.webp
+    license: "[PERLU DIISI] konfirmasi lisensi/asal lembar aset (milik sendiri atau alat generatif)"
+    author: "[PERLU DIISI] pembuat gambar"
+    note: "Hiasan path belajar (batik-sudut-kiri-atas); dekoratif saja, bukan rintangan. Perlu persetujuan KH."
+  - path: ../frontend/src/assets/budaya/batik-sudut-kanan-atas.webp
+    license: "[PERLU DIISI] konfirmasi lisensi/asal lembar aset (milik sendiri atau alat generatif)"
+    author: "[PERLU DIISI] pembuat gambar"
+    note: "Hiasan path belajar (batik-sudut-kanan-atas); dekoratif saja, bukan rintangan. Perlu persetujuan KH."
+  - path: ../frontend/src/assets/budaya/batik-sudut-kiri-bawah.webp
+    license: "[PERLU DIISI] konfirmasi lisensi/asal lembar aset (milik sendiri atau alat generatif)"
+    author: "[PERLU DIISI] pembuat gambar"
+    note: "Hiasan path belajar (batik-sudut-kiri-bawah); dekoratif saja, bukan rintangan. Perlu persetujuan KH."
+  - path: ../frontend/src/assets/budaya/batik-sudut-kanan-bawah.webp
+    license: "[PERLU DIISI] konfirmasi lisensi/asal lembar aset (milik sendiri atau alat generatif)"
+    author: "[PERLU DIISI] pembuat gambar"
+    note: "Hiasan path belajar (batik-sudut-kanan-bawah); dekoratif saja, bukan rintangan. Perlu persetujuan KH."
+  - path: ../frontend/src/assets/budaya/batik-sisi-kiri.webp
+    license: "[PERLU DIISI] konfirmasi lisensi/asal lembar aset (milik sendiri atau alat generatif)"
+    author: "[PERLU DIISI] pembuat gambar"
+    note: "Hiasan path belajar (batik-sisi-kiri); dekoratif saja, bukan rintangan. Perlu persetujuan KH."
+  - path: ../frontend/src/assets/budaya/batik-sisi-kanan.webp
+    license: "[PERLU DIISI] konfirmasi lisensi/asal lembar aset (milik sendiri atau alat generatif)"
+    author: "[PERLU DIISI] pembuat gambar"
+    note: "Hiasan path belajar (batik-sisi-kanan); dekoratif saja, bukan rintangan. Perlu persetujuan KH."
+  - path: ../frontend/src/assets/budaya/batik-awan.webp
+    license: "[PERLU DIISI] konfirmasi lisensi/asal lembar aset (milik sendiri atau alat generatif)"
+    author: "[PERLU DIISI] pembuat gambar"
+    note: "Hiasan path belajar (batik-awan); dekoratif saja, bukan rintangan. Perlu persetujuan KH."
+  - path: ../frontend/src/assets/budaya/batik-sulur.webp
+    license: "[PERLU DIISI] konfirmasi lisensi/asal lembar aset (milik sendiri atau alat generatif)"
+    author: "[PERLU DIISI] pembuat gambar"
+    note: "Hiasan path belajar (batik-sulur); dekoratif saja, bukan rintangan. Perlu persetujuan KH."
   - path: ../frontend/src/components/mascot/PixelMascot.tsx
     license: "milik sendiri (tim KamiPemenang)"
     author: "[PERLU DIISI] pembuat desain maskot"

@@ -106,6 +106,43 @@
   transform: none;
 }
 
+/* Ornamen pixel art: tetap tajam saat diperbesar/diperkecil. */
+.pixel-art {
+  image-rendering: crisp-edges;
+  image-rendering: pixelated;
+}
+
+/* Penari perayaan akhir path: bergoyang dan melompat kecil bergantian. */
+@keyframes menari {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-4deg);
+  }
+  25% {
+    transform: translateY(-8px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(0) rotate(4deg);
+  }
+  75% {
+    transform: translateY(-5px) rotate(0deg);
+  }
+}
+.anim-menari,
+.anim-menari-2,
+.anim-menari-3 {
+  transform-origin: 50% 100%;
+  animation: menari 1.4s ease-in-out infinite;
+}
+.anim-menari-2 {
+  animation-delay: -0.45s;
+}
+.anim-menari-3 {
+  animation-delay: -0.9s;
+  /* Cermin dipertahankan selama animasi */
+  scale: -1 1;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .reveal {
     opacity: 1;
@@ -114,7 +151,10 @@
   }
   .anim-awan,
   .anim-melayang,
-  .anim-sinar {
+  .anim-sinar,
+  .anim-menari,
+  .anim-menari-2,
+  .anim-menari-3 {
     animation: none !important;
   }
   .parallax {
