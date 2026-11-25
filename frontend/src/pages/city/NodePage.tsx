@@ -35,7 +35,7 @@ function Steps({ stage, hasQuiz, hasPost }: { stage: NodeStage; hasQuiz: boolean
       {steps.map((s, i) => (
         <li key={s} aria-current={i === current ? 'step' : undefined}>
           <span
-            className={`rounded-full px-2.5 py-1 ${
+            className={`border-2 border-tinta px-2 py-0.5 font-mono text-[11px] ${
               i === current ? 'bg-teal text-white' : i < current ? 'bg-teal-50 text-teal' : 'bg-pasir/70 text-redup'
             }`}
           >
@@ -172,7 +172,7 @@ function NodePage() {
     const alreadyDone = progress.completed.includes(lesson.id)
     body = (
       <Card className="text-center">
-        <p className="text-xs font-extrabold uppercase tracking-[1.6px] text-redup">Titik {position} belum selesai</p>
+        <p className="eyebrow text-redup">Titik {position} belum selesai</p>
         <h2 className="mt-1 text-2xl font-extrabold text-teal">{title}</h2>
         <p className="mt-3 text-sm text-redup">
           Kamu melewati sebagian titik ini, jadi belum ada poin{alreadyDone ? ' baru' : ''} dan path belum bisa dilanjutkan
@@ -180,7 +180,7 @@ function NodePage() {
         </p>
         <ul className="mx-auto mt-3 grid max-w-sm gap-2 text-left text-sm">
           {missingParts(state).map((m) => (
-            <li key={m} className="flex items-start gap-2 rounded-2xl bg-kertas p-3 font-semibold">
+            <li key={m} className="flex items-start gap-2 border-2 border-tinta bg-kertas p-3 font-semibold">
               <span aria-hidden="true" className="text-amber">
                 ●
               </span>
@@ -212,7 +212,7 @@ function NodePage() {
     const nextTitle = labelOr(detail.lessons.find((l) => l.id === next?.id)?.title, 'titik berikutnya')
     body = (
       <Card className="text-center">
-        <p className="text-xs font-extrabold uppercase tracking-[1.6px] text-redup">Titik {position} selesai</p>
+        <p className="eyebrow text-redup">Titik {position} selesai</p>
         <h2 className="mt-1 text-2xl font-extrabold text-teal">{title}</h2>
         <Pop className="mt-4">
           <p className="text-5xl font-extrabold tabular-nums text-amber" aria-label={`Bertambah ${gained} poin`}>
@@ -227,7 +227,7 @@ function NodePage() {
         {(questions.length > 0 || postQuestions.length > 0) && (
           <div className="mx-auto mt-4 grid max-w-xs grid-cols-2 gap-2 text-sm">
             {questions.length > 0 && (
-              <p className="rounded-2xl bg-kertas p-3">
+              <p className="border-2 border-tinta bg-kertas p-3">
                 <span className="block text-xs font-bold text-redup">Kuis awal</span>
                 <strong className="text-lg tabular-nums">
                   {preCorrect}/{questions.length}
@@ -235,7 +235,7 @@ function NodePage() {
               </p>
             )}
             {postQuestions.length > 0 && (
-              <p className="rounded-2xl bg-teal-50 p-3">
+              <p className="border-2 border-tinta bg-teal-50 p-3">
                 <span className="block text-xs font-bold text-redup">Kuis akhir</span>
                 <strong className="text-lg tabular-nums text-teal">
                   {postCorrect}/{postQuestions.length}
@@ -247,7 +247,7 @@ function NodePage() {
         {gained === 0 && <p className="mt-2 text-xs text-redup">Titik ini sudah pernah diselesaikan; poin dihitung dari hasil terbaik.</p>}
 
         {r && r.badges.length > 0 && (
-          <Pop delay={0.5} className="mx-auto mt-6 max-w-sm rounded-3xl bg-emas-100 p-4">
+          <Pop delay={0.5} className="mx-auto mt-6 max-w-sm border-2 border-tinta bg-emas-100 p-4 shadow-melayang">
           <div role="status">
             <p className="text-sm font-extrabold text-amber">Lencana baru!</p>
             <ul className="mt-2 grid gap-2">
@@ -293,7 +293,7 @@ function NodePage() {
         </Link>
         <Steps stage={state.stage} hasQuiz={questions.length > 0} hasPost={postQuestions.length > 0} />
       </div>
-      <p className="mb-2 text-xs font-extrabold uppercase tracking-[1.6px] text-redup">
+      <p className="mb-2 eyebrow text-redup">
         Titik {position}: {title}
       </p>
       {body}

@@ -3,20 +3,12 @@ import { LogoMark } from './landing/Logo'
 
 export default function SiteFooter() {
   return (
-    <footer className="relative mt-auto overflow-hidden bg-teal-800 text-white">
-      <svg
-        viewBox="0 0 1440 40"
-        preserveAspectRatio="none"
-        className="absolute inset-x-0 top-0 h-6 w-full text-kertas"
-        aria-hidden="true"
-      >
-        <path d="M0 0h1440v8c-240 30-480 30-720 10S240-6 0 22z" fill="currentColor" />
-      </svg>
-      <div className="mx-auto flex max-w-[1360px] flex-col gap-6 px-6 pb-8 pt-12 sm:flex-row sm:items-center sm:justify-between lg:px-10">
+    <footer className="relative mt-auto overflow-hidden border-t-4 border-tinta bg-teal-800 text-white">
+      <div className="mx-auto flex max-w-[1360px] flex-col gap-6 px-6 pb-8 pt-10 sm:flex-row sm:items-center sm:justify-between lg:px-10">
         <div className="flex items-center gap-4">
           <LogoMark className="size-10 text-teal" />
           <div>
-            <p className="text-lg font-black tracking-[0.06em]">RUPALOKA</p>
+            <p className="font-display text-xl font-bold tracking-[0.06em]">RUPALOKA</p>
             <p className="text-sm italic text-white/75">Menjaga Budaya, Merangkai Masa Depan</p>
           </div>
         </div>

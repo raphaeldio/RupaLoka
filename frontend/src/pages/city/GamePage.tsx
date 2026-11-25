@@ -63,7 +63,7 @@ export default function GamePage() {
         <Link to={`/kota/${cityId}`} className="text-sm font-bold text-redup hover:text-teal">
           ← Path {detail.city.name}
         </Link>
-        <p className="text-xs font-extrabold uppercase tracking-[1.6px] text-redup">Titik {lessonIds.length + 1} · Game</p>
+        <p className="eyebrow text-redup">Titik {lessonIds.length + 1} · Game</p>
       </div>
       {result ? (
         <Summary

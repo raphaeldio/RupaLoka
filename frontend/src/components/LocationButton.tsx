@@ -42,7 +42,7 @@ export default function LocationButton({ location, compact = false }: { location
     <div className={compact ? '' : 'rounded-2xl border border-garis bg-kertas p-4'}>
       {!compact && (
         <>
-          <p className="text-xs font-extrabold uppercase tracking-[1.4px] text-redup">Kunjungi</p>
+          <p className="eyebrow text-redup">Kunjungi</p>
           {name && <p className="mt-1 font-bold">{name}</p>}
           {address && <p className="text-sm text-redup">{address}</p>}
         </>

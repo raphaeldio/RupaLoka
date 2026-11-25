@@ -125,7 +125,7 @@ export default function SourcesPage() {
                 </a>
                 , lisensi ODbL 1.0 (disederhanakan oleh tim). Peta ditampilkan dengan Leaflet (BSD-2-Clause).
               </li>
-              <li>Huruf: Nunito Sans (SIL Open Font License 1.1).</li>
+              <li>Huruf: Nunito Sans, Pixelify Sans, dan JetBrains Mono (ketiganya SIL Open Font License 1.1).</li>
               <li>
                 Komponen antarmuka: shadcn/ui (MIT), Radix UI (MIT), ikon Lucide (ISC), animasi Motion (MIT), dan
                 komponen animasi React Bits oleh David Haz (MIT + Commons Clause).

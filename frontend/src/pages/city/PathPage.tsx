@@ -99,12 +99,12 @@ function PathStep({ detail, node, isNext, offset }: { detail: CityDetail; node: 
   const locked = node.status === 'locked'
   const tone =
     node.status === 'done'
-      ? 'bg-teal text-white shadow-[0_6px_0_#0e4d4b]'
+      ? 'border-[3px] border-tinta bg-teal text-white shadow-[5px_5px_0_#1d2a2a]'
       : locked
-        ? 'bg-[#e4e1d7] text-[#a7aa9c] shadow-[0_6px_0_#cfcbbd]'
+        ? 'border-[3px] border-dashed border-tinta/40 bg-[#e4e1d7] text-[#8f9284]'
         : node.id === GAME_NODE
-          ? 'bg-emas text-tinta shadow-[0_6px_0_#a8761a]'
-          : 'bg-white text-teal ring-4 ring-teal shadow-[0_6px_0_#146b68]'
+          ? 'border-[3px] border-tinta bg-emas text-tinta shadow-[5px_5px_0_#1d2a2a]'
+          : 'border-[3px] border-tinta bg-white text-teal shadow-[5px_5px_0_#146b68]'
   const label = `Titik ${node.index + 1}: ${title}. ${meta}. ${locked ? 'Terkunci' : node.status === 'done' ? 'Selesai' : 'Terbuka'}`
 
   // Pembungkus tombol: menampung efek gerak hover/tekan.
@@ -115,7 +115,7 @@ function PathStep({ detail, node, isNext, offset }: { detail: CityDetail; node: 
       }`}
     >
       <span
-        className={`relative grid size-[76px] place-items-center rounded-[28px] transition ${tone} ${
+        className={`relative grid size-[76px] place-items-center rounded-md transition ${tone} ${
           locked ? '' : 'group-active:shadow-none'
         }`}
       >
@@ -150,7 +150,7 @@ function PathStep({ detail, node, isNext, offset }: { detail: CityDetail; node: 
           </div>
         ) : (
           <Magnet padding={50} magnetStrength={5} disabled={!isNext}>
-            <Link to={to} aria-label={label} className="group block rounded-[28px]">
+            <Link to={to} aria-label={label} className="group block rounded-md">
               {circle}
             </Link>
           </Magnet>
@@ -226,7 +226,7 @@ export default function PathPage() {
             {/* Spanduk kota: ornamen di dalam, terpotong tepi lengkung (overflow-clip); konten z-10 */}
             <section
               aria-labelledby="judul-kota"
-              className="relative overflow-hidden rounded-[32px] bg-teal px-6 py-6 pb-14 text-white shadow-melayang [overflow:clip] sm:px-8 sm:pb-16 sm:pr-28"
+              className="relative overflow-hidden border-2 border-tinta bg-teal px-6 py-6 pb-14 text-white shadow-melayang [overflow:clip] sm:px-8 sm:pb-16 sm:pr-28"
             >
               <BatikCorner corner="kiri-atas" className="left-0 top-0 w-12 sm:w-14" />
               <BatikEdge side="kiri" className="left-0 top-14 h-12 w-auto sm:top-16" />
@@ -243,13 +243,13 @@ export default function PathPage() {
               </svg>
               <div className="relative z-10 flex items-center gap-5">
                 <div
-                  className="grid size-16 shrink-0 place-items-center rounded-full border-4 border-white/30 text-lg font-extrabold"
+                  className="grid size-16 shrink-0 place-items-center border-4 border-white/40 font-display text-xl font-bold"
                   aria-label={`${doneCount} dari ${nodes.length} titik selesai`}
                 >
                   {doneCount}/{nodes.length}
                 </div>
                 <div className="min-w-0">
-                  <p className="text-[11px] font-extrabold uppercase tracking-[2px] text-white/70">{detail.city.province}</p>
+                  <p className="eyebrow text-white/70">{detail.city.province}</p>
                   <h1
                     id="judul-kota"
                     className="text-3xl font-extrabold tracking-tight"
@@ -313,7 +313,7 @@ export default function PathPage() {
           <GlowCard>
             <BatikCorner corner="kanan-atas" className="right-0 top-0 w-14" />
             <div className="relative z-10">
-              <p className="text-xs font-extrabold uppercase tracking-[1.6px] text-redup">Poin {detail.city.name}</p>
+              <p className="eyebrow text-redup">Poin {detail.city.name}</p>
               <p className="mt-1 text-4xl font-extrabold tabular-nums text-teal">
                 <CountUp to={points} duration={1.2} trigger="load" />
               </p>
@@ -362,7 +362,7 @@ export default function PathPage() {
 
           {badges.length > 0 && (
             <section
-              className="relative overflow-hidden rounded-3xl border border-garis bg-white p-5 shadow-kartu [overflow:clip]"
+              className="relative overflow-hidden border-2 border-tinta bg-white p-5 shadow-kartu [overflow:clip]"
               aria-labelledby="judul-lencana"
             >
               <BatikCorner corner="kanan-atas" className="right-0 top-0 w-12" />
@@ -410,7 +410,7 @@ export default function PathPage() {
             </div>
           )}
 
-          <section className="relative overflow-hidden rounded-3xl border border-garis bg-white p-5 shadow-kartu [overflow:clip]">
+          <section className="relative overflow-hidden border-2 border-tinta bg-white p-5 shadow-kartu [overflow:clip]">
             <BatikCorner corner="kanan-atas" className="right-0 top-0 w-12" />
             <h2 className="relative z-10 font-extrabold">Koleksi item</h2>
             <p className="relative z-10 mt-1 text-sm text-redup">

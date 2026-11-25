@@ -22,7 +22,7 @@ function Answer({ resp, onSuggest }: { resp: ChatResponse; onSuggest: (q: string
     <div>
       {/* Transparansi (masukan juri, 25 Nov 2026): jawaban bebas dihasilkan AI dari sumber;
           penolakan tidak memakai teks AI. */}
-      <p className="mb-1 flex flex-wrap items-center gap-1.5 text-[10px] font-extrabold uppercase tracking-wide">
+      <p className="mb-1 flex flex-wrap items-center gap-1.5 eyebrow">
         {sourced ? (
           <>
             <span className="rounded-full bg-teal px-2 py-0.5 text-white">Dijawab AI</span>
@@ -217,7 +217,7 @@ export default function AgentPanel({ cityId, onClose }: { cityId: string; onClos
                 <Answer resp={m.resp} onSuggest={(q) => void ask(q)} />
               ) : m.kind === 'script' ? (
                 <>
-                  <p className="mb-1 text-[10px] font-extrabold uppercase tracking-wide text-redup">Pesan pemandu</p>
+                  <p className="mb-1 eyebrow text-redup">Pesan pemandu</p>
                   <p>{m.text}</p>
                 </>
               ) : (

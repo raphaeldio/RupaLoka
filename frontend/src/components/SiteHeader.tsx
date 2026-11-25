@@ -66,14 +66,14 @@ export default function SiteHeader() {
         Lewati ke konten
       </a>
       <div
-        className={`mx-auto flex max-w-[1360px] items-center justify-between gap-3 rounded-full border border-white/70 bg-white/85 py-2 pl-3 pr-2 backdrop-blur transition-shadow duration-300 sm:pl-4 ${
+        className={`mx-auto flex max-w-[1360px] items-center justify-between gap-3 border-2 border-tinta bg-white/95 py-2 pl-3 pr-2 backdrop-blur transition-shadow duration-300 sm:pl-4 ${
           scrolled ? 'shadow-melayang' : 'shadow-kartu'
         }`}
       >
         <Link to="/" className="flex items-center gap-2.5" aria-label="Rupaloka, beranda">
           <LogoMark className="size-10 text-teal" />
           <span className="leading-none">
-            <span className="block text-xl font-black tracking-[0.06em] text-teal">RUPALOKA</span>
+            <span className="block font-display text-xl font-bold tracking-[0.06em] text-teal">RUPALOKA</span>
             <span className="mt-0.5 hidden text-[11px] font-semibold text-redup sm:block">
               Belajar, Bermain, Kunjungi.
             </span>
@@ -87,7 +87,7 @@ export default function SiteHeader() {
               to={n.to}
               end={n.end}
               className={({ isActive: a }) =>
-                `relative flex items-center gap-1.5 rounded-full px-3.5 py-2 text-sm font-bold transition ${
+                `relative flex items-center gap-1.5 rounded-sm px-3.5 py-2 text-sm font-bold transition ${
                   isActive(n.to, a) ? 'bg-teal-50 text-teal' : 'text-tinta/75 hover:bg-kertas hover:text-teal'
                 }`
               }
@@ -101,7 +101,7 @@ export default function SiteHeader() {
         <div className="flex items-center gap-2">
           <Link
             to={START ? `/kota/${START.id}` : '/#peta'}
-            className="hidden items-center gap-2 rounded-full bg-teal px-4 py-2.5 text-sm font-extrabold text-white transition hover:bg-teal-600 sm:flex"
+            className="tekan hidden items-center gap-2 border-2 border-tinta bg-teal px-4 py-2 text-sm font-extrabold text-white shadow-tekan hover:bg-teal-600 sm:flex"
           >
             Mulai belajar
             <svg viewBox="0 0 16 16" className="size-4" aria-hidden="true">
@@ -121,7 +121,7 @@ export default function SiteHeader() {
             aria-expanded={open}
             aria-controls="menu-ponsel"
             aria-label={open ? 'Tutup menu' : 'Buka menu'}
-            className="grid size-10 place-items-center rounded-full text-teal transition hover:bg-teal-50 lg:hidden"
+            className="grid size-10 place-items-center border-2 border-tinta text-teal transition hover:bg-teal-50 lg:hidden"
           >
             <svg viewBox="0 0 20 20" className="size-5" aria-hidden="true">
               <path
@@ -139,7 +139,7 @@ export default function SiteHeader() {
         <nav
           id="menu-ponsel"
           aria-label="Navigasi utama (ponsel)"
-          className="mx-auto mt-2 max-w-[1360px] rounded-3xl border border-white/70 bg-white/95 p-2 shadow-melayang backdrop-blur motion-safe:animate-[card-in_200ms_ease-out] lg:hidden"
+          className="mx-auto mt-2 max-w-[1360px] border-2 border-tinta bg-white p-2 shadow-melayang backdrop-blur motion-safe:animate-[card-in_200ms_ease-out] lg:hidden"
         >
           {NAV.map((n) => (
             <NavLink
@@ -148,7 +148,7 @@ export default function SiteHeader() {
               end={n.end}
               onClick={() => setOpen(false)}
               className={({ isActive: a }) =>
-                `flex items-center gap-3 rounded-2xl px-4 py-3 text-[15px] font-bold ${
+                `flex items-center gap-3 rounded-sm px-4 py-3 text-[15px] font-bold ${
                   isActive(n.to, a) ? 'bg-teal-50 text-teal' : 'text-tinta hover:bg-kertas'
                 }`
               }

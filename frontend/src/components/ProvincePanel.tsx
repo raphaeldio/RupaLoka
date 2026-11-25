@@ -35,7 +35,7 @@ export default function ProvincePanel({
       <Sheet open onOpenChange={(open) => !open && onClose()}>
         <SheetContent side="bottom" className="z-[1001] max-h-[70vh] rounded-t-3xl border-garis px-4 pb-6">
           <SheetHeader className="px-0 pb-0">
-            <p className="text-[10px] font-extrabold uppercase tracking-[1.8px] text-redup">Provinsi</p>
+            <p className="eyebrow text-redup">Provinsi</p>
             <SheetTitle className="text-lg font-extrabold text-teal">{name}</SheetTitle>
             <SheetDescription>{sorted.length ? 'Kota yang bisa dijelajahi:' : 'Belum ada kota di provinsi ini.'}</SheetDescription>
           </SheetHeader>
@@ -58,7 +58,7 @@ export default function ProvincePanel({
     >
       <div className="flex items-start justify-between gap-2">
         <div>
-          <p className="text-[10px] font-extrabold uppercase tracking-[1.8px] text-redup">Provinsi</p>
+          <p className="eyebrow text-redup">Provinsi</p>
           <h2 id="panel-provinsi" className="text-lg font-extrabold leading-tight text-teal">
             {name}
           </h2>

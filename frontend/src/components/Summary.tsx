@@ -57,21 +57,21 @@ export default function Summary({
 
   return (
     <Card>
-      <p className="text-xs font-extrabold uppercase tracking-[1.6px] text-redup">Ringkasan perjalanan</p>
+      <p className="eyebrow text-redup">Ringkasan perjalanan</p>
       <h2 className="mt-1 text-2xl font-extrabold text-teal">Keliling {detail.city.name} selesai!</h2>
 
       <dl className="mt-4 grid grid-cols-3 gap-2 text-center">
-        <div className="rounded-2xl bg-teal-50 p-3">
+        <div className="border-2 border-tinta bg-teal-50 p-3">
           <dt className="text-[11px] font-semibold text-redup">Skor</dt>
           <dd className="text-2xl font-extrabold tabular-nums text-teal" aria-label={String(score)}>
             <CountUp to={score} duration={1.4} separator="." trigger="load" />
           </dd>
         </div>
-        <div className="rounded-2xl bg-kertas p-3">
+        <div className="border-2 border-tinta bg-kertas p-3">
           <dt className="text-[11px] font-semibold text-redup">Rekor</dt>
           <dd className="text-2xl font-extrabold tabular-nums">{best}</dd>
         </div>
-        <div className="rounded-2xl bg-amber-50 p-3">
+        <div className="border-2 border-tinta bg-amber-50 p-3">
           <dt className="text-[11px] font-semibold text-redup">Item baru</dt>
           <dd className="text-2xl font-extrabold tabular-nums text-amber" aria-label={String(unlocked.length)}>
             <CountUp to={unlocked.length} duration={1} trigger="load" />
@@ -80,12 +80,12 @@ export default function Summary({
       </dl>
 
       {pointsGained > 0 && (
-        <p className="mt-4 rounded-2xl bg-teal-50 p-3 text-sm font-bold text-teal">
+        <p className="mt-4 border-2 border-tinta bg-teal-50 p-3 text-sm font-bold text-teal">
           +{pointsGained} poin path (bonus titik game + skor terbaikmu)!
         </p>
       )}
       {badges.length > 0 && (
-        <div className="mt-3 rounded-2xl bg-emas-100 p-3" role="status">
+        <div className="mt-3 border-2 border-tinta bg-emas-100 p-3" role="status">
           <p className="text-sm font-extrabold text-amber">Lencana baru!</p>
           <ul className="mt-2 flex flex-wrap gap-3">
             {badges.map((b) => (
@@ -99,7 +99,7 @@ export default function Summary({
       )}
 
       {allCollected && (
-        <p className="mt-4 rounded-2xl bg-emas-100 p-3 text-sm font-bold">
+        <p className="mt-4 border-2 border-tinta bg-emas-100 p-3 text-sm font-bold">
           Selamat! Semua item budaya {detail.city.name} sudah ada di koleksimu.
         </p>
       )}
@@ -113,7 +113,7 @@ export default function Summary({
         ) : (
           <ul className="mt-2 grid grid-cols-3 gap-2">
             {unlocked.map((i) => (
-              <li key={i.id} className="rounded-2xl border border-garis p-2 text-center">
+              <li key={i.id} className="border-2 border-tinta bg-white p-2 text-center">
                 <Pop delay={0.3}>
                   <SafeImage image={i.image} className="aspect-square w-full rounded-xl" />
                 </Pop>

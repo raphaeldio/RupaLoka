@@ -299,7 +299,7 @@ function ProvinceTooltip({ province, cities }: { province: Province; cities: Pla
       }}
     >
       <div className="min-w-36 rounded-2xl border border-white/70 bg-white/95 px-4 py-3 shadow-melayang backdrop-blur">
-        <p className="text-[10px] font-extrabold uppercase tracking-[1.8px] text-redup">{province.name}</p>
+        <p className="eyebrow text-redup">{province.name}</p>
         {primary ? (
           <>
             <p className="mt-0.5 text-lg font-extrabold leading-tight text-teal">

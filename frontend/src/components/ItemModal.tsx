@@ -59,8 +59,8 @@ export default function ItemModal({
         e.stopPropagation()
       }}
     >
-      <div className="w-full rounded-3xl border border-garis bg-white p-5 shadow-melayang sm:max-h-full sm:max-w-sm sm:overflow-y-auto sm:border-0 motion-safe:animate-[card-in_260ms_ease-out]">
-        <p className="text-[11px] font-extrabold uppercase tracking-[1.6px] text-amber">
+      <div className="w-full border-2 border-tinta bg-white p-5 shadow-kartu sm:max-h-full sm:max-w-sm sm:overflow-y-auto motion-safe:animate-[card-in_260ms_ease-out]">
+        <p className="eyebrow text-amber">
           Item budaya {number} dari {total}
         </p>
         <h2 id="item-judul" className="mt-1 text-2xl font-extrabold text-teal">
@@ -69,7 +69,7 @@ export default function ItemModal({
         <ClickSpark sparkColor={['#e8b64c', '#146b68']} sparkCount={14} sparkRadius={40} className="mt-3 !h-auto !w-fit">
           <Pop delay={0.1}>
             <motion.div animate={{ rotate: [0, -4, 4, 0] }} transition={{ duration: 1.6, repeat: 2, delay: 0.5 }}>
-              <SafeImage image={item.image} className="aspect-square w-28 rounded-2xl" />
+              <SafeImage image={item.image} className="aspect-square w-28 border-2 border-tinta" />
             </motion.div>
           </Pop>
         </ClickSpark>
@@ -97,7 +97,7 @@ export default function ItemModal({
           <SourceChip source={source} label="Sumber" />
         </div>
         {cityId && sources && (
-          <details className="mt-3 rounded-2xl border border-garis p-3">
+          <details className="mt-3 border-2 border-tinta p-3">
             <summary className="cursor-pointer text-sm font-extrabold text-teal">Kartu budaya lengkap</summary>
             <div className="mt-3">
               <CultureCard item={item} cityId={cityId} sources={sources} compact />

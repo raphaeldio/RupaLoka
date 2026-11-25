@@ -1,4 +1,6 @@
 @import '@fontsource-variable/nunito-sans';
+@import '@fontsource-variable/pixelify-sans';
+@import '@fontsource-variable/jetbrains-mono';
 @import 'tailwindcss';
 @import 'tw-animate-css';
 
@@ -8,6 +10,9 @@
  */
 @theme {
   --font-sans: 'Nunito Sans Variable', ui-sans-serif, system-ui, sans-serif;
+  /* Gaya piksel (redesain 25 Nov 2026): judul piksel, label mono. Font OFL, lihat sources.yaml. */
+  --font-display: 'Pixelify Sans Variable', 'Nunito Sans Variable', ui-sans-serif, sans-serif;
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, SFMono-Regular, Menlo, monospace;
 
   /* Palet landing page (referensi tim, Nov 2026) */
   --color-teal: #146b68; /* hijau teal */
@@ -28,9 +33,17 @@
   --color-redup: #6d796e; /* teks sekunder */
   --color-samar: #85907f; /* label peta */
   --color-garis: #e6e2d6;
+  --color-bata: #b5523b; /* merah bata: aksen pita judul */
+  --color-bata-50: #f6e3dc;
 
-  --shadow-kartu: 0 1px 2px rgb(31 41 51 / 0.06), 0 8px 24px -8px rgb(31 41 51 / 0.14);
-  --shadow-melayang: 0 12px 32px -12px rgb(15 76 92 / 0.35);
+  /* Bayangan tegas tanpa blur (gaya piksel): kotak bergeser ke kanan-bawah. */
+  --shadow-kartu: 4px 4px 0 0 #1d2a2a;
+  --shadow-melayang: 3px 3px 0 0 #1d2a2a;
+  --shadow-tekan: 1px 1px 0 0 #1d2a2a;
+
+  /* Sudut nyaris siku agar terasa kotak-kotak piksel. */
+  --radius-2xl: 6px;
+  --radius-3xl: 8px;
 }
 
 @keyframes tooltip-in {
@@ -164,7 +177,7 @@
 
 /* --- Token shadcn/ui dipetakan ke palet Rupaloka ------------------------ */
 :root {
-  --radius: 1rem;
+  --radius: 4px;
   --background: #f5f1e8; /* kertas */
   --foreground: #1d2a2a; /* tinta */
   --card: #ffffff;
@@ -186,10 +199,10 @@
 }
 
 @theme inline {
-  --radius-sm: calc(var(--radius) - 6px);
-  --radius-md: calc(var(--radius) - 4px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 6px);
+  --radius-sm: 2px;
+  --radius-md: 3px;
+  --radius-lg: 4px;
+  --radius-xl: 6px;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -225,9 +238,87 @@
   }
   body {
     @apply bg-kertas font-sans text-tinta antialiased;
+    /* Kertas berpetak */
+    background-image:
+      linear-gradient(to right, rgb(29 42 42 / 0.045) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(29 42 42 / 0.045) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+  h1,
+  h2 {
+    font-family: var(--font-display);
+    letter-spacing: 0;
   }
   :focus-visible {
     @apply outline-2 outline-offset-2 outline-amber;
+  }
+}
+
+/* --- Gaya piksel: komponen kecil yang dipakai ulang ------------------- */
+
+@layer components {
+  /* Label kecil berhuruf mono, mis. "BAB 01 · KENALAN". */
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  /* Kotak bergaris tegas dengan bayangan geser. */
+  .kotak {
+    border: 2px solid var(--color-tinta);
+    background: #fff;
+    box-shadow: var(--shadow-kartu);
+  }
+  /* Pita judul miring: blok warna dengan teks piksel dan bayangan tegas. */
+  .pita {
+    display: inline-block;
+    padding: 0.08em 0.38em 0.12em;
+    border: 3px solid var(--color-tinta);
+    box-shadow: 6px 6px 0 0 var(--color-tinta);
+    font-family: var(--font-display);
+    line-height: 1.05;
+    text-transform: uppercase;
+    transform: rotate(-1.5deg);
+  }
+  .pita-2 {
+    transform: rotate(1deg);
+  }
+  /* Tombol yang "turun" saat ditekan. */
+  .tekan {
+    transition:
+      transform 120ms ease,
+      box-shadow 120ms ease;
+  }
+  .tekan:hover {
+    transform: translate(-1px, -1px);
+  }
+  .tekan:active {
+    transform: translate(2px, 2px);
+    box-shadow: var(--shadow-tekan);
+  }
+}
+
+@keyframes pita-jalan {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+.anim-pita-jalan {
+  animation: pita-jalan 28s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .anim-pita-jalan {
+    animation: none;
+  }
+  .tekan,
+  .tekan:hover,
+  .tekan:active {
+    transform: none;
   }
 }
 

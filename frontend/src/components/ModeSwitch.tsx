@@ -28,7 +28,7 @@ export default function ModeSwitch() {
           <path d="M8 10.5V8a4 4 0 0 1 8 0v2.5" fill="none" stroke="currentColor" strokeWidth="2.2" />
         </svg>
         Mode 3D
-        <span className="rounded-full bg-emas-100 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wide text-amber">
+        <span className="rounded-full bg-emas-100 px-2 py-0.5 eyebrow text-amber">
           Langganan
         </span>
       </Link>

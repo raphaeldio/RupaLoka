@@ -42,7 +42,7 @@ export default function LessonCard({
       {hasVideo && <LessonVideos videos={lesson.videos} onProgress={setWatch} />}
       {image && <SafeImage image={image} className="aspect-[16/9] w-full" />}
       <div className="p-5 sm:p-6">
-        <p className="text-xs font-extrabold uppercase tracking-[1.6px] text-redup">
+        <p className="eyebrow text-redup">
           {eyebrow}
         </p>
         <h2 className="mt-1 text-2xl font-extrabold tracking-tight text-teal">{labelOr(lesson.title, 'Materi budaya')}</h2>
@@ -61,7 +61,7 @@ export default function LessonCard({
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.08 }}
-                  className="rounded-2xl bg-kertas p-3 text-sm"
+                  className="border-2 border-tinta bg-kertas p-3 text-sm"
                 >
                   <ContentText text={f.text} fallback="Fakta sedang diverifikasi." />
                   <div className="mt-2">
@@ -84,7 +84,7 @@ export default function LessonCard({
                     whileTap={{ scale: 0.95 }}
                     type="button"
                     onClick={() => onAsk(q)}
-                    className="rounded-full border border-teal/40 bg-white px-3 py-1.5 text-sm font-semibold text-teal transition hover:bg-teal hover:text-white"
+                    className="tekan border-2 border-tinta bg-white px-3 py-1.5 text-sm font-semibold text-teal shadow-tekan hover:bg-teal hover:text-white"
                   >
                     {q}
                   </motion.button>
@@ -108,14 +108,14 @@ export default function LessonCard({
         )}
 
         {mustWatch && (
-          <div className="mt-6 rounded-2xl bg-kertas p-3" role="status" aria-live="polite">
+          <div className="mt-6 border-2 border-tinta bg-kertas p-3" role="status" aria-live="polite">
             <p className="text-sm font-bold">
               {watched
                 ? 'Mantap, video sudah ditonton. Poin titik ini bisa kamu dapat!'
                 : `Tonton video minimal ${formatClock(watch.required)} pertama untuk mendapat poin.`}
             </p>
             <div
-              className="mt-2 h-2 overflow-hidden rounded-full bg-pasir"
+              className="mt-2 h-3 overflow-hidden border-2 border-tinta bg-white"
               role="progressbar"
               aria-label="Waktu tonton video"
               aria-valuemin={0}
@@ -123,7 +123,7 @@ export default function LessonCard({
               aria-valuenow={watch.watched}
             >
               <div
-                className="h-full rounded-full bg-teal transition-[width] duration-500"
+                className="h-full bg-teal transition-[width] duration-500"
                 style={{ width: `${watched ? 100 : Math.round((watch.watched / watch.required) * 100)}%` }}
               />
             </div>

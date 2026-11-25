@@ -26,7 +26,7 @@ export default function CityCard({ city, onClose }: { city: City; onClose?: () =
         </button>
       )}
 
-      <p className="text-[10px] font-extrabold uppercase tracking-[1.8px] text-redup">
+      <p className="eyebrow text-redup">
         {city.province ?? 'Provinsi belum diisi'}
       </p>
       <h2 id={`kota-${city.id}`} className="mt-1 text-2xl font-extrabold tracking-tight text-teal">

@@ -53,8 +53,8 @@ export default function CultureCard({
         {ASPECTS.map(({ key, label, hint }) => {
           const a = card?.[key]
           return (
-            <div key={key} className="rounded-2xl bg-kertas p-3">
-              <dt className="text-xs font-extrabold uppercase tracking-wide text-teal">
+            <div key={key} className="border-2 border-tinta bg-kertas p-3">
+              <dt className="eyebrow text-teal">
                 {label}
                 <span className="sr-only"> ({hint})</span>
               </dt>

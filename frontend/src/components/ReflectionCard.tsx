@@ -47,8 +47,8 @@ export default function ReflectionCard({ detail, question }: { detail: CityDetai
 
   const id = `refleksi-${question.id}`
   return (
-    <section className="rounded-3xl border border-emas/60 bg-emas-100/50 p-4" aria-labelledby={`${id}-judul`}>
-      <p className="text-[11px] font-extrabold uppercase tracking-[1.6px] text-amber">Refleksi</p>
+    <section className="border-2 border-tinta bg-emas-100/60 p-4 shadow-melayang" aria-labelledby={`${id}-judul`}>
+      <p className="eyebrow text-amber">Refleksi</p>
       <h3 id={`${id}-judul`} className="mt-1 text-lg font-extrabold">
         {question.prompt}
       </h3>
@@ -68,7 +68,7 @@ export default function ReflectionCard({ detail, question }: { detail: CityDetai
           onChange={(e) => setAnswer(e.target.value.slice(0, MAX_CHARS))}
           rows={3}
           maxLength={MAX_CHARS}
-          className="w-full rounded-2xl border border-garis bg-white p-3 text-[15px] focus:outline-none focus-visible:ring-2 focus-visible:ring-teal"
+          className="w-full border-2 border-tinta bg-white p-3 text-[15px] focus:outline-none focus-visible:ring-2 focus-visible:ring-teal"
         />
         <div className="flex items-center justify-between gap-2">
           <span className="text-xs tabular-nums text-redup">
@@ -85,7 +85,7 @@ export default function ReflectionCard({ detail, question }: { detail: CityDetai
         </p>
       )}
       {result && (
-        <div role="status" className="mt-3 rounded-2xl bg-white p-3">
+        <div role="status" className="mt-3 border-2 border-tinta bg-white p-3">
           <p className="text-[15px] font-bold">{result.feedback}</p>
           {result.matched.length > 0 && (
             <ul className="mt-2 grid gap-2">
@@ -104,7 +104,7 @@ export default function ReflectionCard({ detail, question }: { detail: CityDetai
           )}
           <p className="mt-2 flex flex-wrap items-center gap-2 text-xs text-redup">
             {result.method === 'ai' && (
-              <span className="rounded-full bg-pasir px-2 py-0.5 font-bold text-tinta">Dinilai dengan bantuan AI</span>
+              <span className="border-2 border-tinta bg-pasir px-2 py-0.5 font-mono font-bold text-tinta">Dinilai dengan bantuan AI</span>
             )}
             {gained && <span className="font-bold text-teal">+{detail.rewards.points_per_reflection} poin path!</span>}
           </p>

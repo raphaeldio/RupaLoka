@@ -202,7 +202,7 @@ export default function Leaderboard({ cityId, points, canSubmit }: { cityId: str
                     {e.nickname}
                     {mine && <span className="ml-1 text-xs font-bold text-teal">(kamu)</span>}
                   </span>
-                  {e.title && <span className="block text-[11px] font-extrabold uppercase tracking-wide text-amber">{e.title}</span>}
+                  {e.title && <span className="block eyebrow text-amber">{e.title}</span>}
                 </span>
                 <span className="text-sm font-extrabold tabular-nums text-teal">{e.points}</span>
               </motion.li>

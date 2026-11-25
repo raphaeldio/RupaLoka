@@ -32,7 +32,7 @@ export default function SubscriptionPage() {
       </Link>
 
       <section className="mt-4 rounded-[32px] bg-teal px-6 py-8 text-white shadow-melayang sm:px-10">
-        <p className="text-[11px] font-extrabold uppercase tracking-[2px] text-white/70">Langganan Rupaloka</p>
+        <p className="eyebrow text-white/70">Langganan Rupaloka</p>
         <h1 className="mt-1 text-3xl font-extrabold tracking-tight">Mode 3D khusus pelanggan</h1>
         <p className="mt-3 max-w-xl text-sm leading-relaxed text-white/85">
           Di mode 3D kamu bisa memutar dan mengamati objek budaya lebih dekat. Fitur ini sedang disiapkan dan akan tersedia
