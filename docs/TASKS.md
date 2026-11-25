@@ -75,6 +75,16 @@ Fitur P1 (kuis penutup, rekor, analitik) tidak dikerjakan sebelum semua P0 seles
 - [x] **T-055a (HR)** Mode uji kuis `?demo=1` (khusus pengembangan): 2 soal uji netral per titik, bukan materi budaya; `?demo=0` keluar.
 - [x] **T-059d (HR)** UI interaktif dengan shadcn/ui + React Bits (animasi ringan, hormati `prefers-reduced-motion`). *DoD:* uji, lint, build lolos; 360 px tanpa geser horizontal; fps game di ponsel nyata tetap diukur di T-050.
 
+## Fase 3c — Masukan juri (25 Nov 2026; PRD §6.5a, SDD ADR 34–37)
+
+- [x] **T-080 (HR)** Skema + UI kartu budaya lengkap (F-080), soal nilai + bobot poin (F-081), refleksi akhir tur (F-082), Beri masukan (F-083), label "Dijawab AI" + Saloka (F-084), Kunjungi (F-085). *DoD:* pytest, vitest, lint, build lolos; placeholder tampil di 360 px.
+- [ ] **T-081 (KH)** Isi `card` ketiga item (nilai, pengetahuan, ekspresi, fungsi, komunitas — masing-masing bersumber `chunk`) dan minta budayawan memvalidasi (`validator`). *DoD:* `validate_content.py` tanpa peringatan `card.*`.
+- [ ] **T-082 (KH)** Tulis ≥1 soal `kind: nilai` per titik di `quiz.yaml` → `outro`, periksa dua orang. *DoD:* tanpa peringatan "belum punya soal nilai".
+- [ ] **T-083 (KH)** Isi `reflection.yaml` → `values` (label, kata kunci, penjelasan bersumber) untuk refleksi angklung. *DoD:* soal refleksi tampil di ringkasan; uji coba 5 jawaban nyata dicatat apa adanya.
+- [ ] **T-084 (HW)** Buat Google Form masukan; isi `VITE_FEEDBACK_FORM_URL` (+ `VITE_FEEDBACK_FORM_ENTRY`) di Vercel. *DoD:* tombol "Beri masukan" tampil dan membuka form.
+- [ ] **T-085 (KH)** Verifikasi peran Saung Angklung Udjo dan isi `location.links` (situs resmi, jadwal pertunjukan, sanggar/perajin) dengan `verified_by`. *DoD:* tautan tampil di "Kunjungi".
+- [ ] **T-086 (HR)** Isi `MASCOT_NAME=Saloka` di dashboard Render; putuskan reset papan peringkat Supabase (skor lama dihitung dengan batas game 3000). *DoD:* keputusan tercatat.
+
 ## Fase 4 — Kualitas dan deploy (Hari-4)
 
 - [ ] **T-060 (KH+HR)** Set evaluasi: 30 dalam cakupan, 15 luar cakupan + percobaan injeksi. *DoD:* `eval/*.yaml`. *Status (21 Nov 2026):* `eval/out_of_scope.yaml` selesai (HR): 15 luar cakupan + 6 injeksi. `eval/in_scope.yaml` berisi **draf HR 40 soal** (`ins-01`…`ins-30` + `ins-31`…`ins-40` bahasa santai/obrolan) yang diturunkan dari teks chunk saat ini, dengan `expected_chunks`; **menunggu tinjauan KH** (dan verifikasi chunk T-031).
@@ -102,7 +112,7 @@ Fitur P1 (kuis penutup, rekor, analitik) tidak dikerjakan sebelum semua P0 seles
 ## Pasca pendaftaran (P1/P2)
 
 - [ ] T-100 (P1) Kuis penutup dan perbandingan skor (F-023); rekor (F-047).
-- [ ] T-101 (P1) Analitik ringan (F-053), umpan balik (F-054), streaming (F-013).
+- [ ] T-101 (P1) Analitik ringan (F-053), streaming (F-013). Umpan balik (F-054) dipindah ke F-083/T-084.
 - [ ] T-102 (P1) Survei lebih luas dan wawancara guru/museum; perbarui proposal.
 - [ ] T-103 (P1) Kota kedua bersama mitra museum.
 - [ ] T-104 (P2) Penampil 3D di balik flag (F-060), paket langganan (F-061), mode kelas (F-062), portal museum (F-063).

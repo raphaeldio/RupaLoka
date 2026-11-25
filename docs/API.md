@@ -22,6 +22,7 @@ Sumber kebenaran: kode backend (`backend/app/`). Tipe TypeScript dibuat otomatis
 | POST | `/api/chat` | `ChatResponse` | Tanya agen; lihat di bawah |
 | GET | `/api/leaderboard/{id}?player_id=` | `LeaderboardResponse` | Papan peringkat akhir tur (skor = total poin path). `entries[0].title` = gelar juara. `you` diisi bila `player_id` dikirim. 404 bila kota tanpa `rewards.leaderboard`; 503 bila penyimpanan mati. `no-store` |
 | POST | `/api/leaderboard/{id}` | `LeaderboardResponse` | Badan `ScoreSubmit {player_id (UUID), nickname, points}`. Skor terbaik per pemain disimpan. 422: nama 3-20 karakter huruf/angka/spasi/`._-`, kata tidak pantas, atau poin > batas kota; 429 batas laju per IP |
+| POST | `/api/reflection` | `ReflectionResult` | Refleksi akhir tur. Badan `ReflectionRequest {city_id, question_id, answer (≤500)}`. Hasil `{matched[{id,label,explanation,chunk}], method: keyword\|ai\|none, feedback}`; `feedback` dari konten. Soal yang tersedia ada di `CityDetail.reflection` (tanpa kata kunci). 404 soal tidak dikenal; 422 jawaban tidak valid; 429 batas laju per IP. Jawaban tidak disimpan. `no-store` |
 
 Respons konten di-cache 5 menit (`Cache-Control: public, max-age=300`). Muat `CityDetail` sekali per kota lalu simpan di store.
 

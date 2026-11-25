@@ -6,7 +6,7 @@ Konteks proyek untuk Claude Code. Baca ini dulu, lalu `docs/PRD.md`, `docs/SDD.m
 
 **RUPALOKA** — web edukasi budaya Nusantara berbasis gamifikasi dengan pemandu AI dan peta situs sejarah. Tim KamiPemenang (Bandung), untuk BUDAYA GO! 2026, cabang Inovasi Digital, subtema 04 Pembelajaran dan Edukasi Digital Berbasis Budaya.
 
-**Alur (diperbarui 20 Nov 2026):** Beranda = peta Indonesia Leaflet (batas 38 provinsi, titik kota) → pilih kota (MVP: **Bandung**; lainnya "segera hadir") → **path belajar**: titik berurutan (1. Pengenalan Bandung, 2. Angklung, …), tiap titik = **kuis awal → kartu materi (video YouTube) → kuis akhir**, titik terakhir = **game runner keliling kota** (tiap **100 m** lari bertemu NPC: pause → item budaya → penjelasan singkat → lanjut) → ringkasan + "Lihat lokasi asli". Titik selesai memberi **poin path**; poin melewati ambang memberi **lencana** (`city.yaml` → `rewards`). Agen AI = **chatbot melayang** dengan maskot (`src/components/Mascot.tsx`).
+**Alur (diperbarui 20 Nov 2026):** Beranda = peta Indonesia Leaflet (batas 38 provinsi, titik kota) → pilih kota (MVP: **Bandung**; lainnya "segera hadir") → **path belajar**: titik berurutan (1. Pengenalan Bandung, 2. Angklung, …), tiap titik = **kuis awal → kartu materi (video YouTube) → kuis akhir**, titik terakhir = **game runner keliling kota** (tiap **100 m** lari bertemu NPC: pause → item budaya → penjelasan singkat → lanjut) → ringkasan + "Lihat lokasi asli". Titik selesai memberi **poin path**; poin melewati ambang memberi **lencana** (`city.yaml` → `rewards`). Agen AI = **chatbot melayang** bernama **Saloka** dengan maskot (`src/components/Mascot.tsx`); tiap jawaban berlabel "Dijawab AI" + sumber. **Masukan juri (25 Nov 2026, PRD §6.5a):** kartu budaya lengkap per item (`card`), soal `kind: nilai` berpoin besar + refleksi akhir tur (`reflection.yaml`), tombol "Beri masukan" (Google Form), tombol "Kunjungi" (`location.links`).
 
 **Ditunda (jangan dibangun di MVP-0):** penampil 3D, langganan/pembayaran, mode kelas, akun, portal museum. **Papan peringkat akhir tur kota** disetujui tim 21 Nov 2026 (tanpa akun: nama panggilan + id acak perangkat, skor = total poin path, gelar juara dari `city.yaml` → `rewards.leaderboard`, data di Supabase). Siapkan hanya `feature_flags`.
 
@@ -17,7 +17,7 @@ Batas pendaftaran: diperpanjang, tanggal **[lihat docs/decisions.md]**. Fokus: *
 ## Prinsip yang tidak boleh dilanggar
 
 1. **Jangan mengarang konten budaya.** Fakta (tahun, nama, lokasi, koordinat, jam buka, angka) harus berasal dari sumber di `content/`. Bila data belum ada, isi `null`/`TODO` dan beri tahu pengguna. Dasar yang sudah ada: angklung UNESCO 2010; wayang UNESCO 2008; Museum Sri Baduga di Jl. BKR No.185 Bandung. Kaitan wayang golek–Bandung dan peran Saung Angklung Udjo **harus diverifikasi** dulu.
-2. **Kuis dan teks item ditulis manual dan bersumber**, bukan dihasilkan AI saat runtime. AI hanya untuk tanya-jawab agen.
+2. **Kuis dan teks item ditulis manual dan bersumber**, bukan dihasilkan AI saat runtime. AI hanya untuk tanya-jawab agen, dan (pengecualian ADR 34) mengklasifikasi jawaban refleksi ke daftar nilai tulisan tim — tanpa menulis teks yang ditampilkan.
 3. **Agen AI hanya menjawab dari basis pengetahuan** dan selalu menyertakan sitasi `chunk_id`, atau menolak. Jangan melemahkan gerbang skor, validasi sitasi, atau aturan prompt tanpa persetujuan.
 4. **Hormati budaya dalam gamifikasi:** rintangan tidak boleh berupa benda sakral, simbol agama, atau objek yang dihormati komunitas. Objek budaya adalah **hadiah/koleksi**, bukan sesuatu yang ditabrak atau dihancurkan. Daftar rintangan/item harus disetujui anggota budaya (KH).
 5. **Orisinal:** karakter pelari, maskot, dan tampilan dibuat sendiri. Jangan meniru gim, karakter, atau tampilan aplikasi lain (mis. gim dinosaurus peramban, aplikasi belajar bahasa).
@@ -37,7 +37,7 @@ Batas pendaftaran: diperpanjang, tanggal **[lihat docs/decisions.md]**. Fokus: *
 ## Struktur
 
 ```
-content/        # cities.yaml, sources.yaml, <kota>/{city,agent_script,quiz}.yaml, lessons/, items/, knowledge/, assets/
+content/        # cities.yaml, sources.yaml, <kota>/{city,agent_script,quiz,reflection}.yaml, lessons/, items/, knowledge/, assets/
 backend/app/    # main, config, content_loader, retrieval, chat, prompts, schemas
 backend/scripts # validate_content.py, eval_rag.py
 frontend/src/   # pages, flow (state machine), game (engine, spawner, ...), components, lib
