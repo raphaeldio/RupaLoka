@@ -3,7 +3,7 @@
 - Tanggal: 25 November 2026
 - Status: disetujui dalam sesi brainstorming, menunggu tinjauan tim
 - Fitur: F-060 (diperluas), di balik flag `viewer3d` + `premium_content`
-- Usulan ADR: **39** (SDD §16), mencabut penundaan ADR 7 **khusus untuk galeri ini**
+- Usulan ADR: **40** (SDD §16), mencabut penundaan ADR 7 **khusus untuk galeri ini**
 
 ## 1. Tujuan dan batas
 
@@ -215,7 +215,7 @@ Semua angka di bawah adalah **target**. Laporannya hanya diambil dari hasil ukur
 
 ## 8. Perubahan dokumen
 
-- **SDD §16, ADR 39:** "Galeri 3D + penampil + VR dibangun untuk demo lomba di balik `viewer3d` + `premium_content`; mencabut penundaan ADR 7 khusus untuk galeri; R3F v8 + `@react-three/xr` v6; gerbang premium demo hanya di klien."
+- **SDD §16, ADR 40:** "Galeri 3D + penampil + VR dibangun untuk demo lomba di balik `viewer3d` + `premium_content`; mencabut penundaan ADR 7 khusus untuk galeri; R3F v8 + `@react-three/xr` v6; gerbang premium demo hanya di klien."
 - **SDD baris 52 dan 310:** perbarui keterangan 3D.
 - **PRD:** F-060 menjadi "Galeri 3D + penampil objek (hotspot) + VR", tetap P2 di peta jalan, dengan catatan "purwarupa demo lomba".
 - **TASKS:** fase baru "Fase 3d — Galeri 3D/VR (demo; setelah semua P0)". Tugas aset Blender ditandai butuh persetujuan KH.

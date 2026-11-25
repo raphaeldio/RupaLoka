@@ -49,7 +49,7 @@ Keputusan kunci: SPA statis di Vercel + API tipis di Render. **Konten tetap berk
 | Deploy | Frontend: Vercel. API: Render (`render.yaml`, Python 3.11) | Domain **[PERLU DIISI]**; Render paket gratis tidur saat idle (lihat §15) |
 | Basis data | Supabase (Postgres) untuk data runtime | Bukan untuk konten; akses hanya dari backend dengan service role key |
 | Uji | Vitest + Playwright (FE), pytest (BE), skrip evaluasi RAG | — |
-| 3D (ditunda) | `three` + `@react-three/fiber` | Hanya P2; jangan dipasang di MVP-0 |
+| 3D (demo, di balik flag) | `three` + `@react-three/fiber` v8 + drei v9 + `@react-three/xr` v6 | Galeri 3D/VR saja (ADR 40); dimuat lambat di chunk `gallery`, hanya bila `viewer3d` + `premium_content` aktif |
 
 ## 4. Struktur repositori
 
@@ -307,7 +307,7 @@ Tab baru, `rel="noopener noreferrer"`; tampilkan alamat teks sebagai cadangan.
 
 - `feature_flags` (`lib/flags.ts`, dari konfigurasi): `viewer3d`, `class_mode`, `premium_content` = `false` pada MVP-0. `strict_node_requirements` = `false` pada MVP (keputusan tim 21 Nov 2026): syarat titik selesai (kedua kuis dijawab semua + video ditonton 3 menit pertama, ADR 28) disembunyikan; titik selesai walau kuis/video dilewati. Kode syarat tetap ada dan diuji dengan flag aktif.
 - Konten berlabel `tier: free|premium` di YAML (default `free`) agar paket berlangganan dapat ditambahkan tanpa migrasi struktur.
-- Penampil 3D (P2): `@react-three/fiber` + GLB (Draco/Meshopt, ≤3 MB/objek), dimuat lambat hanya bila flag aktif. Sumber model: pindai sendiri (dengan izin lokasi) atau model berlisensi CC0/CC-BY dengan atribusi.
+- Galeri 3D/VR (purwarupa demo, ADR 40; spesifikasi `docs/superpowers/specs/2026-11-25-galeri-3d-vr-design.md`): lorong melingkar + penampil objek + WebXR, GLB Meshopt ≤3 MB/objek (ruangan ≤8 MB), dimuat lambat hanya bila `viewer3d` + `premium_content` aktif (`VITE_FLAGS`). Model dibuat tim di Blender; GLB di `content/assets/models/`, disajikan Vercel di `/models/*`.
 - Autentikasi, pembayaran, dan mode kelas (akun guru, tautan kelas, laporan) memerlukan backend tambahan (DB + auth). **Bukan bagian MVP-0**; rancang pada MVP-1.
 - Portal mitra museum (P2): alur unggah konten ke YAML/DB dengan status verifikasi dan atribusi.
 
@@ -397,3 +397,4 @@ Sediakan parameter uji `?debug=1` (hanya non-produksi) untuk mempercepat skor ag
 | 37 | Kartu budaya (`Item.card`), tautan Kunjungi (`Location.links`), dan refleksi adalah data konten YAML bersumber; kolom kosong = pending (galat saat `--release`) | Prinsip "jangan mengarang konten budaya"; isi menunggu tim budaya | UI menampilkan placeholder; tautan Kunjungi hanya tampil bila `verified_by` terisi |
 | 38 | Redesain gaya piksel (25 Nov 2026): latar kertas berpetak, judul pita miring (Pixelify Sans), label mono (JetBrains Mono), garis tinta 2px, bayangan geser tanpa blur, sudut nyaris siku; landing dibagi bab 01–05 + pita berjalan + CTA akhir | Permintaan tim: gaya situs komunitas teknologi kampus sebagai inspirasi. Hanya bahasa visualnya yang diambil; palet tetap teal/emas/bata Rupaloka, ikon piksel digambar sendiri, tanpa karakter/logo/warna merek pihak lain (prinsip 5) | Token di `src/index.css` (`--shadow-kartu`, `--radius-*`, `.eyebrow`, `.kotak`, `.pita`, `.tekan`); komponen landing di `src/components/landing/pixel.tsx`, `CityPreview.tsx`; font OFL tercatat di halaman Sumber |
 | 39 | Animasi landing dengan GSAP 3.15 + ScrollTrigger (`@gsap/react` useGSAP), lisensi standar GSAP tanpa biaya | Permintaan tim 25 Nov 2026: landing lebih "heboh" dan mengundang, tetap terbaca | `src/components/landing/useLandingMotion.ts` membaca penanda `data-anim`; hanya `gsap.from` (konten tetap tampil bila JS gagal), gerak besar hanya sekali saat masuk, parallax/kemiringan kecil; semua di `gsap.matchMedia('(prefers-reduced-motion: no-preference)')`; HUD bab di pojok bawah (`ChapterHud.tsx`, md ke atas) |
+| 40 | Galeri 3D (lorong melingkar) + penampil objek + VR dibangun untuk demo lomba di balik `viewer3d` + `premium_content`; mencabut penundaan ADR 7 khusus untuk galeri; R3F v8 + drei v9 + `@react-three/xr` v6 | Keputusan tim 25 Nov 2026 (sesi desain): demo premium untuk juri, VR di Quest + 3D sentuh di ponsel, aset Blender milik tim | Gerbang premium demo hanya di klien (bukan pengaman; GLB publik); GLB disajikan CDN Vercel, bukan `/api/assets` di Render (tidur); parameter cincin eksplisit di `gallery.yaml`; teks hotspot dan cek akurasi bentuk oleh KH |

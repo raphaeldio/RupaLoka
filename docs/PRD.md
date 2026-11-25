@@ -166,7 +166,7 @@ Prioritas: **P0** wajib MVP-0, **P1** tahap seleksi berikutnya, **P2** pengemban
 ### 6.7 Fitur berbayar dan mitra (rencana, **bukan MVP-0**)
 | ID | Kebutuhan | Prio |
 |---|---|---|
-| F-060 | Penampil model 3D objek budaya (hotspot) | P2 |
+| F-060 | Galeri 3D (lorong melingkar) + penampil objek (hotspot) + VR; purwarupa demo lomba di balik flag (SDD ADR 40) | P2 |
 | F-061 | Paket langganan individu (akses 3D + konten tambahan) | P2 |
 | F-062 | Paket sekolah: mode kelas, tautan guru, laporan hasil siswa | P2 |
 | F-063 | Portal mitra museum: unggah/validasi konten, atribusi, statistik | P2 |
