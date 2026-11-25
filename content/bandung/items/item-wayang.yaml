@@ -9,3 +9,16 @@ image:
   license: "milik sendiri (tim KamiPemenang)"
 chunk: wayang-golek-001
 lesson: wayang-golek
+
+# Kartu budaya lengkap (masukan juri, 25 Nov 2026). DIISI TIM BUDAYA (KH), jangan dikarang.
+# Tiap aspek: { text: "...", chunk: <id chunk di knowledge/ yang menjadi sumbernya> }.
+# community contoh bentuk: "ekspresi budaya tradisional masyarakat Sunda" (harus bersumber).
+# validator: { name: "<nama budayawan>", role: "<peran>", validated_at: YYYY-MM-DD }.
+# Kolom null = "sedang disusun tim budaya" di UI; validate_content --release gagal sampai lengkap.
+card:
+  nilai: null
+  pengetahuan: null
+  ekspresi: null
+  fungsi: null
+  community: null
+  validator: null

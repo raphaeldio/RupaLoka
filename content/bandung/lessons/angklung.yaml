@@ -39,6 +39,13 @@ location:
   address: "Padasuka, Bandung"        # alamat lengkap [PERLU DIISI] dari sumber
   lat: null
   lng: null
+  # Tombol "Kunjungi" (masukan juri, 25 Nov 2026): tautan ke situs resmi, sanggar, perajin,
+  # dan jadwal pertunjukan agar pemain terhubung dengan komunitas pemilik budaya.
+  # TODO KH: isi setelah peran Saung Angklung Udjo dan tautannya diverifikasi (T-035). Bentuk:
+  #   - { label: "Situs resmi", url: "https://...", kind: situs, verified_by: "<nama>" }
+  #   - { label: "Jadwal pertunjukan", url: "https://...", kind: jadwal, verified_by: "<nama>" }
+  # kind: situs | sanggar | perajin | jadwal
+  links: []
 suggested_questions:
   - "Apa itu angklung?"
   - "Dari bahan apa angklung dibuat?"
