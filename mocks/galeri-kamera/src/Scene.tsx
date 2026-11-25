@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef } from 'react'
 import { useFrame, useThree, type ThreeEvent } from '@react-three/fiber'
 import * as THREE from 'three'
-import { damp, phiLimits, poseFor, polar, PEDESTAL_R, WALL_R, type CamState, type Exhibit } from './flow'
+import { corridorLength, damp, exhibitPos, HALF_W, poseFor, type CamState, type Exhibit } from './flow'
 
 const C = {
   kertas: '#f5f1e8',
@@ -54,29 +54,53 @@ function CameraRig({ state, exhibits, reducedMotion }: Pick<SceneProps, 'state' 
       )
     }
     camera.lookAt(look.current)
+    // Layar tegak: lebarkan FOV vertikal agar objek di sisi lorong tetap terlihat.
+    const fov = 55 + portrait * 22
+    const cam = camera as THREE.PerspectiveCamera
+    if (Math.abs(cam.fov - fov) > 0.1) {
+      cam.fov = fov
+      cam.updateProjectionMatrix()
+    }
   })
   return null
 }
 
+/** Lorong lurus: dua dinding samping, lantai, langit-langit, dinding ujung. */
 function Room({ exhibits }: { exhibits: Exhibit[] }) {
-  const [lo, hi] = phiLimits(exhibits)
-  const a0 = lo - 0.9
-  const a1 = hi + 0.9
-  // Silinder three: x = r·sinθ, z = r·cosθ; sudut kita: x = r·sin a, z = -r·cos a → θ = π − a
+  const L = corridorLength(exhibits) + 6 // ruang 6 m di belakang titik awal (pintu masuk)
+  const zc = -(L / 2 - 6)
+  const H = 4.2
   return (
     <group>
-      <mesh position={[0, 2.1, 0]}>
-        <cylinderGeometry args={[WALL_R, WALL_R, 4.2, 96, 1, true, Math.PI - a1, a1 - a0]} />
-        <meshStandardMaterial color={C.kertas} side={THREE.BackSide} roughness={0.95} />
+      {([-1, 1] as const).map((side) => (
+        <group key={side}>
+          <mesh position={[side * HALF_W, H / 2, zc]} rotation={[0, -side * (Math.PI / 2), 0]}>
+            <planeGeometry args={[L, H]} />
+            <meshStandardMaterial color={C.kertas} roughness={0.95} />
+          </mesh>
+          {/* list dinding (pita bata) */}
+          <mesh position={[side * (HALF_W - 0.02), 0.12, zc]}>
+            <boxGeometry args={[0.04, 0.24, L]} />
+            <meshStandardMaterial color={C.bata} />
+          </mesh>
+        </group>
+      ))}
+      <mesh position={[0, H / 2, -(L - 6)]}>
+        <planeGeometry args={[HALF_W * 2, H]} />
+        <meshStandardMaterial color={C.teal} roughness={0.9} />
       </mesh>
-      {/* list dinding (pita bata) */}
-      <mesh position={[0, 0.12, 0]}>
-        <cylinderGeometry args={[WALL_R - 0.01, WALL_R - 0.01, 0.24, 96, 1, true, Math.PI - a1, a1 - a0]} />
-        <meshStandardMaterial color={C.bata} side={THREE.BackSide} />
-      </mesh>
-      <mesh rotation={[-Math.PI / 2, 0, 0]}>
-        <circleGeometry args={[WALL_R + 2, 96]} />
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, zc]}>
+        <planeGeometry args={[HALF_W * 2, L]} />
         <meshStandardMaterial color={C.tinta} roughness={0.55} metalness={0.1} />
+      </mesh>
+      <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, H, zc]}>
+        <planeGeometry args={[HALF_W * 2, L]} />
+        <meshStandardMaterial color={C.teal800} roughness={1} />
+      </mesh>
+      {/* jalur lantai tengah sebagai penunjuk arah jalan */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.005, zc]}>
+        <planeGeometry args={[0.5, L]} />
+        <meshStandardMaterial color={'#24413f'} roughness={0.7} />
       </mesh>
     </group>
   )
@@ -144,7 +168,9 @@ function ExhibitStand({
   onExhibit,
   onHotspot,
 }: { ex: Exhibit; index: number } & Pick<SceneProps, 'state' | 'wasDrag' | 'spin' | 'onExhibit' | 'onHotspot'>) {
-  const pos = useMemo(() => polar(ex.angle, PEDESTAL_R, 0), [ex.angle])
+  const pos = useMemo(() => exhibitPos(ex), [ex])
+  // Menghadap tengah lorong: objek di kanan (side 1) menghadap −X, di kiri menghadap +X.
+  const facing = -ex.side * (Math.PI / 2)
   const light = useRef<THREE.SpotLight>(null)
   const aim = useRef<THREE.Object3D>(null)
   const model = useRef<THREE.Group>(null)
@@ -168,7 +194,7 @@ function ExhibitStand({
   }
 
   return (
-    <group position={pos} rotation={[0, -ex.angle, 0]}>
+    <group position={pos} rotation={[0, facing, 0]}>
       <mesh position={[0, 0.5, 0]} onClick={click}>
         <boxGeometry args={[0.7, 1, 0.7]} />
         <meshStandardMaterial color={focused ? '#ffffff' : '#e9e2d2'} roughness={0.9} />

@@ -14,7 +14,7 @@ const ITEMS = [
 
 const HINT: Record<CamState['kind'], string> = {
   intro: 'Memasuki galeri…',
-  walk: 'Scroll / geser untuk berjalan · klik objek untuk mendekat',
+  walk: 'Scroll / geser ke atas untuk maju · klik objek di samping untuk mendekat',
   focus: 'Klik objek lagi untuk memeriksa · Esc / klik area kosong untuk mundur',
   inspect: 'Geser untuk memutar objek · klik titik emas · Esc untuk mundur',
 }
@@ -52,23 +52,26 @@ export default function App() {
   }, [])
 
   // Drag: berjalan (walk) atau memutar objek (inspect). Bedakan drag dari klik.
-  const drag = useRef({ down: false, x: 0, moved: 0 })
+  const drag = useRef({ down: false, x: 0, y: 0, moved: 0 })
   const lastWasDrag = useRef(false)
   const spin = useRef(0)
   const stateRef = useRef(state)
   stateRef.current = state
 
   const onPointerDown = (e: React.PointerEvent) => {
-    drag.current = { down: true, x: e.clientX, moved: 0 }
+    drag.current = { down: true, x: e.clientX, y: e.clientY, moved: 0 }
   }
   const onPointerMove = (e: React.PointerEvent) => {
     if (!drag.current.down) return
     const dx = e.clientX - drag.current.x
+    const dy = e.clientY - drag.current.y
     drag.current.x = e.clientX
-    drag.current.moved += Math.abs(dx)
+    drag.current.y = e.clientY
+    drag.current.moved += Math.abs(dx) + Math.abs(dy)
     if (drag.current.moved < 6) return
     const k = stateRef.current.kind
-    if (k === 'walk') dispatch({ type: 'walkBy', delta: -dx * 0.0035 })
+    // geser ke atas = maju (seperti mendorong diri ke depan)
+    if (k === 'walk') dispatch({ type: 'walkBy', delta: dy * 0.012 })
     if (k === 'inspect') spin.current += dx * 0.012
   }
   const onPointerUp = () => {
@@ -77,13 +80,13 @@ export default function App() {
   }
   const onWheel = (e: React.WheelEvent) => {
     if (view !== 'galeri' || stateRef.current.kind === 'inspect') return
-    dispatch({ type: 'walkBy', delta: e.deltaY * 0.0012 })
+    dispatch({ type: 'walkBy', delta: e.deltaY * 0.006 })
   }
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowLeft') dispatch({ type: 'step', dir: -1 })
-      if (e.key === 'ArrowRight') dispatch({ type: 'step', dir: 1 })
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') dispatch({ type: 'step', dir: -1 })
+      if (e.key === 'ArrowRight' || e.key === 'ArrowUp') dispatch({ type: 'step', dir: 1 })
       if (e.key === 'Escape') dispatch({ type: 'back' })
       if (e.key === 'Enter' && stateRef.current.kind === 'focus')
         dispatch({ type: 'clickExhibit', index: stateRef.current.index })
@@ -190,10 +193,10 @@ export default function App() {
             </button>
           )}
           <button onClick={() => dispatch({ type: 'step', dir: -1 })} aria-label="Sebelumnya">
-            ←
+            ↓
           </button>
           <button onClick={() => dispatch({ type: 'step', dir: 1 })} aria-label="Berikutnya">
-            →
+            ↑
           </button>
         </div>
       </footer>
@@ -203,7 +206,10 @@ export default function App() {
           <input type="checkbox" checked={reducedMotion} onChange={(e) => setReducedMotion(e.target.checked)} /> Gerak
           dikurangi
         </label>
-        <span>state: {state.kind}</span>
+        <span>
+          state: {state.kind}
+          {state.kind === 'walk' ? ` d=${state.d.toFixed(1)}m` : ''}
+        </span>
       </div>
     </div>
   )

@@ -1,22 +1,25 @@
 /**
  * Alur kamera galeri (murni, tanpa three.js): state, transisi, dan pose kamera.
- * Pola interaksi terinspirasi galeri dinding lengkung: jalan menyusuri busur,
- * klik objek untuk mendekat, klik lagi untuk inspeksi, Esc/klik kosong untuk mundur.
+ * Tata letak: lorong lurus; kamera berjalan ke depan (−Z), objek berdiri di sisi
+ * kiri dan kanan bergantian. Klik objek = kamera menoleh dan mendekat ke samping,
+ * klik lagi = periksa, Esc/klik kosong = mundur satu tingkat.
  */
 
 export type Vec3 = [number, number, number]
+export type Side = -1 | 1 // −1 kiri, 1 kanan (dari arah jalan)
 
 export interface Exhibit {
   id: string
   label: string
-  /** sudut posisi di busur (radian) */
-  angle: number
+  /** jarak sepanjang lorong (m), positif ke depan */
+  d: number
+  side: Side
   placeholder?: boolean
 }
 
 export type CamState =
   | { kind: 'intro' }
-  | { kind: 'walk'; phi: number }
+  | { kind: 'walk'; d: number }
   | { kind: 'focus'; index: number }
   | { kind: 'inspect'; index: number }
 
@@ -28,46 +31,55 @@ export type CamAction =
   | { type: 'back' }
   | { type: 'goto'; index: number }
 
-/** Jari-jari dinding; pedestal berdiri 1 m di depan dinding. */
-export const WALL_R = 9
-export const PEDESTAL_R = WALL_R - 1.2
-const EYE = 1.6
-
-const SPACING = 0.42
+/** Setengah lebar lorong; pedestal berdiri 0.7 m dari dinding. */
+export const HALF_W = 2.6
+export const PEDESTAL_X = HALF_W - 0.7
+export const EYE = 1.6
+const SPACING = 2.6
+const FIRST_D = 3
+/** Saat berjalan, objek "dilewati" adalah yang ±LOOKAHEAD m di depan kamera. */
+const LOOKAHEAD = 2.4
 
 export function makeExhibits(items: { id: string; label: string; placeholder?: boolean }[]): Exhibit[] {
-  const start = -((items.length - 1) * SPACING) / 2
-  return items.map((it, i) => ({ ...it, angle: start + i * SPACING }))
+  return items.map((it, i) => ({ ...it, d: FIRST_D + i * SPACING, side: (i % 2 === 0 ? -1 : 1) as Side }))
 }
 
-export function phiLimits(ex: Exhibit[]): [number, number] {
-  return [ex[0].angle - 0.25, ex[ex.length - 1].angle + 0.25]
+export function walkLimits(ex: Exhibit[]): [number, number] {
+  return [0, ex[ex.length - 1].d - 0.5]
+}
+
+export function corridorLength(ex: Exhibit[]): number {
+  return ex[ex.length - 1].d + 4
 }
 
 const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v))
 
-/** Titik di lantai pada sudut a, jari-jari r. Sudut 0 = arah -Z (depan kamera awal). */
-export function polar(a: number, r: number, y: number): Vec3 {
-  return [Math.sin(a) * r, y, -Math.cos(a) * r]
+/** Posisi pusat pedestal di dunia. */
+export function exhibitPos(e: Exhibit, y = 0): Vec3 {
+  return [e.side * PEDESTAL_X, y, -e.d]
 }
 
-export function nearestIndex(ex: Exhibit[], phi: number): number {
+export function nearestIndex(ex: Exhibit[], d: number): number {
+  const ahead = d + LOOKAHEAD
   let best = 0
   ex.forEach((e, i) => {
-    if (Math.abs(e.angle - phi) < Math.abs(ex[best].angle - phi)) best = i
+    if (Math.abs(e.d - ahead) < Math.abs(ex[best].d - ahead)) best = i
   })
   return best
 }
 
+/** Titik berdiri saat berjalan agar objek ke-i tampak serong di depan. */
+const standFor = (e: Exhibit) => e.d - LOOKAHEAD
+
 export function reduce(s: CamState, a: CamAction, ex: Exhibit[]): CamState {
-  const [lo, hi] = phiLimits(ex)
+  const [lo, hi] = walkLimits(ex)
   switch (a.type) {
     case 'introDone':
-      return s.kind === 'intro' ? { kind: 'walk', phi: ex[0].angle } : s
+      return s.kind === 'intro' ? { kind: 'walk', d: 0 } : s
     case 'walkBy':
-      if (s.kind === 'walk') return { kind: 'walk', phi: clamp(s.phi + a.delta, lo, hi) }
-      // scroll saat fokus: mundur lalu lanjut berjalan (seperti referensi)
-      if (s.kind === 'focus') return { kind: 'walk', phi: clamp(ex[s.index].angle + a.delta, lo, hi) }
+      if (s.kind === 'walk') return { kind: 'walk', d: clamp(s.d + a.delta, lo, hi) }
+      // scroll saat fokus: kembali ke tengah lorong lalu lanjut berjalan
+      if (s.kind === 'focus') return { kind: 'walk', d: clamp(standFor(ex[s.index]) + a.delta, lo, hi) }
       return s
     case 'clickExhibit':
       if (ex[a.index]?.placeholder) return s
@@ -76,8 +88,8 @@ export function reduce(s: CamState, a: CamAction, ex: Exhibit[]): CamState {
       return s
     case 'step': {
       if (s.kind === 'walk') {
-        const i = clamp(nearestIndex(ex, s.phi) + a.dir, 0, ex.length - 1)
-        return { kind: 'walk', phi: ex[i].angle }
+        const i = clamp(nearestIndex(ex, s.d) + a.dir, 0, ex.length - 1)
+        return { kind: 'walk', d: clamp(standFor(ex[i]), lo, hi) }
       }
       if (s.kind === 'focus') {
         let i = s.index + a.dir
@@ -88,7 +100,7 @@ export function reduce(s: CamState, a: CamAction, ex: Exhibit[]): CamState {
     }
     case 'back':
       if (s.kind === 'inspect') return { kind: 'focus', index: s.index }
-      if (s.kind === 'focus') return { kind: 'walk', phi: ex[s.index].angle }
+      if (s.kind === 'focus') return { kind: 'walk', d: clamp(standFor(ex[s.index]), lo, hi) }
       return s
     case 'goto':
       return ex[a.index]?.placeholder ? s : { kind: 'focus', index: a.index }
@@ -101,30 +113,36 @@ export interface Pose {
 }
 
 /**
- * Pose kamera untuk tiap state. Intro: berdiri di pintu, agak jauh dari busur.
+ * Pose kamera untuk tiap state.
+ * - walk: di tengah lorong, menatap lurus ke depan.
+ * - focus/inspect: menoleh ke samping, menghadap objek.
  * `portrait` (0..1) memundurkan kamera di layar tegak agar objek tidak terpotong.
  */
 export function poseFor(s: CamState, ex: Exhibit[], portrait = 0): Pose {
-  const back = portrait * 1.6
   switch (s.kind) {
     case 'intro':
-      return { position: [0, EYE + 0.4, 6], target: [0, 1.4, -WALL_R] }
-    case 'walk':
-      return { position: polar(s.phi, 3.2 - back, EYE), target: polar(s.phi, WALL_R, 1.4) }
+      return { position: [0, EYE + 0.3, 4], target: [0, 1.4, -6] }
+    case 'walk': {
+      // Layar tegak (FOV horizontal sempit): kamera melirik ke sisi objek terdekat.
+      const glance = portrait * 2.2 * ex[nearestIndex(ex, s.d)].side
+      return { position: [0, EYE, -s.d], target: [glance, 1.45, -s.d - 6] }
+    }
     case 'focus': {
-      const a = ex[s.index].angle
-      return { position: polar(a, PEDESTAL_R - 2.8 - back, 1.55), target: polar(a, PEDESTAL_R, 1.3) }
+      const e = ex[s.index]
+      const dist = 2.1 + portrait * 0.6 // maks. ±2.7 m, masih di dalam lorong
+      return { position: [e.side * (PEDESTAL_X - dist), 1.55, -e.d], target: exhibitPos(e, 1.3) }
     }
     case 'inspect': {
-      const a = ex[s.index].angle
-      return { position: polar(a, PEDESTAL_R - 1.35 - back * 0.6, 1.45), target: polar(a, PEDESTAL_R, 1.35) }
+      const e = ex[s.index]
+      const dist = 1.3 + portrait * 0.5
+      return { position: [e.side * (PEDESTAL_X - dist), 1.45, -e.d], target: exhibitPos(e, 1.35) }
     }
   }
 }
 
-/** Indeks objek yang sedang "dilewati" untuk label bawah layar. */
+/** Indeks objek untuk label bawah layar. */
 export function currentIndex(s: CamState, ex: Exhibit[]): number {
-  if (s.kind === 'walk') return nearestIndex(ex, s.phi)
+  if (s.kind === 'walk') return nearestIndex(ex, s.d)
   if (s.kind === 'intro') return 0
   return s.index
 }
