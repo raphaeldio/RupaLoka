@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useMemo, useState, type MouseEvent } from 'react'
+import { lazy, Suspense, useEffect, useMemo, useRef, useState, type MouseEvent } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import kursorUrl from '../assets/figma-map/kursor.svg'
 import CityCard from '../components/CityCard'
@@ -7,6 +7,8 @@ const LeafletMap = lazy(() => import('../components/LeafletMap'))
 import CityRotator from '../components/landing/CityRotator'
 import { CityStops, CollectionPreview } from '../components/landing/CityPreview'
 import { useCityPreview } from '../components/landing/useCityPreview'
+import ChapterHud from '../components/landing/ChapterHud'
+import { useLandingMotion } from '../components/landing/useLandingMotion'
 import { Chapter, CtaLink, LevelCards, Marquee, PixelIcon, type Level } from '../components/landing/pixel'
 import { ICON_BUKU, ICON_KUIS, ICON_LARI, ICON_PETA, ICON_PIALA } from '../components/landing/pixelIcons'
 import HeroMascot from '../components/mascot/HeroMascot'
@@ -138,18 +140,23 @@ export default function HomePage() {
     },
   ]
 
+  const mainRef = useRef<HTMLElement>(null)
+  const [chapter, setChapter] = useState('')
+  useLandingMotion(mainRef, setChapter, [!!preview.detail])
+
   const [statsRef, statsShown] = useReveal<HTMLDListElement>()
   const provinsi = useCountUp(PROVINCES.length, statsShown)
   const kota = useCountUp(cities.length, statsShown)
   const siap = useCountUp(activeCount, statsShown)
 
   return (
-    <main id="konten" className="relative overflow-x-clip">
+    <main id="konten" ref={mainRef} className="relative overflow-x-clip">
+      <ChapterHud label={chapter} />
       {/* ---------------- Hero ---------------- */}
-      <section className="relative -mt-[76px] overflow-hidden pt-[76px]">
+      <section data-anim-section="hero" data-chapter="00 · Mulai" className="relative -mt-[76px] overflow-hidden pt-[76px]">
         <div className="relative mx-auto grid max-w-[1360px] items-center gap-8 px-4 pb-12 pt-10 sm:px-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:px-12 lg:pb-16 lg:pt-14">
-          <div className="relative z-10 motion-safe:animate-[card-in_600ms_ease-out]">
-            <p className="eyebrow inline-flex items-center gap-2 border-2 border-tinta bg-white px-3 py-1.5 text-teal shadow-tekan">
+          <div className="relative z-10">
+            <p data-anim="hero-eyebrow" className="eyebrow inline-flex items-center gap-2 border-2 border-tinta bg-white px-3 py-1.5 text-teal shadow-tekan">
               <span className="size-2 bg-emas motion-safe:animate-pulse" aria-hidden="true" />
               Ekspedisi budaya Nusantara
             </p>
@@ -157,24 +164,24 @@ export default function HomePage() {
               aria-label={`Jelajahi Budaya, Mulai dari ${firstActive?.name ?? 'Bandung'}`}
               className="mt-6 flex flex-col items-start gap-4 text-[32px] font-bold sm:text-[52px] lg:text-[60px]"
             >
-              <span className="pita bg-teal text-white" aria-hidden="true">
+              <span data-anim="hero-pita" className="pita bg-teal text-white" aria-hidden="true">
                 Jelajahi budaya
               </span>
-              <span className="pita pita-2 bg-bata text-white" aria-hidden="true">
+              <span data-anim="hero-pita" className="pita pita-2 bg-bata text-white" aria-hidden="true">
                 Mulai dari <CityRotator words={rotatorWords} />
               </span>
             </h1>
-            <p className="mt-7 max-w-lg text-[17px] leading-relaxed text-tinta/80">
+            <p data-anim="hero-lead" className="mt-7 max-w-lg text-[17px] leading-relaxed text-tinta/80">
               Kenali kekayaan budaya Indonesia melalui kuis interaktif, materi bersumber, dan permainan seru.
             </p>
 
             <div className="mt-7 flex flex-wrap items-center gap-3">
-              <a href="#peta" onClick={scrollToMap} className={`group ${btn} bg-emas text-tinta`}>
+              <a data-anim="hero-cta" href="#peta" onClick={scrollToMap} className={`group ${btn} bg-emas text-tinta`}>
                 Mulai Jelajah Sekarang
                 <Arrow className="size-4 transition-transform group-hover:translate-x-1" />
               </a>
               {firstActive && (
-                <Link to={`/kota/${firstActive.id}`} className={`${btn} bg-white text-tinta`}>
+                <Link data-anim="hero-cta" to={`/kota/${firstActive.id}`} className={`${btn} bg-white text-tinta`}>
                   Langsung ke {firstActive.name}
                 </Link>
               )}
@@ -182,7 +189,7 @@ export default function HomePage() {
 
             <ol className="mt-8 flex flex-wrap gap-2" aria-label="Cara belajar">
               {STEPS.map((s, i) => (
-                <li key={s} className="flex items-center gap-2 border-2 border-tinta bg-white py-1 pl-1 pr-3 text-[13px] font-semibold">
+                <li key={s} data-anim="hero-step" className="flex items-center gap-2 border-2 border-tinta bg-white py-1 pl-1 pr-3 text-[13px] font-semibold">
                   <span className="grid size-6 place-items-center bg-teal font-mono text-[11px] font-bold text-white">
                     {i + 1}
                   </span>
@@ -192,7 +199,7 @@ export default function HomePage() {
             </ol>
           </div>
 
-          <div className="relative -mx-4 sm:mx-0">
+          <div data-anim="hero-mascot" className="relative -mx-4 sm:mx-0">
             <HeroMascot className="mx-auto w-[min(72vw,340px)] lg:w-[380px]" />
           </div>
         </div>
@@ -201,7 +208,7 @@ export default function HomePage() {
       <Marquee words={['Kuis', 'Materi bersumber', 'Game keliling kota', 'Koleksi budaya', 'Papan peringkat', 'Tanya Saloka']} />
 
       {/* ---------------- Bab 01: Kenalan ---------------- */}
-      <section aria-labelledby="judul-kenalan" className="px-4 py-16 sm:px-8 lg:px-12">
+      <section data-chapter="01 · Kenalan" aria-labelledby="judul-kenalan" className="px-4 py-16 sm:px-8 lg:px-12">
         <div className="mx-auto grid max-w-[1200px] items-start gap-10 lg:grid-cols-[1.2fr_1fr]">
           <div>
             <Chapter
@@ -229,7 +236,7 @@ export default function HomePage() {
           </div>
           <ul className="grid gap-4">
             {PROMISES.map((p) => (
-              <li key={p.title} className="kotak flex gap-4 p-4">
+              <li key={p.title} data-anim="card" className="kotak flex gap-4 p-4">
                 <PixelIcon rows={p.icon} className="size-12 shrink-0" />
                 <div>
                   <p className="font-display text-lg font-bold uppercase">{p.title}</p>
@@ -242,7 +249,7 @@ export default function HomePage() {
       </section>
 
       {/* ---------------- Bab 02: Peta ---------------- */}
-      <section id="peta" aria-labelledby="judul-peta" className="relative scroll-mt-24 px-4 py-16 sm:px-8 lg:px-12">
+      <section id="peta" data-chapter="02 · Pilih kota" aria-labelledby="judul-peta" className="relative scroll-mt-24 px-4 py-16 sm:px-8 lg:px-12">
         <div className="mx-auto max-w-[1360px]">
           <Chapter
             id="judul-peta"
@@ -326,13 +333,13 @@ export default function HomePage() {
               )}
             </div>
 
-            <dl ref={statsRef} className="mt-2 grid w-full max-w-2xl grid-cols-3 gap-3">
+            <dl ref={statsRef} data-anim="stats" className="mt-2 grid w-full max-w-2xl grid-cols-3 gap-3">
               {[
                 { label: 'provinsi di peta', value: provinsi },
                 { label: 'kota terdaftar', value: kota },
                 { label: 'kota siap dijelajahi', value: siap },
               ].map((s) => (
-                <div key={s.label} className="kotak flex flex-col-reverse px-3 py-3 text-center">
+                <div key={s.label} data-anim="stat" className="kotak flex flex-col-reverse px-3 py-3 text-center">
                   <dt className="eyebrow text-redup">{s.label}</dt>
                   <dd className="font-display text-3xl font-bold tabular-nums text-teal sm:text-4xl">{s.value}</dd>
                 </div>
@@ -343,7 +350,7 @@ export default function HomePage() {
       </section>
 
       {/* ---------------- Bab 03: Pilih jalurmu ---------------- */}
-      <section aria-labelledby="judul-jalur" className="px-4 py-16 sm:px-8 lg:px-12">
+      <section data-chapter="03 · Pilih jalurmu" aria-labelledby="judul-jalur" className="px-4 py-16 sm:px-8 lg:px-12">
         <div className="mx-auto max-w-[1200px]">
           <Chapter
             id="judul-jalur"
@@ -373,8 +380,8 @@ export default function HomePage() {
       )}
 
       {/* ---------------- CTA akhir ---------------- */}
-      <section aria-labelledby="judul-ajakan" className="px-4 pb-24 pt-8 sm:px-8 lg:px-12">
-        <div className="kotak mx-auto max-w-[1200px] !bg-teal px-6 py-12 text-center text-white sm:px-12">
+      <section data-chapter="06 · Siap?" aria-labelledby="judul-ajakan" className="px-4 pb-24 pt-8 sm:px-8 lg:px-12">
+        <div data-anim="cta-final" className="kotak mx-auto max-w-[1200px] !bg-teal px-6 py-12 text-center text-white sm:px-12">
           <p className="eyebrow text-emas">Siap?</p>
           <h2 id="judul-ajakan" className="mx-auto mt-3 max-w-2xl text-[30px] font-bold uppercase leading-tight sm:text-[44px]">
             Siap mulai ekspedisimu?
@@ -384,11 +391,11 @@ export default function HomePage() {
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             {firstActive && (
-              <CtaLink to={`/kota/${firstActive.id}`} variant="emas">
+              <CtaLink to={`/kota/${firstActive.id}`} variant="emas" part="cta-btn">
                 Mulai di {firstActive.name}
               </CtaLink>
             )}
-            <a href="#peta" onClick={scrollToMap} className={`${btn} bg-white text-tinta`}>
+            <a data-anim-part="cta-btn" href="#peta" onClick={scrollToMap} className={`${btn} bg-white text-tinta`}>
               Lihat peta
             </a>
           </div>

@@ -79,6 +79,7 @@ Fitur P1 (kuis penutup, rekor, analitik) tidak dikerjakan sebelum semua P0 seles
 
 - [x] **T-080 (HR)** Skema + UI kartu budaya lengkap (F-080), soal nilai + bobot poin (F-081), refleksi akhir tur (F-082), Beri masukan (F-083), label "Dijawab AI" + Saloka (F-084), Kunjungi (F-085). *DoD:* pytest, vitest, lint, build lolos; placeholder tampil di 360 px.
 - [x] **T-087 (HR)** Redesain gaya piksel seluruh UI + landing bab 01–05 (Kenalan, Peta, Pilih jalurmu, Koleksi & peringkat, Titik budaya) + CTA akhir (SDD ADR 38). *DoD:* uji, lint, build lolos; dicek di 360 px dan desktop.
+- [x] **T-088 (HR)** Animasi landing GSAP + ScrollTrigger: hero masuk berurutan, pita judul "dibanting", kartu muncul bertumpuk, pita berjalan miring mengikuti gulir, CTA membesar, HUD bab (SDD ADR 39). *DoD:* uji/lint/build lolos; tanpa animasi bila prefers-reduced-motion.
 - [ ] **T-081 (KH)** Isi `card` ketiga item (nilai, pengetahuan, ekspresi, fungsi, komunitas — masing-masing bersumber `chunk`) dan minta budayawan memvalidasi (`validator`). *DoD:* `validate_content.py` tanpa peringatan `card.*`.
 - [ ] **T-082 (KH)** Tulis ≥1 soal `kind: nilai` per titik di `quiz.yaml` → `outro`, periksa dua orang. *DoD:* tanpa peringatan "belum punya soal nilai".
 - [ ] **T-083 (KH)** Isi `reflection.yaml` → `values` (label, kata kunci, penjelasan bersumber) untuk refleksi angklung. *DoD:* soal refleksi tampil di ringkasan; uji coba 5 jawaban nyata dicatat apa adanya.

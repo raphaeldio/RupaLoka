@@ -1,11 +1,27 @@
-import { Link } from 'react-router-dom'
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { isPlaceholder, type City } from '../lib/cities'
+import PlaneFlight from './PlaneFlight'
+import TravelConfirm from './TravelConfirm'
 
 /** Kartu kota (F-003): nama, ringkasan, jumlah materi dan item, tombol "Mulai". */
 export default function CityCard({ city, onClose }: { city: City; onClose?: () => void }) {
+  const navigate = useNavigate()
+  const [confirm, setConfirm] = useState(false)
+  const [flying, setFlying] = useState(false)
   const active = city.status === 'active'
   const summary = isPlaceholder(city.summary) ? null : city.summary
   const count = (n: number | null | undefined) => (typeof n === 'number' ? String(n) : '–')
+
+  const handleDepart = () => {
+    setConfirm(false)
+    const reduced = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (reduced) {
+      navigate(`/kota/${city.id}`)
+      return
+    }
+    setFlying(true)
+  }
 
   return (
     <article
@@ -49,15 +65,33 @@ export default function CityCard({ city, onClose }: { city: City; onClose?: () =
               <dd className="text-lg font-extrabold text-amber">{count(city.item_count)}</dd>
             </div>
           </dl>
-          <Link
-            to={`/kota/${city.id}`}
-            className="group mt-4 flex items-center justify-center gap-2 rounded-2xl bg-teal px-5 py-3 text-sm font-extrabold text-white shadow-melayang transition hover:bg-teal-600 active:scale-[0.98]"
+          <button
+            type="button"
+            onClick={() => setConfirm(true)}
+            className="group mt-4 flex w-full items-center justify-center gap-2 rounded-2xl bg-teal px-5 py-3 text-sm font-extrabold text-white shadow-melayang transition hover:bg-teal-600 active:scale-[0.98]"
           >
             Mulai jelajah {city.name}
             <svg viewBox="0 0 16 16" className="size-4 transition-transform group-hover:translate-x-0.5" aria-hidden="true">
               <path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
-          </Link>
+          </button>
+          {confirm && (
+            <TravelConfirm
+              city={city}
+              onYes={handleDepart}
+              onNo={() => setConfirm(false)}
+            />
+          )}
+          {flying && (
+            <div className="fixed inset-0 z-[2000] overflow-hidden bg-black/25 backdrop-blur-[2px]">
+              <PlaneFlight
+                width={typeof window !== 'undefined' ? window.innerWidth : 800}
+                height={typeof window !== 'undefined' ? window.innerHeight : 600}
+                cityName={city.name}
+                onDone={() => navigate(`/kota/${city.id}`)}
+              />
+            </div>
+          )}
         </>
       ) : (
         <p className="mt-4 inline-flex items-center gap-2 rounded-full bg-[#eef0ea] px-3 py-1.5 text-xs font-bold text-redup">

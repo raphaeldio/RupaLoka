@@ -24,7 +24,7 @@ export function CollectionPreview({
   const have = useProgress((s) => s.collected[cityId]) ?? []
   const items = detail?.items ?? []
   return (
-    <section aria-labelledby="judul-koleksi" className="px-4 py-16 sm:px-8 lg:px-12">
+    <section data-chapter="04 · Koleksi" aria-labelledby="judul-koleksi" className="px-4 py-16 sm:px-8 lg:px-12">
       <div className="mx-auto max-w-[1200px]">
         <Chapter
           id="judul-koleksi"
@@ -35,7 +35,7 @@ export function CollectionPreview({
           lead={`Tiap item budaya yang kamu temukan di game masuk koleksimu, lengkap dengan kartu budaya dan sumbernya. Poin terbesar datang dari soal nilai dan refleksi, bukan dari lari tercepat.`}
         />
         <div className="mt-10 grid gap-6 lg:grid-cols-[1.4fr_1fr]">
-          <div className="kotak p-5">
+          <div data-anim="card" className="kotak p-5">
             <div className="flex items-baseline justify-between gap-3">
               <h3 className="font-display text-xl font-bold uppercase">Item {cityName}</h3>
               <span className="eyebrow text-amber">
@@ -72,7 +72,7 @@ export function CollectionPreview({
             </div>
           </div>
 
-          <div className="kotak flex flex-col p-5">
+          <div data-anim="card" className="kotak flex flex-col p-5">
             <div className="flex items-center gap-3">
               <PixelIcon rows={ICON_PIALA} className="size-10" />
               <div>
@@ -114,7 +114,7 @@ export function CollectionPreview({
 export function CityStops({ no, cityId, cityName, detail }: { no: number; cityId: string; cityName: string; detail: CityDetail | null }) {
   const lessons = detail?.lessons ?? []
   return (
-    <section aria-labelledby="judul-titik" className="px-4 py-16 sm:px-8 lg:px-12">
+    <section data-chapter="05 · Titik budaya" aria-labelledby="judul-titik" className="px-4 py-16 sm:px-8 lg:px-12">
       <div className="mx-auto max-w-[1200px]">
         <Chapter
           id="judul-titik"
@@ -127,7 +127,7 @@ export function CityStops({ no, cityId, cityName, detail }: { no: number; cityId
         {lessons.length > 0 ? (
           <ol className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {lessons.map((l, i) => (
-              <li key={l.id} className="kotak flex items-start gap-3 p-4">
+              <li key={l.id} data-anim="card" className="kotak flex items-start gap-3 p-4">
                 <span className="grid size-10 shrink-0 place-items-center border-2 border-tinta bg-teal font-display text-lg text-white">
                   {i + 1}
                 </span>
