@@ -1,9 +1,12 @@
 import { Link } from 'react-router-dom'
 import { labelOr } from '../lib/cities'
 import type { Badge, CityDetail } from '../lib/api.types'
+import { pathPoints } from '../lib/rewards'
+import { useCityProgress } from '../lib/store'
 import BadgeIcon from './BadgeIcon'
 import Leaderboard from './Leaderboard'
 import LocationButton from './LocationButton'
+import ReflectionCard from './ReflectionCard'
 import { Pop } from './motion'
 import CountUp from './reactbits/CountUp'
 import { Button, Card, SafeImage } from './primitives'
@@ -40,6 +43,17 @@ export default function Summary({
   const unlocked = detail.items.filter((i) => unlockedIds.includes(i.id))
   const allCollected = detail.items.length > 0 && detail.items.every((i) => collectedIds.includes(i.id))
   const sites = detail.lessons.filter((l) => l.location)
+  // Total poin terkini (refleksi di bawah bisa menambah poin setelah game selesai).
+  const progress = useCityProgress(detail.city.id)
+  const liveTotal = Math.max(
+    pathTotal,
+    pathPoints(
+      detail.lessons.map((l) => l.id),
+      progress,
+      detail.rewards,
+    ),
+  )
+  const reflections = detail.reflection ?? []
 
   return (
     <Card>
@@ -110,15 +124,23 @@ export default function Summary({
         )}
       </section>
 
+      {reflections.length > 0 && (
+        <div className="mt-5 grid gap-3">
+          {reflections.map((q) => (
+            <ReflectionCard key={q.id} detail={detail} question={q} />
+          ))}
+        </div>
+      )}
+
       {detail.rewards.leaderboard?.enabled && (
         <div className="mt-5">
-          <Leaderboard cityId={detail.city.id} points={pathTotal} canSubmit />
+          <Leaderboard cityId={detail.city.id} points={liveTotal} canSubmit />
         </div>
       )}
 
       {sites.length > 0 && (
         <section className="mt-5 grid gap-2" aria-label="Lokasi asli">
-          <h3 className="text-sm font-extrabold">Kunjungi lokasi aslinya</h3>
+          <h3 className="text-sm font-extrabold">Kunjungi lokasi dan komunitas aslinya</h3>
           {sites.map((l) => (
             <LocationButton key={l.id} location={l.location} />
           ))}

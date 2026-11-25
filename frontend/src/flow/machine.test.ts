@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { QuizQuestion, SourceRef } from '../lib/api.types'
-import { initialNode, missingParts, nodeComplete, nodeReducer, postQuestionsFor, questionsFor, quizScore, type NodeEvent, type NodeState } from './machine'
+import { initialNode, missingParts, nodeComplete, nodeReducer, postQuestionsFor, questionsFor, quizCaps, quizScore, type NodeEvent, type NodeState } from './machine'
 
 const reduce = nodeReducer(2)
 const run = (events: NodeEvent[], from: NodeState = initialNode(2)) => events.reduce(reduce, from)
@@ -46,8 +46,9 @@ describe('nodeReducer', () => {
   })
 })
 
-const q = (id: string, chunk: string, correct = 0): QuizQuestion => ({
+const q = (id: string, chunk: string, correct = 0, kind: QuizQuestion['kind'] = 'fakta'): QuizQuestion => ({
   id,
+  kind,
   question: id,
   options: ['a', 'b'],
   correct,
@@ -75,6 +76,22 @@ describe('kuis per titik', () => {
   it('menghitung skor', () => {
     expect(quizScore(questions, [0, 1, 1])).toBe(2)
     expect(quizScore(questions, [null, null, null])).toBe(0)
+  })
+
+  it('memisahkan skor dan batas per jenis soal (fakta / nilai)', () => {
+    const intro = [q('f1', 'b-001'), q('f2', 'b-002', 1)]
+    const outro = [q('n1', 'b-003', 0, 'nilai'), q('f3', 'b-004')]
+    expect(quizScore(outro, [0, 0], 'nilai')).toBe(1)
+    expect(quizScore(outro, [0, 0], 'fakta')).toBe(1)
+    expect(quizScore(outro, [1, 0], 'nilai')).toBe(0)
+    const src = {
+      'b-001': ref('b-001', 'b'),
+      'b-002': ref('b-002', 'b'),
+      'b-003': ref('b-003', 'b'),
+      'b-004': ref('b-004', 'b'),
+    }
+    // titik b: kuis awal 2 fakta, kuis akhir 1 nilai + 1 fakta -> fakta maks 2, nilai maks 1
+    expect(quizCaps(['b', 'c'], { intro, outro }, src, 1)).toEqual({ facts: 2, values: 1, reflections: 1 })
   })
 })
 

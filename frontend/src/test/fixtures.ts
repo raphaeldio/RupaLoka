@@ -23,6 +23,8 @@ export const detailFixture: CityDetail = {
   rewards: {
     points_per_node: 100,
     points_per_correct: 10,
+    points_per_value: 30,
+    points_per_reflection: 50,
     game_node_points: 100,
     game_score_cap: 1000,
     leaderboard: { enabled: true, champion_title: 'Si Paling A', size: 10 },
@@ -40,8 +42,8 @@ export const detailFixture: CityDetail = {
   },
   quiz: {
     intro: [
-      { id: 'q1', question: 'Soal satu?', options: ['Benar', 'Salah'], correct: 0, explanation: 'Penjelasan satu.', chunk: 'a-001' },
-      { id: 'q2', question: 'Soal dua?', options: ['Salah', 'Benar'], correct: 1, explanation: 'Penjelasan dua.', chunk: 'b-001' },
+      { id: 'q1', kind: 'fakta', question: 'Soal satu?', options: ['Benar', 'Salah'], correct: 0, explanation: 'Penjelasan satu.', chunk: 'a-001' },
+      { id: 'q2', kind: 'fakta', question: 'Soal dua?', options: ['Salah', 'Benar'], correct: 1, explanation: 'Penjelasan dua.', chunk: 'b-001' },
     ],
     outro: [],
   },
@@ -53,7 +55,7 @@ export const detailFixture: CityDetail = {
       key_facts: [{ text: 'Fakta A.', chunk: 'a-001' }],
       images: [],
       videos: [],
-      location: { name: 'Situs A', address: 'Jalan A', lat: -6.9, lng: 107.6 },
+      location: { name: 'Situs A', address: 'Jalan A', lat: -6.9, lng: 107.6, links: [] },
       suggested_questions: ['Apa itu A?'],
       tier: 'free',
     },
@@ -79,7 +81,9 @@ export const detailFixture: CityDetail = {
       chunk: 'a-001',
       lesson: 'a',
       tier: 'free',
+      card: null,
     },
   ],
   sources: { 'a-001': ref('a-001', 'a'), 'b-001': ref('b-001', 'b') },
+  reflection: [],
 }

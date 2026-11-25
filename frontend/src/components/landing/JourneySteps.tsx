@@ -10,7 +10,7 @@ const STEPS = [
   },
   {
     title: 'Ditemani pemandu AI',
-    text: 'Tanya apa saja tentang budaya kota. Pemandu hanya menjawab dari catatan bersumber dan menyertakan rujukannya.',
+    text: 'Tanya apa saja tentang budaya kota. Saloka, pemandu AI, hanya menjawab dari catatan bersumber dan menyertakan rujukannya.',
     emoji: '💬',
   },
   {

@@ -29,7 +29,7 @@ export default function SourcesPage() {
         <BlurText text="Sumber dan atribusi" animateBy="words" delay={80} className="inline-flex" />
       </h1>
       <p className="mt-2 text-redup">
-        Semua fakta budaya di Rupaloka berasal dari sumber di bawah dan diperiksa tim. Pemandu AI hanya menjawab dari
+        Semua fakta budaya di Rupaloka berasal dari sumber di bawah dan diperiksa tim. Saloka, pemandu AI, hanya menjawab dari
         sumber ini.
       </p>
 

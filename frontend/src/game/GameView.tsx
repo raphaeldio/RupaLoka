@@ -365,6 +365,8 @@ export default function GameView({
               source={detail.sources[overlay.item.chunk]}
               onAsk={() => onAsk(`Ceritakan lebih lanjut tentang ${labelOr(overlay.item.name, 'item ini')}.`, overlay.item.lesson)}
               onContinue={resumeWithCountdown}
+              cityId={detail.city.id}
+              sources={detail.sources}
             />
           </div>
         )}

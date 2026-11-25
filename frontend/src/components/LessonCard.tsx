@@ -6,6 +6,7 @@ import { featureFlags } from '../lib/flags'
 import { formatClock, MIN_WATCH_SECONDS } from '../lib/watch'
 import { youtubeId } from '../lib/youtube'
 import LessonVideos, { type WatchProgress } from './LessonVideos'
+import FeedbackButton from './FeedbackButton'
 import LocationButton from './LocationButton'
 import { Button, Card, ContentText, SafeImage, SourceChip } from './primitives'
 
@@ -17,6 +18,7 @@ export default function LessonCard({
   onAsk,
   onFinish,
   finishLabel = 'Selesai',
+  cityId,
 }: {
   lesson: Lesson
   /** Teks kecil di atas judul, mis. "Titik 2 · Materi". */
@@ -26,6 +28,8 @@ export default function LessonCard({
   /** `watched` = syarat tonton terpenuhi (selalu true bila materi tanpa video). */
   onFinish: (watched: boolean) => void
   finishLabel?: string
+  /** Untuk tautan "Beri masukan" (tidak tampil bila kosong). */
+  cityId?: string
 }) {
   const hasVideo = lesson.videos.length > 0
   // Syarat tonton 3 menit hanya bila flag aktif (disembunyikan di MVP).
@@ -93,6 +97,11 @@ export default function LessonCard({
         <div className="mt-5">
           <LocationButton location={lesson.location} />
         </div>
+        {cityId && (
+          <div className="mt-3 flex justify-end">
+            <FeedbackButton target={{ cityId, id: lesson.id, title: labelOr(lesson.title, 'Materi budaya') }} />
+          </div>
+        )}
 
         {image && !image.license.includes('[PERLU DIISI]') && (
           <p className="mt-3 text-[11px] text-redup">Gambar: {image.license}</p>

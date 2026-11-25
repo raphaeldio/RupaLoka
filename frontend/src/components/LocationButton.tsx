@@ -1,20 +1,39 @@
-import type { Location } from '../lib/api.types'
+import type { Location, VisitLink } from '../lib/api.types'
 import { isPlaceholder } from '../lib/cities'
 import { coordsOf, googleDirections, osmDirections } from '../lib/mapLinks'
 
-/** "Lihat lokasi asli" (F-032, F-050): tautan arah bila koordinat ada, alamat sebagai cadangan. */
+const KIND_LABEL: Record<VisitLink['kind'], { label: string; icon: string }> = {
+  situs: { label: 'Situs resmi', icon: '🌐' },
+  sanggar: { label: 'Sanggar', icon: '🎶' },
+  perajin: { label: 'Perajin', icon: '🛠️' },
+  jadwal: { label: 'Jadwal pertunjukan', icon: '📅' },
+}
+const KIND_ORDER: VisitLink['kind'][] = ['situs', 'jadwal', 'sanggar', 'perajin']
+
+/** Hanya tautan http(s) yang sudah diperiksa tim budaya (verified_by) yang ditampilkan. */
+const visibleLinks = (location: Location): VisitLink[] =>
+  (location.links ?? [])
+    .filter((l) => /^https?:\/\//.test(l.url) && !isPlaceholder(l.label) && !isPlaceholder(l.verified_by))
+    .sort((a, b) => KIND_ORDER.indexOf(a.kind) - KIND_ORDER.indexOf(b.kind))
+
+/**
+ * "Kunjungi" (F-032, F-050; diperluas 25 Nov 2026): rute ke lokasi asli bila koordinat ada,
+ * alamat sebagai cadangan, ditambah tautan ke situs resmi, sanggar, perajin, dan jadwal
+ * pertunjukan agar pemain terhubung dengan komunitas pemilik budaya.
+ */
 export default function LocationButton({ location, compact = false }: { location: Location | null; compact?: boolean }) {
   if (!location) return null
   const coords = coordsOf(location)
   const name = isPlaceholder(location.name) ? null : location.name
   const address = isPlaceholder(location.address) ? null : location.address
-  if (!coords && !address) return null
+  const links = visibleLinks(location)
+  if (!coords && !address && links.length === 0) return null
 
   return (
     <div className={compact ? '' : 'rounded-2xl border border-garis bg-kertas p-4'}>
       {!compact && (
         <>
-          <p className="text-xs font-extrabold uppercase tracking-[1.4px] text-redup">Lokasi asli</p>
+          <p className="text-xs font-extrabold uppercase tracking-[1.4px] text-redup">Kunjungi</p>
           {name && <p className="mt-1 font-bold">{name}</p>}
           {address && <p className="text-sm text-redup">{address}</p>}
         </>
@@ -50,6 +69,25 @@ export default function LocationButton({ location, compact = false }: { location
         </div>
       ) : (
         <p className="mt-2 text-xs italic text-redup">Koordinat sedang diverifikasi.</p>
+      )}
+      {links.length > 0 && (
+        <ul className="mt-3 flex flex-wrap gap-2" aria-label={`Tautan komunitas${name ? ` ${name}` : ''}`}>
+          {links.map((l) => (
+            <li key={l.url}>
+              <a
+                href={l.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 rounded-full border border-teal/40 bg-white px-3 py-1.5 text-xs font-extrabold text-teal transition hover:bg-teal hover:text-white"
+              >
+                <span aria-hidden="true">{KIND_LABEL[l.kind].icon}</span>
+                <span className="sr-only">{KIND_LABEL[l.kind].label}: </span>
+                {l.label}
+                <span className="sr-only"> (tab baru)</span>
+              </a>
+            </li>
+          ))}
+        </ul>
       )}
     </div>
   )

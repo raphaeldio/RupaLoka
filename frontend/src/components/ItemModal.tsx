@@ -6,6 +6,7 @@ import { isPlaceholder, labelOr } from '../lib/cities'
 import { Pop } from './motion'
 import { Button, SafeImage, SourceChip } from './primitives'
 import ClickSpark from './reactbits/ClickSpark'
+import CultureCard from './CultureCard'
 
 /**
  * Item budaya terbuka (F-012, F-043): gambar, nama, penjelasan singkat bersumber,
@@ -20,6 +21,8 @@ export default function ItemModal({
   source,
   onAsk,
   onContinue,
+  cityId,
+  sources,
 }: {
   item: Item
   /** NPC yang ditemui di game dan menjelaskan item ini (opsional). */
@@ -30,6 +33,9 @@ export default function ItemModal({
   source: SourceRef | undefined
   onAsk: () => void
   onContinue: () => void
+  /** Bila ada: kartu budaya lengkap bisa dibuka di modal (tetap ringkas, terlipat). */
+  cityId?: string
+  sources?: Record<string, SourceRef>
 }) {
   const continueRef = useRef<HTMLButtonElement>(null)
   useEffect(() => continueRef.current?.focus(), [])
@@ -90,6 +96,14 @@ export default function ItemModal({
         <div className="mt-3">
           <SourceChip source={source} label="Sumber" />
         </div>
+        {cityId && sources && (
+          <details className="mt-3 rounded-2xl border border-garis p-3">
+            <summary className="cursor-pointer text-sm font-extrabold text-teal">Kartu budaya lengkap</summary>
+            <div className="mt-3">
+              <CultureCard item={item} cityId={cityId} sources={sources} compact />
+            </div>
+          </details>
+        )}
         <div className="mt-5 flex flex-wrap justify-between gap-2">
           <Button variant="secondary" onClick={onAsk}>
             Tanya lebih lanjut

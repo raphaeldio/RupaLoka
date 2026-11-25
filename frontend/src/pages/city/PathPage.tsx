@@ -10,7 +10,7 @@ import Magnet from '../../components/reactbits/Magnet'
 import ShinyText from '../../components/reactbits/ShinyText'
 import { Progress } from '../../components/ui/progress'
 import { Tooltip, TooltipContent, TooltipTrigger } from '../../components/ui/tooltip'
-import { questionsFor } from '../../flow/machine'
+import { questionsFor, quizCaps } from '../../flow/machine'
 import { useAgent } from '../../lib/agentStore'
 import type { CityDetail } from '../../lib/api.types'
 import { labelOr } from '../../lib/cities'
@@ -200,7 +200,11 @@ export default function PathPage() {
   const earned = earnedBadges(points, badges)
   const upcoming = nextBadge(points, badges)
   const doneCount = nodes.filter((n) => n.status === 'done').length
-  const max = maxPathPoints(lessonIds, detail.quiz.intro.length, detail.rewards)
+  const max = maxPathPoints(
+    lessonIds,
+    quizCaps(lessonIds, detail.quiz, detail.sources, detail.reflection?.length ?? 0),
+    detail.rewards,
+  )
 
   useEffect(() => {
     setContext({ phase: 'quiz_intro', lesson_id: null })
@@ -342,8 +346,14 @@ export default function PathPage() {
                 badges.length > 0 && <p className="mt-2 text-sm font-bold text-teal">Semua lencana kota ini sudah kamu dapat!</p>
               )}
               <p className="mt-3 text-xs text-redup">
-                +{detail.rewards.points_per_node} per titik selesai, +{detail.rewards.points_per_correct} per jawaban benar, +
-                {detail.rewards.game_node_points} saat menamatkan game, ditambah skor game terbaikmu.
+                +{detail.rewards.points_per_node} per titik selesai, +{detail.rewards.points_per_correct} per jawaban fakta
+                benar,{' '}
+                {detail.rewards.points_per_value > 0 && <>+{detail.rewards.points_per_value} per jawaban soal nilai benar, </>}
+                {(detail.reflection?.length ?? 0) > 0 && detail.rewards.points_per_reflection > 0 && (
+                  <>+{detail.rewards.points_per_reflection} untuk refleksi akhir tur, </>
+                )}
+                +{detail.rewards.game_node_points} saat menamatkan game, ditambah skor game terbaikmu (maks.{' '}
+                {detail.rewards.game_score_cap}).
                 {featureFlags.strict_node_requirements &&
                   ' Poin titik hanya didapat bila kuis dikerjakan dan video ditonton minimal 3 menit pertama.'}
               </p>

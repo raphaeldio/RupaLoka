@@ -12,13 +12,28 @@ type Msg =
 
 const MAX_LEN = 500
 
-/** Nama dan visual maskot belum final (T-005); sementara "Pemandu". */
-export const AGENT_NAME = 'Pemandu'
+/** Nama agen pemandu (diputuskan 25 Nov 2026). Visual maskot: T-005. */
+export const AGENT_NAME = 'Saloka'
 
 function Answer({ resp, onSuggest }: { resp: ChatResponse; onSuggest: (q: string) => void }) {
   const parts = splitAnswer(resp.answer, resp.citations)
+  const sourced = resp.grounded && resp.citations.length > 0
   return (
     <div>
+      {/* Transparansi (masukan juri, 25 Nov 2026): jawaban bebas dihasilkan AI dari sumber;
+          penolakan tidak memakai teks AI. */}
+      <p className="mb-1 flex flex-wrap items-center gap-1.5 text-[10px] font-extrabold uppercase tracking-wide">
+        {sourced ? (
+          <>
+            <span className="rounded-full bg-teal px-2 py-0.5 text-white">Dijawab AI</span>
+            <span className="text-teal">
+              {resp.citations.length} sumber
+            </span>
+          </>
+        ) : (
+          <span className="rounded-full bg-white/70 px-2 py-0.5 text-redup">Belum ada sumber yang cocok</span>
+        )}
+      </p>
       <p className="leading-relaxed">
         {parts.map((p, i) =>
           p.type === 'text' ? (
@@ -169,7 +184,7 @@ export default function AgentPanel({ cityId, onClose }: { cityId: string; onClos
         <Mascot mood={mood} className="size-10 shrink-0" />
         <div className="min-w-0 flex-1">
           <p className="font-extrabold text-teal">{AGENT_NAME}</p>
-          <p className="text-[11px] text-redup">Menjawab dari sumber terverifikasi saja</p>
+          <p className="text-[11px] text-redup">Asisten AI · menjawab hanya dari sumber terverifikasi</p>
         </div>
         {onClose && (
           <button
@@ -198,12 +213,21 @@ export default function AgentPanel({ cityId, onClose }: { cityId: string; onClos
             m.kind === 'notice' ? 'bg-amber-50 text-tinta' : m.kind === 'answer' && !m.resp.grounded ? 'bg-pasir/60' : 'bg-kertas'
           return (
             <div key={i} className={`mr-4 rounded-2xl rounded-bl-md px-3 py-2 ${tone}`}>
-              {m.kind === 'answer' ? <Answer resp={m.resp} onSuggest={(q) => void ask(q)} /> : <p>{m.text}</p>}
+              {m.kind === 'answer' ? (
+                <Answer resp={m.resp} onSuggest={(q) => void ask(q)} />
+              ) : m.kind === 'script' ? (
+                <>
+                  <p className="mb-1 text-[10px] font-extrabold uppercase tracking-wide text-redup">Pesan pemandu</p>
+                  <p>{m.text}</p>
+                </>
+              ) : (
+                <p>{m.text}</p>
+              )}
             </div>
           )
         })}
         {busy && (
-          <p className="mr-4 w-fit rounded-2xl bg-kertas px-3 py-2 text-redup" aria-label="Pemandu sedang mengetik">
+          <p className="mr-4 w-fit rounded-2xl bg-kertas px-3 py-2 text-redup" aria-label={`${AGENT_NAME} sedang mengetik`}>
             <span className="motion-safe:animate-pulse">…</span>
           </p>
         )}

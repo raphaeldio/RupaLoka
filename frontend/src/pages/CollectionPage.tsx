@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Card, ContentText, SafeImage, SourceChip } from '../components/primitives'
+import CultureCard from '../components/CultureCard'
 import BlurText from '../components/reactbits/BlurText'
 import TiltedCard from '../components/reactbits/TiltedCard'
 import { getCity } from '../lib/api'
@@ -91,6 +92,22 @@ export default function CollectionPage() {
                 )
               })}
             </ul>
+            {have.length > 0 && (
+              <div className="mt-4 grid gap-2" aria-label={`Kartu budaya ${d.city.name}`}>
+                {d.items
+                  .filter((item) => have.includes(item.id))
+                  .map((item) => (
+                    <details key={item.id} className="rounded-2xl border border-garis bg-white p-4">
+                      <summary className="cursor-pointer font-extrabold text-teal">
+                        Kartu budaya lengkap: {labelOr(item.name, 'Item budaya')}
+                      </summary>
+                      <div className="mt-3">
+                        <CultureCard item={item} cityId={d.city.id} sources={d.sources} />
+                      </div>
+                    </details>
+                  ))}
+              </div>
+            )}
             {have.length < d.items.length && (
               <Link to={`/kota/${d.city.id}`} className="mt-3 inline-block text-sm font-extrabold text-teal hover:underline">
                 Main di {d.city.name} untuk menemukan sisanya →

@@ -76,11 +76,15 @@ function NodePage() {
   const [state, dispatch] = useReducer(reducer, undefined, () => initialNode(questions.length, postQuestions.length))
 
   const [result, setResult] = useState<{ before: number; after: number; badges: Badge[]; complete: boolean } | null>(null)
+  // Poin jawaban benar per jenis soal (fakta / nilai) memakai hasil terbaik dari kuis awal dan akhir
+  // (cocok dengan quizCaps/maxPathPoints dan max_points backend).
   const preCorrect = quizScore(questions, state.answers)
   const postCorrect = quizScore(postQuestions, state.postAnswers)
-  // Poin jawaban benar memakai hasil terbaik dari kuis awal dan akhir, dibatasi jumlah soal titik ini
-  // (agar cocok dengan maxPathPoints yang menghitung soal kuis awal).
-  const correct = Math.min(Math.max(preCorrect, postCorrect), questions.length || postQuestions.length)
+  const correct = Math.max(quizScore(questions, state.answers, 'fakta'), quizScore(postQuestions, state.postAnswers, 'fakta'))
+  const valueCorrect = Math.max(
+    quizScore(questions, state.answers, 'nilai'),
+    quizScore(postQuestions, state.postAnswers, 'nilai'),
+  )
 
   useEffect(() => {
     if (!lesson) return
@@ -99,7 +103,7 @@ function NodePage() {
       setResult({ before, after: before, badges: [], complete })
       return
     }
-    completeNode(cityId, lesson.id, correct)
+    completeNode(cityId, lesson.id, correct, valueCorrect)
     const after = pathPoints(lessonIds, useProgress.getState().cities[cityId] ?? p, detail.rewards)
     const badges = newBadges(before, after, detail.rewards.badges)
     setResult({ before, after, badges, complete })
@@ -161,6 +165,7 @@ function NodePage() {
         onAsk={(q) => ask(q, lesson.id)}
         onFinish={(watched) => dispatch({ type: 'FINISH_LESSON', watched })}
         finishLabel={postQuestions.length > 0 ? 'Lanjut ke kuis akhir' : 'Selesaikan titik'}
+        cityId={cityId}
       />
     )
   } else if (result && !result.complete) {

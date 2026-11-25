@@ -42,7 +42,7 @@ export default function AboutPage() {
         </h2>
         <ul className="mt-2 list-disc space-y-1.5 pl-5 text-[15px]">
           <li>Fakta budaya ditulis dan diperiksa manusia, dengan sumber yang bisa kamu buka.</li>
-          <li>Pemandu AI menyertakan rujukan di setiap jawaban, atau mengaku tidak tahu.</li>
+          <li>Saloka (pemandu AI) menyertakan label "Dijawab AI" dan rujukan di setiap jawaban, atau mengaku tidak tahu.</li>
           <li>Objek budaya adalah hadiah dan koleksi, bukan rintangan yang ditabrak.</li>
           <li>Tanpa akun: progres dan koleksi tersimpan di perangkatmu saja.</li>
         </ul>

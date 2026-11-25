@@ -12,6 +12,8 @@ import type {
   CityDetail,
   CitySummary,
   LeaderboardResponse,
+  ReflectionRequest,
+  ReflectionResult,
   ScoreSubmit,
   SourcesResponse,
 } from './api.types'
@@ -91,6 +93,20 @@ export function submitScore(cityId: string, body: ScoreSubmit, signal?: AbortSig
  */
 export function postChat(body: ChatRequest, signal?: AbortSignal): Promise<ChatResponse> {
   return request('/api/chat', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+    signal,
+  })
+}
+
+/**
+ * Nilai jawaban refleksi akhir tur. Dicocokkan dengan kata kunci tim budaya; bila tidak cocok,
+ * AI hanya mengklasifikasi ke daftar nilai (`method: "ai"`). 404 soal tidak dikenal,
+ * 422 jawaban terlalu panjang/kosong, 429 terlalu sering. Jawaban tidak disimpan server.
+ */
+export function submitReflection(body: ReflectionRequest, signal?: AbortSignal): Promise<ReflectionResult> {
+  return request('/api/reflection', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
