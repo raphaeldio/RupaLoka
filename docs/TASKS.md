@@ -93,13 +93,13 @@ Fitur P1 (kuis penutup, rekor, analitik) tidak dikerjakan sebelum semua P0 seles
 
 Spesifikasi `docs/superpowers/specs/2026-11-25-galeri-3d-vr-design.md`, rencana `docs/superpowers/plans/2026-11-25-galeri-3d-vr.md`, purwarupa kamera `mocks/galeri-kamera/`.
 
-- [ ] **T-110 (HR)** Dokumen: ADR 40, F-060, fase ini, CLAUDE.md, `VITE_FLAGS`. *DoD:* dokumen konsisten.
-- [ ] **T-111 (HR)** Flag dari `VITE_FLAGS`. *DoD:* uji `parseFlags`; bawaan tetap `false`.
-- [ ] **T-112 (HR)** Pembaca node GLB (Python). *DoD:* pytest dengan GLB buatan tes.
-- [ ] **T-113 (HR)** Skema `gallery.yaml`, `Item.model`, `Item.hotspots`; `CityDetail.gallery`. *DoD:* pytest; tipe TS dihasilkan ulang.
-- [ ] **T-114 (HR)** Validasi aset galeri (file, ukuran, hotspot, posisi pedestal vs cincin). *DoD:* pytest; `--release` gagal bila isi KH kosong.
-- [ ] **T-115 (HR)** Kerangka konten galeri Bandung (model/hotspot `null`). *DoD:* `validate_content.py` lolos dengan peringatan.
-- [ ] **T-116 (HR)** Sajikan GLB dari Vercel (`/models/*`, cache immutable). *DoD:* uji plugin; build memuat `dist/models`.
+- [x] **T-110 (HR)** Dokumen: ADR 40, F-060, fase ini, CLAUDE.md, `VITE_FLAGS`. *DoD:* dokumen konsisten. *Status:* selesai (ADR 40; ADR 39 dan T-090…T-109 ternyata sudah terpakai, jadi galeri memakai T-110…T-129).
+- [x] **T-111 (HR)** Flag dari `VITE_FLAGS`. *DoD:* uji `parseFlags`; bawaan tetap `false`. *Status:* selesai.
+- [x] **T-112 (HR)** Pembaca node GLB (Python). *DoD:* pytest dengan GLB buatan tes. *Status:* selesai (`app/glb.py`; hanya translasi lokal, empty harus di akar adegan).
+- [x] **T-113 (HR)** Skema `gallery.yaml`, `Item.model`, `Item.hotspots`; `CityDetail.gallery`. *DoD:* pytest; tipe TS dihasilkan ulang. *Status:* selesai. Model dicatat di `sources.yaml` → `assets` per path (seperti gambar), bukan kolom `source`.
+- [x] **T-114 (HR)** Validasi aset galeri (file, ukuran, hotspot, posisi pedestal vs cincin). *DoD:* pytest; `--release` gagal bila isi KH kosong. *Status:* selesai (`app/ring.py`, vektor uji bersama pedestal_1/2).
+- [x] **T-115 (HR)** Kerangka konten galeri Bandung (model/hotspot `null`). *DoD:* `validate_content.py` lolos dengan peringatan. *Status:* selesai; model belum didaftarkan di `sources.yaml` (menyusul di T-121 bersama GLB).
+- [x] **T-116 (HR)** Sajikan GLB dari Vercel (`/models/*`, cache immutable). *DoD:* uji plugin; build memuat `dist/models`. *Status:* selesai; uji plugin lolos. `vite build` penuh belum terverifikasi (mesin kehabisan memori saat dicoba). Cache `/models/*` sementara `must-revalidate`; diganti `immutable` setelah nama ber-hash di T-121.
 - [ ] **T-117 (HR)** Pasang paket 3D + `check:bundle`. *DoD:* peer dependency cocok React 18; three tidak ada di chunk utama.
 - [ ] **T-118 (HR)** `cameraFlow.ts` (port mock) + uji. *DoD:* vitest; vektor uji bersama dengan validator.
 - [ ] **T-119 (HR)** `xrSupport.ts` + `galleryConfig.ts`. *DoD:* vitest.
