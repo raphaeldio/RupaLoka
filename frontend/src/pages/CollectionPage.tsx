@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Card, ContentText, SafeImage, SourceChip } from '../components/primitives'
+import { ContentText, SafeImage, SourceChip } from '../components/primitives'
 import CultureCard from '../components/CultureCard'
 import BlurText from '../components/reactbits/BlurText'
-import TiltedCard from '../components/reactbits/TiltedCard'
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from '../components/ui/dialog'
 import { getCity } from '../lib/api'
 import type { CityDetail } from '../lib/api.types'
 import { bundledCities, labelOr } from '../lib/cities'
@@ -15,6 +15,9 @@ export default function CollectionPage() {
   const [details, setDetails] = useState<CityDetail[]>([])
   const [failed, setFailed] = useState(false)
   const [loading, setLoading] = useState(true)
+  // Kartu budaya yang sedang dibuka (klik salah satu item koleksi).
+  const [open, setOpen] = useState<{ city: CityDetail; itemId: string } | null>(null)
+  const openItem = open?.city.items.find((i) => i.id === open.itemId) ?? null
 
   useEffect(() => {
     const ctrl = new AbortController()
@@ -58,56 +61,44 @@ export default function CollectionPage() {
                 {have.length}/{d.items.length}
               </p>
             </div>
-            <ul className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
+            <ul className="mt-3 grid grid-cols-2 gap-4 sm:grid-cols-3">
               {d.items.map((item) => {
                 const owned = have.includes(item.id)
+                const name = labelOr(item.name, 'Item budaya')
                 return (
-                  <li key={item.id}>
-                    <TiltedCard containerHeight="100%" containerWidth="100%" rotateAmplitude={owned ? 12 : 4} scaleOnHover={owned ? 1.05 : 1} glare={owned ? 0.35 : 0} radius={24}>
-                    <Card className="h-full p-3 sm:p-4">
-                      {owned ? (
-                        <>
-                          <SafeImage image={item.image} className="aspect-square w-full rounded-2xl" />
-                          <h3 className="mt-2 font-extrabold text-teal">{labelOr(item.name, 'Item budaya')}</h3>
-                          <p className="mt-1 text-xs leading-relaxed">
-                            <ContentText text={item.short_explanation} fallback="Penjelasan sedang disiapkan." />
-                          </p>
-                          <div className="mt-2">
-                            <SourceChip source={d.sources[item.chunk]} />
-                          </div>
-                        </>
-                      ) : (
-                        <div className="grid aspect-square place-items-center rounded-2xl bg-pasir/60 text-center">
+                  <li key={item.id} className="flex">
+                    {owned ? (
+                      <button
+                        type="button"
+                        onClick={() => setOpen({ city: d, itemId: item.id })}
+                        aria-haspopup="dialog"
+                        className="tekan kotak flex w-full flex-col p-3 text-left sm:p-4"
+                      >
+                        <SafeImage image={item.image} className="aspect-square w-full border-2 border-tinta" />
+                        <h3 className="mt-3 font-display text-lg font-bold leading-tight text-teal">{name}</h3>
+                        <p className="mt-1 line-clamp-3 text-xs leading-relaxed">
+                          <ContentText text={item.short_explanation} fallback="Penjelasan sedang disiapkan." />
+                        </p>
+                        <span className="eyebrow mt-auto flex items-center gap-1 pt-3 text-teal">
+                          Lihat kartu budaya <span aria-hidden="true">→</span>
+                        </span>
+                      </button>
+                    ) : (
+                      <div className="flex w-full flex-col border-2 border-dashed border-tinta/40 bg-white/60 p-3 sm:p-4">
+                        <div className="grid aspect-square place-items-center bg-pasir/60 text-center">
                           <div>
-                            <p className="text-3xl font-extrabold text-redup" aria-hidden="true">
+                            <p className="font-display text-4xl text-redup" aria-hidden="true">
                               ?
                             </p>
                             <p className="mt-1 text-xs font-bold text-redup">Belum ditemukan</p>
                           </div>
                         </div>
-                      )}
-                    </Card>
-                    </TiltedCard>
+                      </div>
+                    )}
                   </li>
                 )
               })}
             </ul>
-            {have.length > 0 && (
-              <div className="mt-4 grid gap-2" aria-label={`Kartu budaya ${d.city.name}`}>
-                {d.items
-                  .filter((item) => have.includes(item.id))
-                  .map((item) => (
-                    <details key={item.id} className="rounded-2xl border border-garis bg-white p-4">
-                      <summary className="cursor-pointer font-extrabold text-teal">
-                        Kartu budaya lengkap: {labelOr(item.name, 'Item budaya')}
-                      </summary>
-                      <div className="mt-3">
-                        <CultureCard item={item} cityId={d.city.id} sources={d.sources} />
-                      </div>
-                    </details>
-                  ))}
-              </div>
-            )}
             {have.length < d.items.length && (
               <Link to={`/kota/${d.city.id}`} className="mt-3 inline-block text-sm font-extrabold text-teal hover:underline">
                 Main di {d.city.name} untuk menemukan sisanya →
@@ -116,6 +107,33 @@ export default function CollectionPage() {
           </section>
         )
       })}
+
+      <Dialog open={!!openItem} onOpenChange={(v) => !v && setOpen(null)}>
+        {open && openItem && (
+          <DialogContent className="max-h-[90dvh] gap-0 overflow-y-auto border-2 border-tinta bg-white p-0 shadow-kartu sm:max-w-2xl">
+            <div className="grid gap-4 border-b-2 border-tinta bg-kertas p-5 sm:grid-cols-[160px_1fr] sm:p-6">
+              <SafeImage image={openItem.image} className="aspect-square w-32 border-2 border-tinta sm:w-full" />
+              <div className="min-w-0 pr-6">
+                <p className="eyebrow text-amber">Kartu budaya · {open.city.city.name}</p>
+                <DialogTitle className="mt-1 font-display text-3xl font-bold leading-tight text-teal">
+                  {labelOr(openItem.name, 'Item budaya')}
+                </DialogTitle>
+                <DialogDescription asChild>
+                  <p className="mt-2 text-sm leading-relaxed text-tinta">
+                    <ContentText text={openItem.short_explanation} fallback="Penjelasan sedang disiapkan." />
+                  </p>
+                </DialogDescription>
+                <div className="mt-3">
+                  <SourceChip source={open.city.sources[openItem.chunk]} label="Sumber" />
+                </div>
+              </div>
+            </div>
+            <div className="p-5 sm:p-6">
+              <CultureCard item={openItem} cityId={open.city.city.id} sources={open.city.sources} />
+            </div>
+          </DialogContent>
+        )}
+      </Dialog>
     </main>
   )
 }
