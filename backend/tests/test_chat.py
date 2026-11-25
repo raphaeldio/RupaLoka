@@ -80,7 +80,7 @@ def test_in_scope_answer_has_valid_citations(root: Path) -> None:
     }
     system, turns = llm.calls[0]
     assert "Jawab HANYA dari KONTEKS" in system
-    assert "Pemandu Rupaloka" in system
+    assert "Saloka" in system
     assert turns[-1].role == "user"
     assert "[materi-a-001] Zorblat dibuat dari kayu jati tua." in turns[-1].text
     assert f"<<<\n{IN_SCOPE}\n>>>" in turns[-1].text

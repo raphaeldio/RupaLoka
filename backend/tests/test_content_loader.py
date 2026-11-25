@@ -316,3 +316,51 @@ def test_video_belum_diperiksa_jadi_tertunda(make_content: Any) -> None:
         )
     )
     assert_pending(root, "videos[0]: isi video belum ditonton/diperiksa")
+
+
+# --- masukan juri 25 Nov 2026: kartu budaya, soal nilai, tautan kunjungi --------
+
+
+def _messages(root: Path) -> list[tuple[str, str]]:
+    return [(i.severity, i.message) for i in load_content(root).issues]
+
+
+def test_card_missing_is_pending_and_bad_chunk_is_error(make_content: Any) -> None:
+    def mutate(files: dict[str, Any]) -> None:
+        del files["kota-uji/items/item-a.yaml"]["card"]
+        card = files["kota-uji/items/item-b.yaml"]["card"]
+        card["fungsi"]["chunk"] = "tidak-ada"
+        card["validator"] = None
+        card["nilai"] = None
+
+    msgs = _messages(make_content(mutate))
+    assert ("pending", "card: kartu budaya belum disusun") in msgs
+    assert ("error", "card.fungsi: chunk 'tidak-ada' tidak ada di knowledge/") in msgs
+    assert ("pending", "card.validator: kartu belum divalidasi budayawan") in msgs
+    assert ("pending", "card.nilai: belum diisi") in msgs
+
+
+def test_value_question_required_per_node(make_content: Any) -> None:
+    def mutate(files: dict[str, Any]) -> None:
+        files["kota-uji/quiz.yaml"]["outro"][0]["kind"] = "fakta"
+
+    msgs = _messages(make_content(mutate))
+    assert ("pending", "titik path 'materi-a' belum punya soal nilai (kind: nilai)") in msgs
+    assert not any("materi-b' belum punya soal nilai" in m for _, m in msgs)
+
+
+def test_visit_links(make_content: Any) -> None:
+    def ok_link(files: dict[str, Any]) -> None:
+        files["kota-uji/lessons/materi-a.yaml"]["location"]["links"] = [
+            {"label": "Situs resmi", "url": "https://example.org", "kind": "situs"}
+        ]
+
+    msgs = _messages(make_content(ok_link))
+    assert ("pending", "location.links[0]: tautan belum diperiksa (verified_by)") in msgs
+
+    def bad_link(files: dict[str, Any]) -> None:
+        files["kota-uji/lessons/materi-a.yaml"]["location"]["links"] = [
+            {"label": "X", "url": "javascript:alert(1)", "kind": "situs", "verified_by": "A"}
+        ]
+
+    assert any(s == "error" and "http" in m for s, m in _messages(make_content(bad_link)))

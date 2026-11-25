@@ -97,13 +97,18 @@ class LeaderboardConfig(Strict):
 class Rewards(Strict):
     """Poin path belajar (titik = materi, titik terakhir = game) dan lencana.
 
-    Poin kota = titik materi selesai × points_per_node + jawaban kuis benar ×
-    points_per_correct + (game_node_points bila game sudah dimainkan sekali) +
+    Poin kota = titik materi selesai × points_per_node + jawaban fakta benar ×
+    points_per_correct + jawaban nilai benar × points_per_value + refleksi yang dikenali ×
+    points_per_reflection + (game_node_points bila game sudah dimainkan sekali) +
     skor game terbaik, dibatasi game_score_cap (agar batas papan peringkat tetap ada).
     """
 
     points_per_node: int = Field(default=100, ge=0)
     points_per_correct: int = Field(default=10, ge=0)
+    # Soal nilai (kind: nilai) dan refleksi akhir tur diberi poin lebih besar agar peringkat
+    # mencerminkan pemahaman, bukan kecepatan berlari (masukan juri, 25 Nov 2026).
+    points_per_value: int = Field(default=30, ge=0)
+    points_per_reflection: int = Field(default=50, ge=0)
     game_node_points: int = Field(default=100, ge=0)
     game_score_cap: int = Field(default=1000, ge=0)
     badges: list[Badge] = Field(default_factory=list)
@@ -161,8 +166,13 @@ class AgentScript(Strict):
 # --- content/<kota>/quiz.yaml ----------------------------------------------
 
 
+QuestionKind = Literal["fakta", "nilai"]
+
+
 class QuizQuestion(Strict):
     id: Id
+    # "nilai" = soal tentang nilai/makna budaya (bukan hafalan fakta); poinnya points_per_value.
+    kind: QuestionKind = "fakta"
     question: Text
     options: list[Text] = Field(min_length=2)
     correct: int = Field(ge=0)
@@ -225,11 +235,31 @@ class KeyFact(Strict):
     chunk: Id
 
 
+VisitKind = Literal["situs", "sanggar", "perajin", "jadwal"]
+
+
+class VisitLink(Strict):
+    """Tautan "Kunjungi": situs resmi, sanggar, perajin, atau jadwal pertunjukan komunitas."""
+
+    label: Text
+    url: Text
+    kind: VisitKind
+    note: str | None = None
+    verified_by: str | None = None  # nama KH yang memeriksa tautan; kosong = tertunda
+
+    @model_validator(mode="after")
+    def _http_only(self) -> VisitLink:
+        if not re.match(r"^https?://", self.url):
+            raise ValueError("url tautan kunjungi harus diawali http:// atau https://")
+        return self
+
+
 class Location(Strict):
     name: Text
     address: Text
     lat: Lat | None = None
     lng: Lng | None = None
+    links: list[VisitLink] = Field(default_factory=list)
 
 
 class Lesson(Strict):
@@ -244,6 +274,35 @@ class Lesson(Strict):
     tier: Tier = "free"
 
 
+class CardAspect(Strict):
+    """Satu bagian kartu budaya: teks ditulis tim budaya, bersumber pada chunk."""
+
+    text: Text
+    chunk: Id
+
+
+class Validator(Strict):
+    """Budayawan/anggota komunitas yang memvalidasi kartu budaya."""
+
+    name: Text
+    role: str | None = None
+    validated_at: date | None = None
+
+
+class CultureCard(Strict):
+    """Kartu budaya lengkap (masukan juri, 25 Nov 2026). Kosong = belum disusun (pending)."""
+
+    nilai: CardAspect | None = None
+    pengetahuan: CardAspect | None = None
+    ekspresi: CardAspect | None = None
+    fungsi: CardAspect | None = None
+    community: CardAspect | None = None  # mis. "ekspresi budaya tradisional masyarakat Sunda"
+    validator: Validator | None = None
+
+
+CARD_ASPECTS = ("nilai", "pengetahuan", "ekspresi", "fungsi", "community")
+
+
 class Item(Strict):
     id: Id
     name: Text
@@ -253,6 +312,42 @@ class Item(Strict):
     chunk: Id
     lesson: Id
     tier: Tier = "free"
+    card: CultureCard | None = None
+
+
+# --- content/<kota>/reflection.yaml (opsional) -----------------------------
+
+
+class ReflectionValue(Strict):
+    """Nilai yang diharapkan muncul di jawaban refleksi; kata kunci ditulis tim budaya."""
+
+    id: Id
+    label: Text
+    keywords: list[Text] = Field(default_factory=list)
+    explanation: CardAspect | None = None
+
+
+class ReflectionQuestion(Strict):
+    id: Id
+    lesson: Id | None = None
+    prompt: Text
+    values: list[ReflectionValue] = Field(default_factory=list)
+    feedback_match: Text
+    feedback_miss: Text
+
+    @model_validator(mode="after")
+    def _unique(self) -> ReflectionQuestion:
+        _no_duplicates([v.id for v in self.values], "values")
+        return self
+
+
+class ReflectionFile(Strict):
+    questions: list[ReflectionQuestion] = Field(default_factory=list)
+
+    @model_validator(mode="after")
+    def _unique(self) -> ReflectionFile:
+        _no_duplicates([q.id for q in self.questions], "reflection")
+        return self
 
 
 # --- content/<kota>/knowledge/*.yaml ---------------------------------------

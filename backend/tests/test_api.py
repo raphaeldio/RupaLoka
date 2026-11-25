@@ -56,15 +56,8 @@ def test_city_detail(client: TestClient) -> None:
 def test_city_detail_has_sources_but_no_chunk_text(client: TestClient) -> None:
     body = client.get("/api/content/cities/kota-uji").json()
     sources = body["sources"]
-    # Hanya chunk yang dirujuk kuis, fakta, atau item.
-    assert set(sources) == {
-        "materi-a-001",
-        "materi-b-001",
-        "materi-c-001",
-        "materi-a-002",
-        "materi-b-002",
-        "materi-c-002",
-    }
+    # Chunk yang dirujuk: kuis awal (-001), item (-002), kartu budaya (-003), kuis akhir (-004).
+    assert set(sources) == {f"materi-{x}-00{n}" for x in "abc" for n in (1, 2, 3, 4)}
     ref = sources["materi-a-001"]
     assert ref["chunk_id"] == "materi-a-001"
     assert ref["lesson_id"] == "materi-a"

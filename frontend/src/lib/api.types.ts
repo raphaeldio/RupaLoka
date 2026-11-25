@@ -25,6 +25,12 @@ export interface Badge {
   description: string
 }
 
+/** Satu bagian kartu budaya: teks ditulis tim budaya, bersumber pada chunk. */
+export interface CardAspect {
+  text: string
+  chunk: string
+}
+
 export interface ChatContext {
   phase?: "quiz_intro" | "lessons" | "game" | "summary" | null
   lesson_id?: string | null
@@ -71,6 +77,7 @@ export interface CityDetail {
   lessons: Lesson[]
   items: Item[]
   sources: Record<string, SourceRef>
+  reflection: ReflectionPrompt[]
 }
 
 /** Kartu kota (F-003). Hitungan hanya diisi untuk kota aktif. */
@@ -84,6 +91,16 @@ export interface CitySummary {
   summary: string | null
   lesson_count: number | null
   item_count: number | null
+}
+
+/** Kartu budaya lengkap (masukan juri, 25 Nov 2026). Kosong = belum disusun (pending). */
+export interface CultureCard {
+  nilai: CardAspect | null
+  pengetahuan: CardAspect | null
+  ekspresi: CardAspect | null
+  fungsi: CardAspect | null
+  community: CardAspect | null
+  validator: Validator | null
 }
 
 export interface GameConfig {
@@ -120,6 +137,7 @@ export interface Item {
   chunk: string
   lesson: string
   tier: "free" | "premium"
+  card: CultureCard | null
 }
 
 export interface KeyFact {
@@ -166,6 +184,14 @@ export interface Location {
   address: string
   lat: number | null
   lng: number | null
+  links: VisitLink[]
+}
+
+export interface MatchedValue {
+  id: string
+  label: string
+  explanation: string | null
+  chunk: string | null
 }
 
 export interface Quiz {
@@ -175,6 +201,7 @@ export interface Quiz {
 
 export interface QuizQuestion {
   id: string
+  kind: "fakta" | "nilai"
   question: string
   options: string[]
   correct: number
@@ -182,15 +209,37 @@ export interface QuizQuestion {
   chunk: string
 }
 
+/** Soal refleksi akhir tur untuk klien (tanpa kata kunci agar tidak bisa dicontek). */
+export interface ReflectionPrompt {
+  id: string
+  lesson: string | null
+  prompt: string
+}
+
+export interface ReflectionRequest {
+  city_id: string
+  question_id: string
+  answer: string
+}
+
+export interface ReflectionResult {
+  matched: MatchedValue[]
+  method: "keyword" | "ai" | "none"
+  feedback: string
+}
+
 /**
  * Poin path belajar (titik = materi, titik terakhir = game) dan lencana.
- * Poin kota = titik materi selesai × points_per_node + jawaban kuis benar ×
- * points_per_correct + (game_node_points bila game sudah dimainkan sekali) +
+ * Poin kota = titik materi selesai × points_per_node + jawaban fakta benar ×
+ * points_per_correct + jawaban nilai benar × points_per_value + refleksi yang dikenali ×
+ * points_per_reflection + (game_node_points bila game sudah dimainkan sekali) +
  * skor game terbaik, dibatasi game_score_cap (agar batas papan peringkat tetap ada).
  */
 export interface Rewards {
   points_per_node: number
   points_per_correct: number
+  points_per_value: number
+  points_per_reflection: number
   game_node_points: number
   game_score_cap: number
   badges: Badge[]
@@ -231,6 +280,13 @@ export interface Speed {
   ramp_per_100: number
 }
 
+/** Budayawan/anggota komunitas yang memvalidasi kartu budaya. */
+export interface Validator {
+  name: string
+  role: string | null
+  validated_at: string | null
+}
+
 /** Video YouTube pendukung materi (pengganti gambar materi, 21 Nov 2026). */
 export interface VideoRef {
   url: string
@@ -238,6 +294,15 @@ export interface VideoRef {
   channel: string
   note: string | null
   checked_by: string | null
+}
+
+/** Tautan "Kunjungi": situs resmi, sanggar, perajin, atau jadwal pertunjukan komunitas. */
+export interface VisitLink {
+  label: string
+  url: string
+  kind: "situs" | "sanggar" | "perajin" | "jadwal"
+  note: string | null
+  verified_by: string | null
 }
 
 export interface YourRank {

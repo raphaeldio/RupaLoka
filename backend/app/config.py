@@ -50,7 +50,7 @@ class Settings:
     trusted_proxy_hops: int = 0
     # Swagger /docs; matikan di produksi agar permukaan serangan kecil.
     enable_docs: bool = True
-    mascot_name: str = "Pemandu Rupaloka"  # [PERLU DIISI] nama maskot final
+    mascot_name: str = "Saloka"  # nama agen (masukan juri 25 Nov 2026)
 
     # Papan peringkat (data runtime di Supabase, SDD §16). Tanpa keduanya: simpanan memori
     # (hilang saat restart; hanya untuk pengembangan).
@@ -80,7 +80,7 @@ class Settings:
             global_rate_limit_per_min=int(env("GLOBAL_RATE_LIMIT_PER_MIN") or 120),
             trusted_proxy_hops=max(0, int(env("TRUSTED_PROXY_HOPS") or 0)),
             enable_docs=_bool(env("ENABLE_DOCS"), default=True),
-            mascot_name=_str(env("MASCOT_NAME")) or "Pemandu Rupaloka",
+            mascot_name=_str(env("MASCOT_NAME")) or "Saloka",
             supabase_url=_str(env("SUPABASE_URL")),
             supabase_service_role_key=_str(env("SUPABASE_SERVICE_ROLE_KEY")),
             leaderboard_rate_limit_per_min=int(env("LEADERBOARD_RATE_LIMIT_PER_MIN") or 10),

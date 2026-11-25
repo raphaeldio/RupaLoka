@@ -19,6 +19,7 @@ import yaml
 from pydantic import BaseModel, ValidationError
 
 from app.schemas import (
+    CARD_ASPECTS,
     AgentScript,
     Chunk,
     City,
@@ -27,6 +28,7 @@ from app.schemas import (
     Item,
     Lesson,
     Quiz,
+    ReflectionFile,
     SourcesFile,
 )
 
@@ -71,6 +73,7 @@ class CityContent:
     lessons: dict[str, Lesson]
     items: dict[str, Item]
     chunks: dict[str, Chunk]
+    reflection: ReflectionFile | None = None
 
 
 @dataclass
@@ -220,8 +223,12 @@ class _Loader:
         lessons = self._load_by_id(Lesson, city_dir / "lessons", config.lessons, "materi")
         items = self._load_by_id(Item, city_dir / "items", config.game.items_order, "item")
         chunks = self._load_chunks(city_dir / "knowledge")
+        reflection_path = city_dir / "reflection.yaml"
+        reflection = (
+            self._load_one(ReflectionFile, reflection_path) if reflection_path.is_file() else None
+        )
 
-        content = CityContent(config, agent_script, quiz, lessons, items, chunks)
+        content = CityContent(config, agent_script, quiz, lessons, items, chunks, reflection)
         self._check_city(city_dir, content, sources)
         return content
 
@@ -295,6 +302,18 @@ class _Loader:
             for lesson_id in c.config.lessons:
                 if lesson_id not in quiz_lessons:
                     self.pending(quiz_path, f"titik path '{lesson_id}' belum punya soal kuis")
+            # Kuis akhir tiap titik memuat minimal satu soal nilai (masukan juri, 25 Nov 2026).
+            post = c.quiz.outro or c.quiz.intro
+            value_lessons = {
+                c.chunks[q.chunk].lesson_id
+                for q in post
+                if q.kind == "nilai" and q.chunk in c.chunks
+            }
+            for lesson_id in c.config.lessons:
+                if lesson_id not in value_lessons:
+                    self.pending(
+                        quiz_path, f"titik path '{lesson_id}' belum punya soal nilai (kind: nilai)"
+                    )
             if len(c.quiz.intro) != QUIZ_INTRO_COUNT:
                 self.pending(
                     quiz_path,
@@ -319,6 +338,12 @@ class _Loader:
                 lesson.location.lat is None or lesson.location.lng is None
             ):
                 self.pending(path, "location: lat/lng belum diisi (tombol lokasi butuh koordinat)")
+            if lesson.location is not None:
+                for i, link in enumerate(lesson.location.links):
+                    if is_unfilled(link.verified_by):
+                        self.pending(
+                            path, f"location.links[{i}]: tautan belum diperiksa (verified_by)"
+                        )
             for i, image in enumerate(lesson.images):
                 self._check_image(path, f"images[{i}]", image, sources)
             for i, video in enumerate(lesson.videos):
@@ -340,6 +365,29 @@ class _Loader:
                     f"short_explanation {words} kata (maksimal {ITEM_EXPLANATION_MAX_WORDS})",
                 )
             self._check_image(path, "image", item.image, sources)
+            self._check_card(path, item, need_chunk)
+
+        # Refleksi akhir tur (opsional)
+        if c.reflection is not None:
+            ref_path = city_dir / "reflection.yaml"
+            for q in c.reflection.questions:
+                if q.lesson is not None and q.lesson not in lesson_ids:
+                    self.error(
+                        ref_path, f"refleksi '{q.id}': lesson '{q.lesson}' bukan materi kota ini"
+                    )
+                if not q.values:
+                    self.pending(ref_path, f"refleksi '{q.id}': daftar nilai (values) belum diisi")
+                for v in q.values:
+                    if not v.keywords:
+                        self.pending(ref_path, f"refleksi '{q.id}' nilai '{v.id}': keywords kosong")
+                    if v.explanation is None:
+                        self.pending(
+                            ref_path, f"refleksi '{q.id}' nilai '{v.id}': explanation belum diisi"
+                        )
+                    else:
+                        need_chunk(
+                            ref_path, f"refleksi '{q.id}' nilai '{v.id}'", v.explanation.chunk
+                        )
 
         # Rintangan (PRD §7)
         objects = {o.id: o for o in sources.objects} if sources else {}
@@ -358,6 +406,20 @@ class _Loader:
                 )
             elif is_unfilled(obj.approved_by):
                 self.pending(config_path, f"rintangan '{obstacle}' belum disetujui (approved_by)")
+
+    def _check_card(self, path: Path, item: Item, need_chunk: Any) -> None:
+        card = item.card
+        if card is None:
+            self.pending(path, "card: kartu budaya belum disusun")
+            return
+        for name in CARD_ASPECTS:
+            aspect = getattr(card, name)
+            if aspect is None:
+                self.pending(path, f"card.{name}: belum diisi")
+            else:
+                need_chunk(path, f"card.{name}", aspect.chunk)
+        if card.validator is None:
+            self.pending(path, "card.validator: kartu belum divalidasi budayawan")
 
     def _check_image(
         self, path: Path, where: str, image: ImageRef, sources: SourcesFile | None

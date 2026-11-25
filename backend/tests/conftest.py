@@ -100,7 +100,20 @@ def valid_content() -> dict[str, Any]:
                     "chunk": f"{LESSONS[n % 3]}-001",
                 }
                 for n in range(1, 6)
-            ]
+            ],
+            # Kuis akhir: satu soal nilai per titik.
+            "outro": [
+                {
+                    "id": f"n-{lesson_id}",
+                    "kind": "nilai",
+                    "question": "Nilai contoh apa yang tampak?",
+                    "options": ["A", "B"],
+                    "correct": 0,
+                    "explanation": "Penjelasan nilai contoh.",
+                    "chunk": f"{lesson_id}-004",
+                }
+                for lesson_id in LESSONS
+            ],
         },
     }
     for lesson_id in LESSONS:
@@ -123,6 +136,13 @@ def valid_content() -> dict[str, Any]:
             "image": _image(item_id),
             "chunk": f"{lesson_id}-002",
             "lesson": lesson_id,
+            "card": {
+                **{
+                    aspect: {"text": f"Isi {aspect} kartu contoh.", "chunk": f"{lesson_id}-003"}
+                    for aspect in ("nilai", "pengetahuan", "ekspresi", "fungsi", "community")
+                },
+                "validator": {"name": "Penguji", "role": "budayawan", "validated_at": "2026-11-25"},
+            },
         }
     return files
 

@@ -40,6 +40,14 @@ class SourceRef(Source):
     lesson_id: str  # materi asal chunk; dipakai untuk saran materi setelah kuis (F-022)
 
 
+class ReflectionPrompt(BaseModel):
+    """Soal refleksi akhir tur untuk klien (tanpa kata kunci agar tidak bisa dicontek)."""
+
+    id: str
+    lesson: str | None = None
+    prompt: str
+
+
 class CityDetail(BaseModel):
     city: City
     phases: list[Phase]
@@ -50,6 +58,7 @@ class CityDetail(BaseModel):
     lessons: list[Lesson]  # urut sesuai city.yaml
     items: list[Item]  # urut sesuai items_order
     sources: dict[str, SourceRef]  # chunk_id -> sumber, hanya chunk yang dirujuk konten
+    reflection: list[ReflectionPrompt] = []  # soal refleksi siap pakai (punya daftar nilai)
 
 
 class SourcesResponse(BaseModel):
