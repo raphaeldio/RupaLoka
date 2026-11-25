@@ -303,6 +303,33 @@ class CultureCard(Strict):
 CARD_ASPECTS = ("nilai", "pengetahuan", "ekspresi", "fungsi", "community")
 
 
+class AccuracyCheck(Strict):
+    """Pemeriksaan bentuk model 3D buatan tim oleh anggota budaya (KH)."""
+
+    by: Text
+    checked_at: date
+
+
+class ItemModel(Strict):
+    """Model 3D objek untuk galeri (SDD ADR 40). Berkas dicatat di sources.yaml → assets."""
+
+    src: Text  # relatif terhadap content/, mis. assets/models/angklung.glb
+    poster: Text | None = None  # gambar cadangan bila 3D gagal; kosong = item.image
+    accuracy_check: AccuracyCheck | None = None
+
+
+class Hotspot(Strict):
+    """Titik penjelasan pada model; posisinya dari node `hotspot_<id>` di GLB.
+
+    Teks dan chunk DIISI TIM BUDAYA; kosong = tidak ditampilkan (pending).
+    """
+
+    id: Id
+    label: Text
+    text: Text | None = None
+    chunk: Id | None = None
+
+
 class Item(Strict):
     id: Id
     name: Text
@@ -313,6 +340,53 @@ class Item(Strict):
     lesson: Id
     tier: Tier = "free"
     card: CultureCard | None = None
+    model: ItemModel | None = None
+    hotspots: list[Hotspot] = Field(default_factory=list)
+
+    @model_validator(mode="after")
+    def _hotspot_ids_unique(self) -> Item:
+        _no_duplicates([h.id for h in self.hotspots], "hotspots")
+        return self
+
+
+# --- content/<kota>/gallery.yaml (opsional; galeri 3D, SDD ADR 40) ----------
+
+
+class GalleryRoom(Strict):
+    model: Text  # GLB lorong melingkar, relatif terhadap content/
+
+
+class GalleryLayout(Strict):
+    """Parameter lorong cincin; dibaca sama oleh frontend (cameraFlow.ts) dan validator."""
+
+    radius: float = Field(default=6.0, ge=6.0)  # jari-jari garis tengah lorong (m)
+    slots: int = Field(default=12, ge=1)  # jumlah pedestal di keliling
+    first_d: float = Field(default=3.0, ge=0.0)  # jarak pedestal pertama dari titik awal (m)
+
+
+class GalleryExhibit(Strict):
+    item: Id
+
+
+class KhApproval(Strict):
+    name: Text
+    approved_at: date
+
+
+class GalleryFile(Strict):
+    room: GalleryRoom
+    layout: GalleryLayout = Field(default_factory=GalleryLayout)
+    exhibits: list[GalleryExhibit] = Field(min_length=1)  # urutan = pedestal_1, pedestal_2, ...
+    approved_by_kh: KhApproval | None = None
+
+    @model_validator(mode="after")
+    def _check(self) -> GalleryFile:
+        _no_duplicates([e.item for e in self.exhibits], "exhibits")
+        if len(self.exhibits) > self.layout.slots:
+            raise ValueError(
+                f"{len(self.exhibits)} exhibits melebihi layout.slots ({self.layout.slots})"
+            )
+        return self
 
 
 # --- content/<kota>/reflection.yaml (opsional) -----------------------------

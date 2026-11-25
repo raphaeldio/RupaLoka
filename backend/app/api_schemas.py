@@ -10,6 +10,7 @@ from app.schemas import (
     AgentScript,
     AssetEntry,
     City,
+    GalleryFile,
     GameConfig,
     Item,
     Lesson,
@@ -59,6 +60,7 @@ class CityDetail(BaseModel):
     items: list[Item]  # urut sesuai items_order
     sources: dict[str, SourceRef]  # chunk_id -> sumber, hanya chunk yang dirujuk konten
     reflection: list[ReflectionPrompt] = []  # soal refleksi siap pakai (punya daftar nilai)
+    gallery: GalleryFile | None = None  # galeri 3D (ADR 40); klien menampilkan bila flag aktif
 
 
 class SourcesResponse(BaseModel):

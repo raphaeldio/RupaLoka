@@ -311,6 +311,7 @@ def _city_detail(city: City, cc: CityContent) -> CityDetail:
     referenced = {q.chunk for q in cc.quiz.intro + cc.quiz.outro}
     referenced |= {f.chunk for lesson in cc.lessons.values() for f in lesson.key_facts}
     referenced |= {item.chunk for item in cc.items.values()}
+    referenced |= {h.chunk for item in cc.items.values() for h in item.hotspots if h.chunk}
     for item in cc.items.values():
         if item.card is not None:
             for name in CARD_ASPECTS:
@@ -345,6 +346,7 @@ def _city_detail(city: City, cc: CityContent) -> CityDetail:
             ReflectionPrompt(id=q.id, lesson=q.lesson, prompt=q.prompt)
             for q in reflection_questions(cc)
         ],
+        gallery=cc.gallery,
     )
 
 

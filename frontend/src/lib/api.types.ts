@@ -1,6 +1,12 @@
 // Dibuat otomatis oleh backend/scripts/gen_ts_types.py dari skema API. JANGAN disunting manual.
 // Regenerasi setelah mengubah backend/app/*schemas*.py: python scripts/gen_ts_types.py
 
+/** Pemeriksaan bentuk model 3D buatan tim oleh anggota budaya (KH). */
+export interface AccuracyCheck {
+  by: string
+  checked_at: string
+}
+
 export interface AgentScript {
   quiz_intro: string
   lessons_start: string
@@ -78,6 +84,7 @@ export interface CityDetail {
   items: Item[]
   sources: Record<string, SourceRef>
   reflection: ReflectionPrompt[]
+  gallery: GalleryFile | null
 }
 
 /** Kartu kota (F-003). Hitungan hanya diisi untuk kota aktif. */
@@ -103,6 +110,28 @@ export interface CultureCard {
   validator: Validator | null
 }
 
+export interface GalleryExhibit {
+  item: string
+}
+
+export interface GalleryFile {
+  room: GalleryRoom
+  layout: GalleryLayout
+  exhibits: GalleryExhibit[]
+  approved_by_kh: KhApproval | null
+}
+
+/** Parameter lorong cincin; dibaca sama oleh frontend (cameraFlow.ts) dan validator. */
+export interface GalleryLayout {
+  radius: number
+  slots: number
+  first_d: number
+}
+
+export interface GalleryRoom {
+  model: string
+}
+
 export interface GameConfig {
   unlock_every: number
   items_order: string[]
@@ -122,6 +151,17 @@ export interface HistoryTurn {
   content: string
 }
 
+/**
+ * Titik penjelasan pada model; posisinya dari node `hotspot_<id>` di GLB.
+ * Teks dan chunk DIISI TIM BUDAYA; kosong = tidak ditampilkan (pending).
+ */
+export interface Hotspot {
+  id: string
+  label: string
+  text: string | null
+  chunk: string | null
+}
+
 export interface ImageRef {
   src: string
   alt: string
@@ -138,11 +178,25 @@ export interface Item {
   lesson: string
   tier: "free" | "premium"
   card: CultureCard | null
+  model: ItemModel | null
+  hotspots: Hotspot[]
+}
+
+/** Model 3D objek untuk galeri (SDD ADR 40). Berkas dicatat di sources.yaml → assets. */
+export interface ItemModel {
+  src: string
+  poster: string | null
+  accuracy_check: AccuracyCheck | null
 }
 
 export interface KeyFact {
   text: string
   chunk: string
+}
+
+export interface KhApproval {
+  name: string
+  approved_at: string
 }
 
 /** Papan peringkat akhir tur kota (diputuskan tim 21 Nov 2026). Skor = total poin path. */

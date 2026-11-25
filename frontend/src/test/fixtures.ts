@@ -82,8 +82,11 @@ export const detailFixture: CityDetail = {
       lesson: 'a',
       tier: 'free',
       card: null,
+      model: null,
+      hotspots: [],
     },
   ],
   sources: { 'a-001': ref('a-001', 'a'), 'b-001': ref('b-001', 'b') },
   reflection: [],
+  gallery: null,
 }

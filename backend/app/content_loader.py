@@ -18,12 +18,15 @@ from typing import Any, Literal, TypeVar
 import yaml
 from pydantic import BaseModel, ValidationError
 
+from app.glb import GlbError, read_nodes_file
+from app.ring import ring_point
 from app.schemas import (
     CARD_ASPECTS,
     AgentScript,
     Chunk,
     City,
     CityConfig,
+    GalleryFile,
     ImageRef,
     Item,
     Lesson,
@@ -41,6 +44,13 @@ LESSON_COUNT_RANGE = (3, 5)  # titik path materi; titik game ditambah otomatis
 MIN_CHUNKS_PER_LESSON = 8
 NARRATIVE_WORDS = (100, 200)
 ITEM_EXPLANATION_MAX_WORDS = 60
+
+# Galeri 3D (SDD ADR 40): batas ukuran GLB dan toleransi posisi pedestal.
+MB = 1024 * 1024
+MAX_OBJECT_MODEL_BYTES = 3 * MB
+MAX_ROOM_MODEL_BYTES = 8 * MB
+MAX_GALLERY_BYTES = 15 * MB
+PEDESTAL_TOLERANCE_M = 0.1
 
 _BRACKET_PLACEHOLDER = re.compile(r"\[[^\]]*\]")
 
@@ -74,6 +84,7 @@ class CityContent:
     items: dict[str, Item]
     chunks: dict[str, Chunk]
     reflection: ReflectionFile | None = None
+    gallery: GalleryFile | None = None
 
 
 @dataclass
@@ -228,7 +239,12 @@ class _Loader:
             self._load_one(ReflectionFile, reflection_path) if reflection_path.is_file() else None
         )
 
-        content = CityContent(config, agent_script, quiz, lessons, items, chunks, reflection)
+        gallery_path = city_dir / "gallery.yaml"
+        gallery = self._load_one(GalleryFile, gallery_path) if gallery_path.is_file() else None
+
+        content = CityContent(
+            config, agent_script, quiz, lessons, items, chunks, reflection, gallery
+        )
         self._check_city(city_dir, content, sources)
         return content
 
@@ -366,6 +382,15 @@ class _Loader:
                 )
             self._check_image(path, "image", item.image, sources)
             self._check_card(path, item, need_chunk)
+            if item.hotspots and item.model is None:
+                self.error(path, "hotspots butuh model 3D (model.src)")
+            for h in item.hotspots:
+                if h.chunk is not None:
+                    need_chunk(path, f"hotspot '{h.id}'", h.chunk)
+
+        # Galeri 3D (opsional)
+        if c.gallery is not None:
+            self._check_gallery(city_dir, c, sources)
 
         # Refleksi akhir tur (opsional)
         if c.reflection is not None:
@@ -406,6 +431,100 @@ class _Loader:
                 )
             elif is_unfilled(obj.approved_by):
                 self.pending(config_path, f"rintangan '{obstacle}' belum disetujui (approved_by)")
+
+    def _check_gallery(self, city_dir: Path, c: CityContent, sources: SourcesFile | None) -> None:
+        assert c.gallery is not None
+        g = c.gallery
+        gallery_path = city_dir / "gallery.yaml"
+        registered = {a.path for a in sources.assets} if sources else set()
+        if g.approved_by_kh is None:
+            self.pending(gallery_path, "approved_by_kh: isi galeri belum disetujui anggota budaya")
+
+        room_nodes = self._check_model_file(
+            gallery_path, "room.model", g.room.model, MAX_ROOM_MODEL_BYTES, registered
+        )
+        total = self._size(g.room.model)
+        if room_nodes is not None:
+            self._check_pedestals(gallery_path, c, room_nodes)
+
+        for i, exhibit in enumerate(g.exhibits):
+            item = c.items.get(exhibit.item)
+            if item is None:
+                self.error(
+                    gallery_path, f"exhibits[{i}]: item '{exhibit.item}' tidak ada di items/"
+                )
+                continue
+            path = city_dir / "items" / f"{item.id}.yaml"
+            if item.model is None:
+                self.pending(path, "model 3D belum ada (model.src) untuk galeri")
+                continue
+            if item.model.accuracy_check is None:
+                self.pending(path, "model.accuracy_check: bentuk model belum diperiksa KH")
+            if item.model.poster is not None and not (self.root / item.model.poster).is_file():
+                self.pending(path, f"model.poster: berkas '{item.model.poster}' belum ada")
+            for h in item.hotspots:
+                if h.text is None or h.chunk is None:
+                    self.pending(path, f"hotspot '{h.id}': teks belum diisi (text/chunk)")
+            nodes = self._check_model_file(
+                path, "model.src", item.model.src, MAX_OBJECT_MODEL_BYTES, registered
+            )
+            total += self._size(item.model.src)
+            if nodes is not None:
+                for h in item.hotspots:
+                    if f"hotspot_{h.id}" not in nodes:
+                        self.error(
+                            path, f"hotspot '{h.id}': node 'hotspot_{h.id}' tidak ada di GLB"
+                        )
+
+        if total > MAX_GALLERY_BYTES:
+            self.error(
+                gallery_path,
+                f"total model galeri {total / MB:.1f} MB melebihi {MAX_GALLERY_BYTES // MB} MB",
+            )
+
+    def _size(self, rel: str) -> int:
+        f = self.root / rel
+        return f.stat().st_size if f.is_file() else 0
+
+    def _check_model_file(
+        self, path: Path, where: str, rel: str, max_bytes: int, registered: set[str]
+    ) -> dict[str, tuple[float, float, float]] | None:
+        """Periksa satu GLB; kembalikan node-nya bila berkas ada dan terbaca."""
+        if rel not in registered:
+            self.pending(path, f"{where}: '{rel}' belum tercatat di sources.yaml (assets)")
+        f = self.root / rel
+        if not f.is_file():
+            self.pending(path, f"{where}: berkas model '{rel}' belum ada")
+            return None
+        size = f.stat().st_size
+        if size > max_bytes:
+            self.error(
+                path, f"{where}: '{rel}' {size / MB:.1f} MB melebihi batas {max_bytes // MB} MB"
+            )
+        try:
+            return read_nodes_file(f)
+        except GlbError as exc:
+            self.error(path, f"{where}: '{rel}' tidak terbaca: {exc}")
+            return None
+
+    def _check_pedestals(
+        self, path: Path, c: CityContent, nodes: dict[str, tuple[float, float, float]]
+    ) -> None:
+        assert c.gallery is not None
+        layout = c.gallery.layout
+        for i in range(layout.slots):
+            name = f"pedestal_{i + 1}"
+            if name not in nodes:
+                self.error(path, f"room.model: node '{name}' tidak ada di GLB ruangan")
+                continue
+            x, _, z = nodes[name]
+            ex, ez = ring_point(layout, i)
+            if abs(x - ex) > PEDESTAL_TOLERANCE_M or abs(z - ez) > PEDESTAL_TOLERANCE_M:
+                self.error(
+                    path,
+                    f"room.model: {name} di ({x:.2f}, {z:.2f}), "
+                    f"seharusnya ({ex:.2f}, {ez:.2f}) sesuai layout",
+                )
 
     def _check_card(self, path: Path, item: Item, need_chunk: Any) -> None:
         card = item.card
