@@ -42,19 +42,55 @@
 | `gallery/GalleryPage.tsx` | Gerbang flag, deteksi mode, tombol "Masuk VR", overlay HTML (progres, panel hotspot layar) | `featureFlags`, `xrSupport`, `galleryConfig` |
 | `gallery/xrSupport.ts` | **Murni, diuji.** Masukan: ketersediaan WebGL, `navigator.xr.isSessionSupported('immersive-vr')`, UA. Keluaran: `'vr' \| 'cardboard' \| 'touch' \| 'desktop' \| 'no-webgl'` | — |
 | `gallery/galleryConfig.ts` | **Murni, diuji.** Menggabungkan `gallery.yaml` dengan item; hotspot yang `text`-nya `null` disaring; galat bila id item tidak dikenal | content loader |
-| `gallery/GalleryScene.tsx` | Satu `<Canvas><XR>`: ruangan GLB, pedestal, `TeleportTarget` di lantai, `XROrigin` | `galleryConfig` |
-| `gallery/Exhibit.tsx` | Satu objek di pedestal_N; klik, ketuk, tatap atau grab membuka Inspector; `ErrorBoundary` per objek | data item |
-| `gallery/Inspector.tsx` | Objek di tengah pandangan, diputar (orbit di layar, grab di VR), penanda hotspot di posisi empty `hotspot_<id>` | `hotspots` |
+| `gallery/cameraFlow.ts` | **Murni, diuji.** Jalur cincin (posisi, arah maju, normal kanan per jarak `d`), state kamera, reducer transisi, pose per state (§2.1) | — |
+| `gallery/GalleryScene.tsx` | Satu `<Canvas><XR>`: ruangan GLB berbentuk cincin, pedestal, rig kamera (mode layar), `TeleportTarget` di lantai + `XROrigin` (VR) | `galleryConfig`, `cameraFlow` |
+| `gallery/Exhibit.tsx` | Satu objek di `pedestal_N`; klik, ketuk, tatap atau grab membuka Inspector; `ErrorBoundary` per objek | data item |
+| `gallery/Inspector.tsx` | Objek di tengah pandangan, diputar (geser di layar, grab di VR), penanda hotspot di posisi empty `hotspot_<id>` | `hotspots` |
 | `gallery/HotspotPanel.tsx` | Teks hotspot bersumber + "Tanya Saloka". Di layar memakai DOM, di VR memakai panel 3D (teks biasa) | item, chatbot yang ada |
+
+### 2.1 Tata ruang dan alur kamera (keputusan 25 Nov 2026)
+
+Dicoba di mock `mocks/galeri-kamera/` (tombol "Melingkar"). Pola interaksi "klik untuk mendekat, Esc untuk mundur, Galeri/Daftar" terinspirasi shutabug.com. Tata ruang dan tampilannya milik Rupaloka (prinsip 5).
+
+**Tata ruang: lorong melingkar tanpa ujung.**
+- Lorong selebar 5,2 m berbentuk cincin dengan jari-jari garis tengah ±6 m.
+- Pedestal berdiri bergantian di **dinding dalam** (kiri) dan **dinding luar** (kanan) dari arah jalan, 0,7 m dari dinding.
+- Jumlah slot = `max(jumlah objek, 12)` dan jari-jari = `max(6 m, slot × 3,1 m / 2π)`. Batas bawah 6 m menjaga lengkung dinding dalam tidak terlalu tajam (jari-jari dinding dalam ≥3,4 m).
+- Slot tanpa objek menampilkan pedestal "Segera hadir" yang tidak bisa diklik.
+
+**State kamera (mode layar):**
+
+| State | Pose kamera | Masuk dari |
+|---|---|---|
+| `intro` | 4 m di belakang titik awal, setinggi mata +0,3 m | muat halaman |
+| `walk(d)` | Di garis tengah lorong pada jarak `d`, menatap titik lorong 3 m di depan (pandangan ikut melengkung) | intro selesai (0,9 dtk), mundur dari `focus` |
+| `focus(i)` | Menoleh ke sisi objek, 2,1 m di depannya, menatap objek | klik/ketuk objek, pilih dari Daftar, ← → saat fokus |
+| `inspect(i)` | 1,3 m di depan objek; geser memutar objek (bukan kamera) | klik objek yang sedang difokus, Enter |
+
+**Transisi:**
+- **Maju/mundur:** scroll, geser layar ke atas/bawah, atau tombol/panah ↑ ↓. Nilai `d` berputar (modulo keliling), jadi tidak ada ujung.
+- **Langkah ↑ ↓ saat berjalan:** berdiri 2,4 m sebelum objek berikutnya.
+- **Esc, klik area kosong, atau tombol "Mundur":** `inspect` → `focus` → `walk`. Saat kembali ke `walk`, kamera berdiri 2,4 m sebelum objek tadi.
+- **Scroll saat `focus`:** langsung kembali berjalan.
+- **← → saat `focus`:** pindah ke objek asli berikutnya, melewati slot kosong.
+- Drag yang bergeser >6 px tidak dihitung sebagai klik.
+
+**Label bawah:** "Kamu sedang melewati / Di depanmu / Memeriksa" + nama objek. Objek "dilewati" = objek terdekat dengan titik 2,4 m di depan kamera.
+
+**Gerak:**
+- Kamera meluruh menuju pose (peluruhan eksponensial; λ = 6 saat berjalan, 3,2 saat menoleh), tidak bergantung frame rate.
+- `prefers-reduced-motion` (atau toggle): kamera langsung melompat ke pose tujuan, ditutup kedipan pudar 0,18 dtk.
+
+**Layar tegak:** FOV vertikal 55° → hingga 77°, kamera mundur ±0,6 m saat fokus, dan saat berjalan kamera sedikit melirik ke sisi objek terdekat. Tanpa ini, objek di samping berada di luar FOV horizontal ±21° di layar 360 px.
 
 **Kontrol per mode** (satu scene, yang berganti hanya lapisan input):
 
 | Mode | Berpindah | Memilih/inspeksi |
 |---|---|---|
-| desktop | Klik pedestal (kamera berpindah) | Klik objek; drag untuk orbit; scroll untuk zoom |
-| touch | Ketuk pedestal | Ketuk objek; geser untuk orbit; cubit untuk zoom |
-| vr (Quest) | Teleport (`teleportPointer` kontroler + tangan) | Ray atau grab untuk mengambil dan memutar objek |
-| cardboard | Titik teleport tetap, dipilih dengan tatapan | Tatap 2 dtk (`gaze`) |
+| desktop | Scroll / ↑ ↓ / drag vertikal, menyusuri cincin | Klik objek (fokus → periksa); drag horizontal memutar objek; Esc mundur |
+| touch | Geser ke atas/bawah, tombol ↑ ↓ | Ketuk objek; geser memutar objek; tombol "Mundur" |
+| vr (Quest) | Teleport di lantai cincin (`teleportPointer` kontroler + tangan); kamera = kepala pengguna, tanpa rig | Ray atau grab untuk mengambil dan memutar objek |
+| cardboard | Titik teleport tetap di depan tiap pedestal, dipilih dengan tatapan | Tatap 2 dtk (`gaze`) |
 | no-webgl | — | Grid kartu 2D: `poster` + hotspot sebagai daftar teks |
 
 ## 3. Konten dan alur Blender
@@ -63,7 +99,7 @@
 
 ```yaml
 room:
-  model: assets/models/galeri-bandung.glb   # cahaya sudah di-bake
+  model: assets/models/galeri-bandung.glb   # lorong cincin (§2.1), cahaya sudah di-bake
   source: src-model-galeri                  # id di sources.yaml
 exhibits:                                   # urutan = pedestal_1, pedestal_2, ...
   - item: item-angklung
@@ -96,14 +132,14 @@ Aturannya:
 
 - File GLB yang dirujuk ada. Ukurannya ≤3 MB per objek dan ≤8 MB untuk ruangan.
 - `source` terdaftar di `sources.yaml`.
-- Tiap `hotspots[].id` punya node `hotspot_<id>` di GLB, dan `len(exhibits)` ≤ jumlah node `pedestal_N` di GLB ruangan. Nama node dibaca dari chunk JSON GLB, tanpa dependensi 3D.
+- Tiap `hotspots[].id` punya node `hotspot_<id>` di GLB, dan `len(exhibits)` ≤ jumlah node `pedestal_N` di GLB ruangan. Posisi tiap `pedestal_N` berada dalam 0,1 m dari posisi yang dihitung jalur cincin (§2.1). Nama node dibaca dari chunk JSON GLB, tanpa dependensi 3D.
 - Pydantic: `Item.model` dan `Item.hotspots` opsional. Skema galeri baru; `gen_ts_types.py` dijalankan ulang.
 - `--release` gagal bila ada `text`, `chunk`, `accuracy_check` atau `approved_by_kh` yang masih `null`.
 
 ### 3.4 Alur Blender (lewat connector)
 
 1. Modelkan objek dengan anggaran ±20–50 rb segitiga dan ruangan ±50 rb, berskala meter, dengan origin di dasar objek.
-2. Tempatkan empty `hotspot_<id>` (objek) dan `pedestal_N` (ruangan). Mesh statis ruangan digabung agar draw call rendah.
+2. Ruangan = lorong cincin sesuai §2.1 (dinding dalam dan luar, lantai, langit-langit). Tempatkan empty `hotspot_<id>` (objek) dan `pedestal_N` (ruangan, bergantian dalam/luar searah jalan, sumbu +Z lokal menghadap tengah lorong). Jari-jari dan jumlah slot cincin harus sama dengan nilai di `cameraFlow.ts`; validator membandingkan posisi `pedestal_N` dengan jalur. Mesh statis ruangan digabung agar draw call rendah.
 3. Bake cahaya ruangan ke lightmap. Objek memakai PBR sederhana (base color, normal, ORM), tekstur ≤1024 px, dan material sesedikit mungkin.
 4. Isi `asset.copyright` "© tim KamiPemenang", lalu ekspor GLB ke `blender/export/`. File `.blend` disimpan di `blender/src/` (Git LFS bila besar), **tidak** di folder yang disajikan.
 5. `frontend/scripts/optimize_models.mjs` (gltf-transform) melakukan kompresi Meshopt dan tekstur WebP (KTX2 hanya bila pengukuran memori GPU menuntutnya, lihat §5). Keluarannya ke `content/assets/models/` dengan nama ber-hash.
@@ -162,6 +198,7 @@ Semua angka di bawah adalah **target**. Laporannya hanya diambil dari hasil ukur
 
 - **vitest:**
   - `xrSupport`: tiap kombinasi WebGL/XR/UA menghasilkan mode yang benar.
+  - `cameraFlow`: jalur cincin (titik awal, arah maju, normal kanan, keliling), pembungkusan `d`, transisi `walk`/`focus`/`inspect`/`back`, langkah melewati slot kosong, objek "dilewati", pose fokus berada di dalam lorong.
   - `galleryConfig`: penggabungan, penyaringan hotspot `null`, galat id tak dikenal.
   - `GalleryPage`: gerbang flag (mati → kartu premium; hidup → memuat scene tiruan).
   - `flags`: parsing `VITE_FLAGS`.
