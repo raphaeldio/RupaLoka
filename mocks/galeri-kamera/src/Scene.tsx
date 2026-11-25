@@ -65,47 +65,6 @@ function CameraRig({ state, layout, reducedMotion }: Pick<SceneProps, 'state' | 
   return null
 }
 
-/** Lorong lurus: dua dinding samping, lantai, langit-langit, dinding ujung. */
-function StraightRoom({ layout }: { layout: Layout }) {
-  const L = layout.length + 6 // ruang 6 m di belakang titik awal (pintu masuk)
-  const zc = -(L / 2 - 6)
-  const H = 4.2
-  return (
-    <group>
-      {([-1, 1] as const).map((side) => (
-        <group key={side}>
-          <mesh position={[side * HALF_W, H / 2, zc]} rotation={[0, -side * (Math.PI / 2), 0]}>
-            <planeGeometry args={[L, H]} />
-            <meshStandardMaterial color={C.kertas} roughness={0.95} />
-          </mesh>
-          {/* list dinding (pita bata) */}
-          <mesh position={[side * (HALF_W - 0.02), 0.12, zc]}>
-            <boxGeometry args={[0.04, 0.24, L]} />
-            <meshStandardMaterial color={C.bata} />
-          </mesh>
-        </group>
-      ))}
-      <mesh position={[0, H / 2, -(L - 6)]}>
-        <planeGeometry args={[HALF_W * 2, H]} />
-        <meshStandardMaterial color={C.teal} roughness={0.9} />
-      </mesh>
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, zc]}>
-        <planeGeometry args={[HALF_W * 2, L]} />
-        <meshStandardMaterial color={C.tinta} roughness={0.55} metalness={0.1} />
-      </mesh>
-      <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, H, zc]}>
-        <planeGeometry args={[HALF_W * 2, L]} />
-        <meshStandardMaterial color={C.teal800} roughness={1} />
-      </mesh>
-      {/* jalur lantai tengah sebagai penunjuk arah jalan */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.005, zc]}>
-        <planeGeometry args={[0.5, L]} />
-        <meshStandardMaterial color={'#24413f'} roughness={0.7} />
-      </mesh>
-    </group>
-  )
-}
-
 /** Objek pengganti dari primitif; model GLB asli menyusul dari Blender. */
 function PlaceholderModel({ id }: { id: string }) {
   if (id === 'angklung') {
@@ -170,7 +129,7 @@ function ExhibitStand({
   onHotspot,
 }: { ex: Exhibit; index: number } & Pick<SceneProps, 'layout' | 'state' | 'wasDrag' | 'spin' | 'onExhibit' | 'onHotspot'>) {
   const pos = useMemo(() => exhibitPos(layout, ex), [layout, ex])
-  // Menghadap tengah lorong (lurus maupun melingkar).
+  // Menghadap tengah lorong.
   const facing = useMemo(() => exhibitYaw(layout, ex), [layout, ex])
   const light = useRef<THREE.SpotLight>(null)
   const aim = useRef<THREE.Object3D>(null)
@@ -282,7 +241,7 @@ export function Scene(props: SceneProps) {
       <ambientLight intensity={0.35} />
       <hemisphereLight args={['#fff3dc', C.tinta, 0.35]} />
       <CameraRig state={props.state} layout={layout} reducedMotion={props.reducedMotion} />
-      {layout.kind === 'lurus' ? <StraightRoom layout={layout} /> : <RingRoom layout={layout} />}
+      <RingRoom layout={layout} />
       {layout.exhibits.map((ex, i) => (
         <ExhibitStand key={ex.id} ex={ex} index={i} {...props} />
       ))}
