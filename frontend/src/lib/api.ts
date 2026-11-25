@@ -127,6 +127,14 @@ export function assetUrl(src: string): string {
   return `${API_BASE}/api/${src.replace(/^\/+/, '')}`
 }
 
+/**
+ * Model 3D galeri disajikan frontend (Vercel), bukan API (ADR 40, vite/contentModels.ts):
+ * assets/models/x.glb -> /models/x.glb
+ */
+export function modelUrl(src: string): string {
+  return `/models/${src.replace(/^\/*(?:assets\/)?models\//, '')}`
+}
+
 /** Isi templat skrip agen, mis. item_unlocked: "Kamu menemukan {item}! {short_explanation}". */
 export function fillTemplate(template: string, values: Record<string, string>): string {
   return template.replace(/\{(\w+)\}/g, (whole, key: string) => values[key] ?? whole)
