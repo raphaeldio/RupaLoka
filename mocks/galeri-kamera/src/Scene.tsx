@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef } from 'react'
 import { useFrame, useThree, type ThreeEvent } from '@react-three/fiber'
 import * as THREE from 'three'
-import { corridorLength, damp, exhibitPos, HALF_W, poseFor, type CamState, type Exhibit } from './flow'
+import { damp, exhibitPos, exhibitYaw, HALF_W, poseFor, ringCenter, type CamState, type Exhibit, type Layout } from './flow'
 
 const C = {
   kertas: '#f5f1e8',
@@ -14,7 +14,7 @@ const C = {
 
 export interface SceneProps {
   state: CamState
-  exhibits: Exhibit[]
+  layout: Layout
   reducedMotion: boolean
   /** true bila pointer terakhir adalah drag (bukan klik) */
   wasDrag: () => boolean
@@ -25,16 +25,16 @@ export interface SceneProps {
 }
 
 /** Rig kamera: meluruh menuju pose state; gerak dikurangi = langsung lompat. */
-function CameraRig({ state, exhibits, reducedMotion }: Pick<SceneProps, 'state' | 'exhibits' | 'reducedMotion'>) {
+function CameraRig({ state, layout, reducedMotion }: Pick<SceneProps, 'state' | 'layout' | 'reducedMotion'>) {
   const camera = useThree((s) => s.camera)
   const aspect = useThree((s) => s.size.width / s.size.height)
   // 0 di layar lebar, naik sampai 1 di ponsel tegak (aspek ~0.5)
   const portrait = Math.min(1, Math.max(0, (1 - aspect) / 0.5))
-  const look = useRef(new THREE.Vector3(...poseFor({ kind: 'intro' }, exhibits).target))
+  const look = useRef(new THREE.Vector3(...poseFor({ kind: 'intro' }, layout).target))
   const first = useRef(true)
 
   useFrame((_, dt) => {
-    const pose = poseFor(state, exhibits, portrait)
+    const pose = poseFor(state, layout, portrait)
     const d = Math.min(dt, 0.05)
     const lambda = state.kind === 'walk' ? 6 : 3.2
     if (reducedMotion || first.current) {
@@ -66,8 +66,8 @@ function CameraRig({ state, exhibits, reducedMotion }: Pick<SceneProps, 'state' 
 }
 
 /** Lorong lurus: dua dinding samping, lantai, langit-langit, dinding ujung. */
-function Room({ exhibits }: { exhibits: Exhibit[] }) {
-  const L = corridorLength(exhibits) + 6 // ruang 6 m di belakang titik awal (pintu masuk)
+function StraightRoom({ layout }: { layout: Layout }) {
+  const L = layout.length + 6 // ruang 6 m di belakang titik awal (pintu masuk)
   const zc = -(L / 2 - 6)
   const H = 4.2
   return (
@@ -160,6 +160,7 @@ export const MOCK_HOTSPOTS: [number, number, number][] = [
 ]
 
 function ExhibitStand({
+  layout,
   ex,
   index,
   state,
@@ -167,10 +168,10 @@ function ExhibitStand({
   spin,
   onExhibit,
   onHotspot,
-}: { ex: Exhibit; index: number } & Pick<SceneProps, 'state' | 'wasDrag' | 'spin' | 'onExhibit' | 'onHotspot'>) {
-  const pos = useMemo(() => exhibitPos(ex), [ex])
-  // Menghadap tengah lorong: objek di kanan (side 1) menghadap −X, di kiri menghadap +X.
-  const facing = -ex.side * (Math.PI / 2)
+}: { ex: Exhibit; index: number } & Pick<SceneProps, 'layout' | 'state' | 'wasDrag' | 'spin' | 'onExhibit' | 'onHotspot'>) {
+  const pos = useMemo(() => exhibitPos(layout, ex), [layout, ex])
+  // Menghadap tengah lorong (lurus maupun melingkar).
+  const facing = useMemo(() => exhibitYaw(layout, ex), [layout, ex])
   const light = useRef<THREE.SpotLight>(null)
   const aim = useRef<THREE.Object3D>(null)
   const model = useRef<THREE.Group>(null)
@@ -230,17 +231,59 @@ function ExhibitStand({
   )
 }
 
+/** Lorong melingkar: dinding dalam (cembung) dan luar (cekung) berbentuk cincin. */
+function RingRoom({ layout }: { layout: Layout }) {
+  const c = ringCenter(layout)
+  const R = layout.radius
+  const H = 4.2
+  const rin = R - HALF_W
+  const rout = R + HALF_W
+  return (
+    <group position={c}>
+      <mesh position={[0, H / 2, 0]}>
+        <cylinderGeometry args={[rin, rin, H, 96, 1, true]} />
+        <meshStandardMaterial color={C.kertas} side={THREE.FrontSide} roughness={0.95} />
+      </mesh>
+      <mesh position={[0, H / 2, 0]}>
+        <cylinderGeometry args={[rout, rout, H, 128, 1, true]} />
+        <meshStandardMaterial color={C.kertas} side={THREE.BackSide} roughness={0.95} />
+      </mesh>
+      {/* list dinding (pita bata) */}
+      <mesh position={[0, 0.12, 0]}>
+        <cylinderGeometry args={[rin + 0.02, rin + 0.02, 0.24, 96, 1, true]} />
+        <meshStandardMaterial color={C.bata} />
+      </mesh>
+      <mesh position={[0, 0.12, 0]}>
+        <cylinderGeometry args={[rout - 0.02, rout - 0.02, 0.24, 128, 1, true]} />
+        <meshStandardMaterial color={C.bata} side={THREE.BackSide} />
+      </mesh>
+      <mesh rotation={[-Math.PI / 2, 0, 0]}>
+        <ringGeometry args={[rin, rout, 128]} />
+        <meshStandardMaterial color={C.tinta} roughness={0.55} metalness={0.1} />
+      </mesh>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.005, 0]}>
+        <ringGeometry args={[R - 0.25, R + 0.25, 128]} />
+        <meshStandardMaterial color={'#24413f'} roughness={0.7} />
+      </mesh>
+      <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, H, 0]}>
+        <ringGeometry args={[rin, rout, 128]} />
+        <meshStandardMaterial color={C.teal800} roughness={1} side={THREE.DoubleSide} />
+      </mesh>
+    </group>
+  )
+}
+
 export function Scene(props: SceneProps) {
-  const { exhibits } = props
+  const { layout } = props
   return (
     <>
       <color attach="background" args={[C.teal800]} />
       <fog attach="fog" args={[C.teal800, 9, 22]} />
       <ambientLight intensity={0.35} />
       <hemisphereLight args={['#fff3dc', C.tinta, 0.35]} />
-      <CameraRig state={props.state} exhibits={exhibits} reducedMotion={props.reducedMotion} />
-      <Room exhibits={exhibits} />
-      {exhibits.map((ex, i) => (
+      <CameraRig state={props.state} layout={layout} reducedMotion={props.reducedMotion} />
+      {layout.kind === 'lurus' ? <StraightRoom layout={layout} /> : <RingRoom layout={layout} />}
+      {layout.exhibits.map((ex, i) => (
         <ExhibitStand key={ex.id} ex={ex} index={i} {...props} />
       ))}
     </>

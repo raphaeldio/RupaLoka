@@ -1,21 +1,144 @@
 /**
- * Alur kamera galeri (murni, tanpa three.js): state, transisi, dan pose kamera.
- * Tata letak: lorong lurus; kamera berjalan ke depan (−Z), objek berdiri di sisi
- * kiri dan kanan bergantian. Klik objek = kamera menoleh dan mendekat ke samping,
- * klik lagi = periksa, Esc/klik kosong = mundur satu tingkat.
+ * Alur kamera galeri (murni, tanpa three.js): jalur, state, transisi, dan pose kamera.
+ * Kamera selalu berjalan "maju" di sepanjang jalur; objek berdiri di sisi kiri dan
+ * kanan jalur bergantian. Jalur bisa lurus (berujung) atau melingkar (tanpa ujung).
+ * Klik objek = kamera menoleh dan mendekat, klik lagi = periksa, Esc = mundur.
  */
 
 export type Vec3 = [number, number, number]
 export type Side = -1 | 1 // −1 kiri, 1 kanan (dari arah jalan)
+export type LayoutKind = 'lurus' | 'melingkar'
 
 export interface Exhibit {
   id: string
   label: string
-  /** jarak sepanjang lorong (m), positif ke depan */
+  /** jarak sepanjang jalur (m) */
   d: number
   side: Side
   placeholder?: boolean
 }
+
+/** Titik jalur: posisi (y=0), arah maju, dan normal kanan (semuanya satuan). */
+export interface Frame {
+  p: Vec3
+  t: Vec3
+  n: Vec3
+}
+
+export interface Layout {
+  kind: LayoutKind
+  /** panjang jalur; untuk melingkar = keliling */
+  length: number
+  loop: boolean
+  /** jari-jari garis tengah lorong (hanya melingkar) */
+  radius: number
+  exhibits: Exhibit[]
+  at: (d: number) => Frame
+}
+
+/** Setengah lebar lorong; pedestal berdiri 0.7 m dari dinding. */
+export const HALF_W = 2.6
+export const PEDESTAL_X = HALF_W - 0.7
+export const EYE = 1.6
+const SPACING = 2.6
+const FIRST_D = 3
+/** Saat berjalan, objek "dilewati" adalah yang ±LOOKAHEAD m di depan kamera. */
+const LOOKAHEAD = 2.4
+/** Jari-jari garis tengah lorong melingkar dan jumlah slot pedestal di kelilingnya. */
+const RING_R = 6
+const RING_SLOTS = 12
+
+type ItemIn = { id: string; label: string; placeholder?: boolean }
+
+export function makeLayout(kind: LayoutKind, items: ItemIn[]): Layout {
+  if (kind === 'lurus') {
+    const exhibits = items.map((it, i) => ({
+      ...it,
+      d: FIRST_D + i * SPACING,
+      side: (i % 2 === 0 ? -1 : 1) as Side,
+    }))
+    return {
+      kind,
+      length: exhibits[exhibits.length - 1].d + 4,
+      loop: false,
+      radius: 0,
+      exhibits,
+      at: (d) => ({ p: [0, 0, -d], t: [0, 0, -1], n: [1, 0, 0] }),
+    }
+  }
+  // Melingkar: pusat lingkaran di kiri titik awal, berjalan berlawanan arah jarum jam
+  // (dilihat dari atas). Kiri = dinding dalam, kanan = dinding luar.
+  const R = RING_R
+  const length = 2 * Math.PI * R
+  const slots: ItemIn[] = Array.from({ length: RING_SLOTS }, (_, i) =>
+    items[i] ?? { id: `slot-${i + 1}`, label: 'Segera hadir', placeholder: true },
+  )
+  const exhibits = slots.map((it, i) => ({
+    ...it,
+    d: FIRST_D + (i * length) / RING_SLOTS,
+    side: (i % 2 === 0 ? -1 : 1) as Side,
+  }))
+  return {
+    kind,
+    length,
+    loop: true,
+    radius: R,
+    exhibits,
+    at: (d) => {
+      const a = d / R
+      const c = Math.cos(a)
+      const s = Math.sin(a)
+      return { p: [-R + R * c, 0, -R * s], t: [-s, 0, -c], n: [c, 0, -s] }
+    },
+  }
+}
+
+/** Pusat lingkaran (melingkar) di dunia. */
+export function ringCenter(L: Layout): Vec3 {
+  return [-L.radius, 0, 0]
+}
+
+const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v))
+const wrap = (v: number, len: number) => ((v % len) + len) % len
+
+function normD(L: Layout, d: number): number {
+  return L.loop ? wrap(d, L.length) : clamp(d, 0, L.exhibits[L.exhibits.length - 1].d - 0.5)
+}
+
+/** Selisih jarak jalur (bertanda); di jalur melingkar ambil yang terpendek. */
+function delta(L: Layout, from: number, to: number): number {
+  const raw = to - from
+  if (!L.loop) return raw
+  const w = wrap(raw, L.length)
+  return w > L.length / 2 ? w - L.length : w
+}
+
+const add = (a: Vec3, b: Vec3, k = 1): Vec3 => [a[0] + b[0] * k, a[1] + b[1] * k, a[2] + b[2] * k]
+
+/** Posisi pusat pedestal di dunia. */
+export function exhibitPos(L: Layout, e: Exhibit, y = 0): Vec3 {
+  const f = L.at(e.d)
+  const p = add(f.p, f.n, e.side * PEDESTAL_X)
+  return [p[0], y, p[2]]
+}
+
+/** Rotasi Y pedestal agar menghadap ke tengah lorong (lokal +Z → −side·n). */
+export function exhibitYaw(L: Layout, e: Exhibit): number {
+  const n = L.at(e.d).n
+  return Math.atan2(-e.side * n[0], -e.side * n[2])
+}
+
+export function nearestIndex(L: Layout, d: number): number {
+  const ahead = d + LOOKAHEAD
+  let best = 0
+  L.exhibits.forEach((e, i) => {
+    if (Math.abs(delta(L, ahead, e.d)) < Math.abs(delta(L, ahead, L.exhibits[best].d))) best = i
+  })
+  return best
+}
+
+/** Titik berdiri saat berjalan agar objek ke-i tampak serong di depan. */
+const standFor = (L: Layout, e: Exhibit) => normD(L, e.d - LOOKAHEAD)
 
 export type CamState =
   | { kind: 'intro' }
@@ -31,55 +154,16 @@ export type CamAction =
   | { type: 'back' }
   | { type: 'goto'; index: number }
 
-/** Setengah lebar lorong; pedestal berdiri 0.7 m dari dinding. */
-export const HALF_W = 2.6
-export const PEDESTAL_X = HALF_W - 0.7
-export const EYE = 1.6
-const SPACING = 2.6
-const FIRST_D = 3
-/** Saat berjalan, objek "dilewati" adalah yang ±LOOKAHEAD m di depan kamera. */
-const LOOKAHEAD = 2.4
-
-export function makeExhibits(items: { id: string; label: string; placeholder?: boolean }[]): Exhibit[] {
-  return items.map((it, i) => ({ ...it, d: FIRST_D + i * SPACING, side: (i % 2 === 0 ? -1 : 1) as Side }))
-}
-
-export function walkLimits(ex: Exhibit[]): [number, number] {
-  return [0, ex[ex.length - 1].d - 0.5]
-}
-
-export function corridorLength(ex: Exhibit[]): number {
-  return ex[ex.length - 1].d + 4
-}
-
-const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v))
-
-/** Posisi pusat pedestal di dunia. */
-export function exhibitPos(e: Exhibit, y = 0): Vec3 {
-  return [e.side * PEDESTAL_X, y, -e.d]
-}
-
-export function nearestIndex(ex: Exhibit[], d: number): number {
-  const ahead = d + LOOKAHEAD
-  let best = 0
-  ex.forEach((e, i) => {
-    if (Math.abs(e.d - ahead) < Math.abs(ex[best].d - ahead)) best = i
-  })
-  return best
-}
-
-/** Titik berdiri saat berjalan agar objek ke-i tampak serong di depan. */
-const standFor = (e: Exhibit) => e.d - LOOKAHEAD
-
-export function reduce(s: CamState, a: CamAction, ex: Exhibit[]): CamState {
-  const [lo, hi] = walkLimits(ex)
+export function reduce(s: CamState, a: CamAction, L: Layout): CamState {
+  const ex = L.exhibits
+  const n = ex.length
   switch (a.type) {
     case 'introDone':
       return s.kind === 'intro' ? { kind: 'walk', d: 0 } : s
     case 'walkBy':
-      if (s.kind === 'walk') return { kind: 'walk', d: clamp(s.d + a.delta, lo, hi) }
+      if (s.kind === 'walk') return { kind: 'walk', d: normD(L, s.d + a.delta) }
       // scroll saat fokus: kembali ke tengah lorong lalu lanjut berjalan
-      if (s.kind === 'focus') return { kind: 'walk', d: clamp(standFor(ex[s.index]) + a.delta, lo, hi) }
+      if (s.kind === 'focus') return { kind: 'walk', d: normD(L, standFor(L, ex[s.index]) + a.delta) }
       return s
     case 'clickExhibit':
       if (ex[a.index]?.placeholder) return s
@@ -88,19 +172,25 @@ export function reduce(s: CamState, a: CamAction, ex: Exhibit[]): CamState {
       return s
     case 'step': {
       if (s.kind === 'walk') {
-        const i = clamp(nearestIndex(ex, s.d) + a.dir, 0, ex.length - 1)
-        return { kind: 'walk', d: clamp(standFor(ex[i]), lo, hi) }
+        const j = nearestIndex(L, s.d) + a.dir
+        const i = L.loop ? wrap(j, n) : clamp(j, 0, n - 1)
+        return { kind: 'walk', d: standFor(L, ex[i]) }
       }
       if (s.kind === 'focus') {
-        let i = s.index + a.dir
-        while (ex[i]?.placeholder) i += a.dir
-        return i >= 0 && i < ex.length ? { kind: 'focus', index: i } : s
+        // lompat ke objek asli berikutnya, lewati slot "Segera hadir"
+        for (let k = 1; k < n; k++) {
+          const j = s.index + a.dir * k
+          if (!L.loop && (j < 0 || j >= n)) return s
+          const i = wrap(j, n)
+          if (!ex[i].placeholder) return { kind: 'focus', index: i }
+        }
+        return s
       }
       return s
     }
     case 'back':
       if (s.kind === 'inspect') return { kind: 'focus', index: s.index }
-      if (s.kind === 'focus') return { kind: 'walk', d: clamp(standFor(ex[s.index]), lo, hi) }
+      if (s.kind === 'focus') return { kind: 'walk', d: standFor(L, ex[s.index]) }
       return s
     case 'goto':
       return ex[a.index]?.placeholder ? s : { kind: 'focus', index: a.index }
@@ -114,35 +204,39 @@ export interface Pose {
 
 /**
  * Pose kamera untuk tiap state.
- * - walk: di tengah lorong, menatap lurus ke depan.
+ * - walk: di tengah lorong, menatap ke depan mengikuti jalur (di jalur melingkar
+ *   menatap titik jalur 3 m di depan, jadi pandangan ikut melengkung).
  * - focus/inspect: menoleh ke samping, menghadap objek.
- * `portrait` (0..1) memundurkan kamera di layar tegak agar objek tidak terpotong.
+ * `portrait` (0..1): di layar tegak kamera mundur dan melirik ke sisi objek terdekat.
  */
-export function poseFor(s: CamState, ex: Exhibit[], portrait = 0): Pose {
+export function poseFor(s: CamState, L: Layout, portrait = 0): Pose {
+  const withY = (v: Vec3, y: number): Vec3 => [v[0], y, v[2]]
   switch (s.kind) {
-    case 'intro':
-      return { position: [0, EYE + 0.3, 4], target: [0, 1.4, -6] }
+    case 'intro': {
+      const f = L.at(0)
+      return { position: withY(add(f.p, f.t, -4), EYE + 0.3), target: withY(L.at(6).p, 1.4) }
+    }
     case 'walk': {
-      // Layar tegak (FOV horizontal sempit): kamera melirik ke sisi objek terdekat.
-      const glance = portrait * 2.2 * ex[nearestIndex(ex, s.d)].side
-      return { position: [0, EYE, -s.d], target: [glance, 1.45, -s.d - 6] }
+      const f = L.at(s.d)
+      const ahead = L.loop ? L.at(s.d + 3) : { ...f, p: add(f.p, f.t, 6) }
+      const glance = portrait * (L.loop ? 1.1 : 2.2) * L.exhibits[nearestIndex(L, s.d)].side
+      return { position: withY(f.p, EYE), target: withY(add(ahead.p, ahead.n, glance), 1.45) }
     }
-    case 'focus': {
-      const e = ex[s.index]
-      const dist = 2.1 + portrait * 0.6 // maks. ±2.7 m, masih di dalam lorong
-      return { position: [e.side * (PEDESTAL_X - dist), 1.55, -e.d], target: exhibitPos(e, 1.3) }
-    }
+    case 'focus':
     case 'inspect': {
-      const e = ex[s.index]
-      const dist = 1.3 + portrait * 0.5
-      return { position: [e.side * (PEDESTAL_X - dist), 1.45, -e.d], target: exhibitPos(e, 1.35) }
+      const e = L.exhibits[s.index]
+      const f = L.at(e.d)
+      const dist = s.kind === 'focus' ? 2.1 + portrait * 0.6 : 1.3 + portrait * 0.5
+      const pos = add(f.p, f.n, e.side * (PEDESTAL_X - dist))
+      const y = s.kind === 'focus' ? 1.55 : 1.45
+      return { position: withY(pos, y), target: exhibitPos(L, e, s.kind === 'focus' ? 1.3 : 1.35) }
     }
   }
 }
 
 /** Indeks objek untuk label bawah layar. */
-export function currentIndex(s: CamState, ex: Exhibit[]): number {
-  if (s.kind === 'walk') return nearestIndex(ex, s.d)
+export function currentIndex(s: CamState, L: Layout): number {
+  if (s.kind === 'walk') return nearestIndex(L, s.d)
   if (s.kind === 'intro') return 0
   return s.index
 }

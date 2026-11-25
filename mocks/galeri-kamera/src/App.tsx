@@ -1,13 +1,17 @@
 import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { Scene } from './Scene'
-import { currentIndex, makeExhibits, reduce, type CamAction, type CamState } from './flow'
+import { currentIndex, makeLayout, reduce, type CamAction, type CamState, type LayoutKind } from './flow'
 
 // Label saja; tanpa fakta budaya. Teks hotspot asli menunggu tim budaya (KH).
 const ITEMS = [
   { id: 'angklung', label: 'Angklung' },
   { id: 'wayang', label: 'Wayang golek' },
   { id: 'cepot', label: 'Cepot' },
+]
+// Lorong lurus memakai 2 slot kosong; lorong melingkar mengisi sisa kelilingnya sendiri.
+const STRAIGHT_ITEMS = [
+  ...ITEMS,
   { id: 'slot-4', label: 'Segera hadir', placeholder: true },
   { id: 'slot-5', label: 'Segera hadir', placeholder: true },
 ]
@@ -20,9 +24,16 @@ const HINT: Record<CamState['kind'], string> = {
 }
 
 export default function App() {
-  const exhibits = useMemo(() => makeExhibits(ITEMS), [])
+  const [kind, setKind] = useState<LayoutKind>('melingkar')
+  // key: ganti tata letak = mulai ulang galeri dari pintu masuk
+  return <Gallery key={kind} kind={kind} onKind={setKind} />
+}
+
+function Gallery({ kind, onKind }: { kind: LayoutKind; onKind: (k: LayoutKind) => void }) {
+  const layout = useMemo(() => makeLayout(kind, kind === 'lurus' ? STRAIGHT_ITEMS : ITEMS), [kind])
+  const exhibits = layout.exhibits
   const [state, dispatchRaw] = useReducer(
-    (s: CamState, a: CamAction) => reduce(s, a, exhibits),
+    (s: CamState, a: CamAction) => reduce(s, a, layout),
     { kind: 'intro' } as CamState,
   )
   const [reducedMotion, setReducedMotion] = useState(
@@ -99,7 +110,7 @@ export default function App() {
     if (state.kind !== 'inspect') spin.current = 0
   }, [state.kind])
 
-  const idx = currentIndex(state, exhibits)
+  const idx = currentIndex(state, layout)
   const current = exhibits[idx]
 
   return (
@@ -121,7 +132,7 @@ export default function App() {
         >
           <Scene
             state={state}
-            exhibits={exhibits}
+            layout={layout}
             reducedMotion={reducedMotion}
             wasDrag={() => lastWasDrag.current}
             spin={spin}
@@ -136,6 +147,14 @@ export default function App() {
       <header className="top">
         <div className="brand">
           <span className="tag">MOCK</span> Rupaloka · Galeri 3D — alur kamera
+        </div>
+        <div className="seg" role="group" aria-label="Bentuk lorong">
+          <button aria-pressed={kind === 'lurus'} onClick={() => onKind('lurus')}>
+            Lurus
+          </button>
+          <button aria-pressed={kind === 'melingkar'} onClick={() => onKind('melingkar')}>
+            Melingkar
+          </button>
         </div>
         <div className="seg" role="group" aria-label="Tampilan">
           <button aria-pressed={view === 'galeri'} onClick={() => setView('galeri')}>

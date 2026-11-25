@@ -11,6 +11,8 @@ npm install
 npm run dev    # http://localhost:5180
 ```
 
+Tata letak: **Melingkar** (bawaan; lorong cincin tanpa ujung, objek di dinding dalam dan luar) atau **Lurus**.
+
 Alur: intro (masuk dari pintu) → berjalan maju di lorong, objek di kiri-kanan (scroll / geser ke atas / ↑↓)
 → klik objek = kamera menoleh dan mendekat
 → klik lagi = periksa (geser memutar objek, titik emas = hotspot) → Esc / klik kosong = mundur satu tingkat.
