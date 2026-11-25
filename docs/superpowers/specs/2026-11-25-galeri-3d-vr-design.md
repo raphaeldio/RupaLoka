@@ -101,6 +101,7 @@ Dicoba di mock `mocks/galeri-kamera/` (tombol "Melingkar"). Pola interaksi "klik
 room:
   model: assets/models/galeri-bandung.glb   # lorong cincin (§2.1), cahaya sudah di-bake
   source: src-model-galeri                  # id di sources.yaml
+layout: {radius: 6, slots: 12, first_d: 3}  # parameter cincin §2.1; dibaca frontend dan validator
 exhibits:                                   # urutan = pedestal_1, pedestal_2, ...
   - item: item-angklung
   - item: item-wayang
@@ -176,6 +177,7 @@ Semua angka di bawah adalah **target**. Laporannya hanya diambil dari hasil ukur
 - **Bundle:** semua paket 3D hanya ada di chunk `gallery`, dan drei diimpor per modul. Anggaran ukuran di CI: chunk utama tidak boleh bertambah karena galeri, dan chunk `gallery` punya batas yang ditetapkan dari pengukuran pertama (diukur dengan `rollup-plugin-visualizer`). Chunk `gallery` di-prefetch saat tautan "Galeri 3D" terlihat atau di-hover.
 - **Unduhan:** total galeri Bandung ≤15 MB. Urutan muat: ruangan dulu, lalu objek terdekat. Bila `navigator.connection.saveData` aktif atau `effectiveType` lambat, tampilkan konfirmasi "Galeri butuh ±N MB. Lanjutkan?" (N dihitung dari ukuran file sebenarnya).
 - **Decoder:** Meshopt (dan KTX2 bila dipakai) di-self-host di Vercel.
+- **Penyajian:** GLB disimpan di `content/assets/models/`, lalu disalin plugin Vite ke `/models/*` dan disajikan CDN Vercel, bukan `/api/assets` di Render (Render gratis tertidur; *cold start* menggagalkan unduhan besar). Lihat rencana Tugas 7.
 - **Cache:** GLB ber-hash disajikan dengan `Cache-Control: public, max-age=31536000, immutable` lewat `vercel.json`.
 - **Baterai:** `frameloop="demand"` di mode layar. Di VR render terus, dikelola XR. Render berhenti saat tab tersembunyi.
 - **Memori:** saat meninggalkan rute, geometri dan tekstur di-dispose dan cache `useGLTF` dibersihkan.
