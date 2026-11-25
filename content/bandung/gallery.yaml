@@ -1,0 +1,21 @@
+# Galeri 3D Bandung: lorong melingkar + penampil objek + VR (SDD ADR 40, T-115).
+# Spesifikasi: docs/superpowers/specs/2026-11-25-galeri-3d-vr-design.md §2.1, §3.1.
+# Fitur premium; di klien hanya tampil bila VITE_FLAGS memuat viewer3d,premium_content.
+
+room:
+  model: assets/models/galeri-bandung.glb   # lorong cincin, cahaya di-bake (T-121)
+
+# Parameter cincin dibaca sama oleh frontend (cameraFlow.ts) dan validator (app/ring.py).
+# GLB ruangan harus punya empty pedestal_1..pedestal_{slots} di posisi jalur ini (±0,1 m).
+layout:
+  radius: 6        # jari-jari garis tengah lorong (m), minimal 6
+  slots: 12        # pedestal di keliling; slot tanpa objek = "Segera hadir"
+  first_d: 3       # jarak pedestal pertama dari titik awal (m)
+
+exhibits:          # urutan = pedestal_1, pedestal_2, ...
+  - item: item-angklung
+  - item: item-wayang
+  - item: item-cepot
+
+# Persetujuan anggota budaya (KH) atas isi galeri: { name: "<nama>", approved_at: YYYY-MM-DD }
+approved_by_kh: null

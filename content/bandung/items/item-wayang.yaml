@@ -22,3 +22,14 @@ card:
   fungsi: null
   community: null
   validator: null
+
+# Galeri 3D (SDD ADR 40, T-115). Model dibuat tim di Blender (T-121); bentuknya diperiksa KH
+# lalu isi accuracy_check: { by: "<nama>", checked_at: YYYY-MM-DD }. poster null = pakai image.
+model:
+  src: assets/models/item-wayang.glb
+  poster: null
+  accuracy_check: null
+# Hotspot: DIISI TIM BUDAYA setelah menetapkan bagian objek beserta sumbernya. Nama bagian juga
+# fakta, jadi jangan ditebak. Bentuk: - { id: <id>, label: "...", text: "...", chunk: <id chunk> }
+# dan Blender menaruh empty "hotspot_<id>" di model.
+hotspots: []
