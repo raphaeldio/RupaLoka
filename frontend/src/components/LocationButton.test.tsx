@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import type { Location } from '../lib/api.types'
 import LocationButton from './LocationButton'
@@ -20,10 +20,20 @@ describe('LocationButton (Kunjungi)', () => {
       />,
     )
     expect(screen.getByText('Kunjungi')).toBeInTheDocument()
-    const links = screen.getAllByRole('link')
+    const links = within(screen.getByRole('list')).getAllByRole('link')
     expect(links.map((a) => a.getAttribute('href'))).toEqual(['https://contoh.test', 'https://contoh.test/jadwal'])
     expect(screen.queryByText('Belum dicek')).not.toBeInTheDocument()
-    expect(screen.getByText('Koordinat sedang diverifikasi.')).toBeInTheDocument()
+  })
+
+  it('tanpa koordinat tetapi ada alamat → rute Google Maps dari nama + alamat (tanpa menebak koordinat)', () => {
+    render(<LocationButton location={{ ...base, name: 'Museum Uji', address: 'Jl. Uji No.1, Kota' }} />)
+    const link = screen.getByRole('link', { name: /Buka rute di Google Maps/ })
+    expect(link).toHaveAttribute(
+      'href',
+      'https://www.google.com/maps/dir/?api=1&destination=Museum%20Uji%2C%20Jl.%20Uji%20No.1%2C%20Kota',
+    )
+    expect(link).toHaveAttribute('target', '_blank')
+    expect(screen.getByText(/koordinat sedang diverifikasi/)).toBeInTheDocument()
   })
 
   it('tanpa koordinat, alamat, dan tautan → tidak tampil', () => {
