@@ -18,12 +18,18 @@ from fastapi.staticfiles import StaticFiles
 from app.api_schemas import (
     CityDetail,
     CitySummary,
+    DecorOut,
+    ExhibitOut,
+    GalleryOut,
     Health,
     LeaderboardEntry,
     LeaderboardResponse,
+    ReflectionPrompt,
     ScoreSubmit,
     SourceRef,
     SourcesResponse,
+    TtsRequest,
+    TtsStatus,
     YourRank,
 )
 from app.chat import ChatRequest, ChatResponse, ChatService, RateLimiter, UnknownContext
@@ -36,11 +42,14 @@ from app.leaderboard import (
     build_store,
     clean_nickname,
     max_points,
+    reflection_questions,
 )
 from app.llm import LLM, GeminiLLM, LLMError
+from app.reflection import ReflectionRequest, ReflectionResult, assess
 from app.retrieval import Retriever
-from app.schemas import City
+from app.schemas import CARD_ASPECTS, City
 from app.security import add_security_headers, client_ip
+from app.tts import TtsService, TtsUnavailable
 
 logger = logging.getLogger("rupaloka")
 
@@ -78,11 +87,20 @@ def create_app(
     settings: Settings | None = None,
     llm: LLM | None = None,
     leaderboard: LeaderboardStore | None = None,
+    tts: TtsService | None = None,
 ) -> FastAPI:
     settings = settings or Settings.from_env()
     limiter = RateLimiter(settings.rate_limit_per_min)
     global_limiter = RateLimiter(settings.global_rate_limit_per_min)
     board_limiter = RateLimiter(settings.leaderboard_rate_limit_per_min)
+    tts_limiter = RateLimiter(settings.tts_rate_limit_per_min)
+    tts_global_limiter = RateLimiter(settings.tts_global_rate_limit_per_min)
+    tts_service = tts or TtsService(
+        settings.elevenlabs_api_key,
+        settings.elevenlabs_voice_id,
+        settings.elevenlabs_model,
+        daily_char_limit=settings.tts_daily_char_limit,
+    )
 
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
@@ -126,6 +144,32 @@ def create_app(
 
     def content(request: Request) -> Content:
         return request.app.state.content  # type: ignore[no-any-return]
+
+    @app.get("/api/tts/status", response_model=TtsStatus)
+    def tts_status() -> TtsStatus:
+        return TtsStatus(enabled=tts_service.enabled)
+
+    # Fungsi sinkron: FastAPI menjalankannya di threadpool (panggilan HTTP ke ElevenLabs).
+    @app.post("/api/tts", response_class=Response)
+    def tts_speak(req: TtsRequest, request: Request) -> Response:
+        if not tts_service.enabled:
+            raise HTTPException(status_code=503, detail="tts_not_configured")
+        if not tts_limiter.allow(client_ip(request, settings.trusted_proxy_hops)):
+            raise HTTPException(status_code=429, detail="rate_limited")
+        if not tts_global_limiter.allow("*"):
+            raise HTTPException(status_code=503, detail="tts_busy")
+        try:
+            audio = tts_service.synthesize(req.text)
+        except ValueError as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
+        except TtsUnavailable as exc:
+            logger.warning("TTS tidak tersedia: %s", exc.reason)
+            raise HTTPException(status_code=503, detail=exc.reason) from exc
+        return Response(
+            content=audio,
+            media_type="audio/mpeg",
+            headers={"Cache-Control": "private, max-age=86400"},
+        )
 
     @app.get("/api/health", response_model=Health)
     def health(request: Request) -> Health:
@@ -204,6 +248,30 @@ def create_app(
             logger.warning("chat: LLM tidak tersedia: %s", exc)
             raise HTTPException(status_code=503, detail="agen sedang tidak tersedia") from exc
 
+    @app.post("/api/reflection", response_model=ReflectionResult)
+    async def reflection(
+        req: ReflectionRequest, request: Request, response: Response
+    ) -> ReflectionResult:
+        # Jawaban pemain tidak disimpan maupun dicatat; jangan di-cache.
+        response.headers["Cache-Control"] = "no-store"
+        if not limiter.allow(client_ip(request, settings.trusted_proxy_hops)):
+            raise HTTPException(
+                status_code=429,
+                detail="terlalu sering mengirim; coba lagi nanti",
+                headers={"Retry-After": "60", "Cache-Control": "no-store"},
+            )
+        cc = content(request).city_content.get(req.city_id)
+        question = next(
+            (q for q in reflection_questions(cc) if q.id == req.question_id) if cc else iter(()),
+            None,
+        )
+        if question is None:
+            raise HTTPException(status_code=404, detail="soal refleksi tidak dikenal")
+        service: ChatService = request.app.state.chat
+        # Kuota global LLM dipakai bersama chat; bila habis, nilai dengan kata kunci saja.
+        llm = service.llm if global_limiter.allow("*") else None
+        return await assess(question, req.answer, llm)
+
     def board_city(request: Request, city_id: str) -> tuple[CityContent, str, int]:
         cc = content(request).city_content.get(city_id)
         cfg = cc.config.rewards.leaderboard if cc else None
@@ -278,12 +346,87 @@ def create_app(
     return app
 
 
+def _gallery_out(cc: CityContent) -> GalleryOut | None:
+    g = cc.gallery
+    if g is None:
+        return None
+    exhibits: list[ExhibitOut] = []
+    for ex in g.exhibits:
+        if ex.item is not None:
+            item = cc.items.get(ex.item)
+            if item is None:
+                continue
+            name, model, hotspots, image = item.name, item.model, item.hotspots, item.image
+            short, short_chunk = item.short_explanation, item.chunk
+            kind = "item"
+        else:
+            obj = ex.object
+            assert obj is not None
+            name, model, hotspots, image = obj.name, obj.model, obj.hotspots, obj.image
+            short = obj.short_explanation.text if obj.short_explanation else None
+            short_chunk = obj.short_explanation.chunk if obj.short_explanation else None
+            kind = "object"
+        exhibits.append(
+            ExhibitOut(
+                id=ex.key,
+                kind=kind,
+                name=name,
+                short_explanation=short,
+                short_chunk=short_chunk,
+                asal_usul=ex.asal_usul,
+                image=image,
+                model_src=model.src if model else None,
+                model_available=bool(model and model.src in cc.models_present),
+                accuracy_by=model.accuracy_check.by if model and model.accuracy_check else None,
+                hotspots=[h for h in hotspots if h.text and h.chunk],
+            )
+        )
+    return GalleryOut(
+        layout=g.layout,
+        room_model=g.room.model,
+        room_available=g.room.model in cc.models_present,
+        exhibits=exhibits,
+        guide_model=g.guide.model if g.guide else None,
+        guide_available=bool(g.guide and g.guide.model in cc.models_present),
+        decor=[
+            DecorOut(
+                id=d.id,
+                name=d.name,
+                model_src=d.model,
+                model_available=d.model in cc.models_present,
+                slot=d.slot,
+            )
+            for d in g.decor
+        ],
+        approved=g.approved_by_kh is not None,
+    )
+
+
 def _city_detail(city: City, cc: CityContent) -> CityDetail:
     # Validasi menjamin agent_script dan quiz ada; tanpa itu konten tidak lolos startup.
     assert cc.agent_script is not None and cc.quiz is not None
     referenced = {q.chunk for q in cc.quiz.intro + cc.quiz.outro}
     referenced |= {f.chunk for lesson in cc.lessons.values() for f in lesson.key_facts}
     referenced |= {item.chunk for item in cc.items.values()}
+    referenced |= {h.chunk for item in cc.items.values() for h in item.hotspots if h.chunk}
+    gallery = _gallery_out(cc)
+    if gallery is not None:
+        for ex in gallery.exhibits:
+            referenced |= {c for c in (ex.short_chunk,) if c}
+            referenced |= {ex.asal_usul.chunk} if ex.asal_usul else set()
+            referenced |= {h.chunk for h in ex.hotspots if h.chunk}
+    for item in cc.items.values():
+        if item.card is not None:
+            for name in CARD_ASPECTS:
+                aspect = getattr(item.card, name)
+                if aspect is not None:
+                    referenced.add(aspect.chunk)
+    referenced |= {
+        v.explanation.chunk
+        for q in reflection_questions(cc)
+        for v in q.values
+        if v.explanation is not None
+    }
     return CityDetail(
         city=city,
         phases=cc.config.phases,
@@ -302,6 +445,11 @@ def _city_detail(city: City, cc: CityContent) -> CityDetail:
             for cid in sorted(referenced)
             if cid in cc.chunks
         },
+        reflection=[
+            ReflectionPrompt(id=q.id, lesson=q.lesson, prompt=q.prompt)
+            for q in reflection_questions(cc)
+        ],
+        gallery=gallery,
     )
 
 

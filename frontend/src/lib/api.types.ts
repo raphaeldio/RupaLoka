@@ -1,12 +1,19 @@
 // Dibuat otomatis oleh backend/scripts/gen_ts_types.py dari skema API. JANGAN disunting manual.
 // Regenerasi setelah mengubah backend/app/*schemas*.py: python scripts/gen_ts_types.py
 
+/** Pemeriksaan bentuk model 3D buatan tim oleh anggota budaya (KH). */
+export interface AccuracyCheck {
+  by: string
+  checked_at: string
+}
+
 export interface AgentScript {
   quiz_intro: string
   lessons_start: string
   game_start: string
   item_unlocked: string
   summary: string
+  small_talk: SmallTalkScript | null
 }
 
 export interface AssetEntry {
@@ -23,6 +30,12 @@ export interface Badge {
   name: string
   min_points: number
   description: string
+}
+
+/** Satu bagian kartu budaya: teks ditulis tim budaya, bersumber pada chunk. */
+export interface CardAspect {
+  text: string
+  chunk: string
 }
 
 export interface ChatContext {
@@ -43,6 +56,7 @@ export interface ChatResponse {
   citations: Citation[]
   refusal_reason: "out_of_scope" | "no_valid_citation" | null
   suggestions: string[]
+  intent: "question" | "small_talk"
 }
 
 export interface Citation {
@@ -71,6 +85,8 @@ export interface CityDetail {
   lessons: Lesson[]
   items: Item[]
   sources: Record<string, SourceRef>
+  reflection: ReflectionPrompt[]
+  gallery: GalleryOut | null
 }
 
 /** Kartu kota (F-003). Hitungan hanya diisi untuk kota aktif. */
@@ -84,6 +100,58 @@ export interface CitySummary {
   summary: string | null
   lesson_count: number | null
   item_count: number | null
+}
+
+/** Kartu budaya lengkap (masukan juri, 25 Nov 2026). Kosong = belum disusun (pending). */
+export interface CultureCard {
+  nilai: CardAspect | null
+  pengetahuan: CardAspect | null
+  ekspresi: CardAspect | null
+  fungsi: CardAspect | null
+  community: CardAspect | null
+  validator: Validator | null
+}
+
+/** Pajangan dinding (lukisan) di seberang pedestal `slot`; hanya hiasan. */
+export interface DecorOut {
+  id: string
+  name: string
+  model_src: string
+  model_available: boolean
+  slot: number
+}
+
+/** Satu pedestal galeri, siap tampil. Teks hanya dari konten bersumber; None = pending. */
+export interface ExhibitOut {
+  id: string
+  kind: "item" | "object"
+  name: string
+  short_explanation: string | null
+  short_chunk: string | null
+  asal_usul: CardAspect | null
+  image: ImageRef | null
+  model_src: string | null
+  model_available: boolean
+  accuracy_by: string | null
+  hotspots: Hotspot[]
+}
+
+/** Parameter lorong cincin; dibaca sama oleh frontend (cameraFlow.ts) dan validator. */
+export interface GalleryLayout {
+  radius: number
+  slots: number
+  first_d: number
+}
+
+export interface GalleryOut {
+  layout: GalleryLayout
+  room_model: string
+  room_available: boolean
+  exhibits: ExhibitOut[]
+  guide_model: string | null
+  guide_available: boolean
+  decor: DecorOut[]
+  approved: boolean
 }
 
 export interface GameConfig {
@@ -105,6 +173,17 @@ export interface HistoryTurn {
   content: string
 }
 
+/**
+ * Titik penjelasan pada model; posisinya dari node `hotspot_<id>` di GLB.
+ * Teks dan chunk DIISI TIM BUDAYA; kosong = tidak ditampilkan (pending).
+ */
+export interface Hotspot {
+  id: string
+  label: string
+  text: string | null
+  chunk: string | null
+}
+
 export interface ImageRef {
   src: string
   alt: string
@@ -120,6 +199,16 @@ export interface Item {
   chunk: string
   lesson: string
   tier: "free" | "premium"
+  card: CultureCard | null
+  model: ItemModel | null
+  hotspots: Hotspot[]
+}
+
+/** Model 3D objek untuk galeri (SDD ADR 40). Berkas dicatat di sources.yaml → assets. */
+export interface ItemModel {
+  src: string
+  poster: string | null
+  accuracy_check: AccuracyCheck | null
 }
 
 export interface KeyFact {
@@ -166,6 +255,14 @@ export interface Location {
   address: string
   lat: number | null
   lng: number | null
+  links: VisitLink[]
+}
+
+export interface MatchedValue {
+  id: string
+  label: string
+  explanation: string | null
+  chunk: string | null
 }
 
 export interface Quiz {
@@ -175,6 +272,7 @@ export interface Quiz {
 
 export interface QuizQuestion {
   id: string
+  kind: "fakta" | "nilai"
   question: string
   options: string[]
   correct: number
@@ -182,15 +280,37 @@ export interface QuizQuestion {
   chunk: string
 }
 
+/** Soal refleksi akhir tur untuk klien (tanpa kata kunci agar tidak bisa dicontek). */
+export interface ReflectionPrompt {
+  id: string
+  lesson: string | null
+  prompt: string
+}
+
+export interface ReflectionRequest {
+  city_id: string
+  question_id: string
+  answer: string
+}
+
+export interface ReflectionResult {
+  matched: MatchedValue[]
+  method: "keyword" | "ai" | "none"
+  feedback: string
+}
+
 /**
  * Poin path belajar (titik = materi, titik terakhir = game) dan lencana.
- * Poin kota = titik materi selesai × points_per_node + jawaban kuis benar ×
- * points_per_correct + (game_node_points bila game sudah dimainkan sekali) +
+ * Poin kota = titik materi selesai × points_per_node + jawaban fakta benar ×
+ * points_per_correct + jawaban nilai benar × points_per_value + refleksi yang dikenali ×
+ * points_per_reflection + (game_node_points bila game sudah dimainkan sekali) +
  * skor game terbaik, dibatasi game_score_cap (agar batas papan peringkat tetap ada).
  */
 export interface Rewards {
   points_per_node: number
   points_per_correct: number
+  points_per_value: number
+  points_per_reflection: number
   game_node_points: number
   game_score_cap: number
   badges: Badge[]
@@ -201,6 +321,18 @@ export interface ScoreSubmit {
   player_id: string
   nickname: string
   points: number
+}
+
+/**
+ * Balasan basa-basi agen (salam, terima kasih, dsb.), ditulis tim; tanpa fakta budaya.
+ * Dipakai `app/conversation.py` tanpa memanggil LLM (SDD ADR 41).
+ */
+export interface SmallTalkScript {
+  greeting: string
+  thanks: string
+  goodbye: string
+  identity: string
+  help: string
 }
 
 export interface Source {
@@ -231,6 +363,21 @@ export interface Speed {
   ramp_per_100: number
 }
 
+export interface TtsRequest {
+  text: string
+}
+
+export interface TtsStatus {
+  enabled: boolean
+}
+
+/** Budayawan/anggota komunitas yang memvalidasi kartu budaya. */
+export interface Validator {
+  name: string
+  role: string | null
+  validated_at: string | null
+}
+
 /** Video YouTube pendukung materi (pengganti gambar materi, 21 Nov 2026). */
 export interface VideoRef {
   url: string
@@ -238,6 +385,15 @@ export interface VideoRef {
   channel: string
   note: string | null
   checked_by: string | null
+}
+
+/** Tautan "Kunjungi": situs resmi, sanggar, perajin, atau jadwal pertunjukan komunitas. */
+export interface VisitLink {
+  label: string
+  url: string
+  kind: "situs" | "sanggar" | "perajin" | "jadwal"
+  note: string | null
+  verified_by: string | null
 }
 
 export interface YourRank {

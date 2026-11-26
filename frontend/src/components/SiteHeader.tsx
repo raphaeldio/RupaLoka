@@ -66,14 +66,14 @@ export default function SiteHeader() {
         Lewati ke konten
       </a>
       <div
-        className={`mx-auto flex max-w-[1360px] items-center justify-between gap-3 rounded-full border border-white/70 bg-white/85 py-2 pl-3 pr-2 backdrop-blur transition-shadow duration-300 sm:pl-4 ${
-          scrolled ? 'shadow-melayang' : 'shadow-kartu'
+        className={`mx-auto flex max-w-[1360px] items-center justify-between gap-3 rounded-full bg-white/92 py-1.5 pl-2 pr-1.5 ring-1 ring-emas/40 transition-shadow duration-300 sm:pl-3 ${
+          scrolled ? 'shadow-[0_16px_34px_-16px_rgb(14_77_75/0.5)]' : 'shadow-[0_10px_26px_-16px_rgb(14_77_75/0.4)]'
         }`}
       >
         <Link to="/" className="flex items-center gap-2.5" aria-label="Rupaloka, beranda">
-          <LogoMark className="size-10 text-teal" />
+          <LogoMark className="size-10 rounded-full text-teal" />
           <span className="leading-none">
-            <span className="block text-xl font-black tracking-[0.06em] text-teal">RUPALOKA</span>
+            <span className="block font-piksel text-xl font-bold tracking-[0.06em] text-teal-800">RUPALOKA</span>
             <span className="mt-0.5 hidden text-[11px] font-semibold text-redup sm:block">
               Belajar, Bermain, Kunjungi.
             </span>
@@ -87,8 +87,10 @@ export default function SiteHeader() {
               to={n.to}
               end={n.end}
               className={({ isActive: a }) =>
-                `relative flex items-center gap-1.5 rounded-full px-3.5 py-2 text-sm font-bold transition ${
-                  isActive(n.to, a) ? 'bg-teal-50 text-teal' : 'text-tinta/75 hover:bg-kertas hover:text-teal'
+                `relative flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-extrabold transition ${
+                  isActive(n.to, a)
+                    ? 'bg-teal-800 text-white shadow-[0_8px_18px_-8px_rgb(14_77_75/0.6)]'
+                    : 'text-tinta/75 hover:-translate-y-0.5 hover:bg-amber-50 hover:text-teal-800'
                 }`
               }
             >
@@ -101,10 +103,10 @@ export default function SiteHeader() {
         <div className="flex items-center gap-2">
           <Link
             to={START ? `/kota/${START.id}` : '/#peta'}
-            className="hidden items-center gap-2 rounded-full bg-teal px-4 py-2.5 text-sm font-extrabold text-white transition hover:bg-teal-600 sm:flex"
+            className="pil pil-emas group hidden !px-5 !py-2.5 !text-sm sm:inline-flex"
           >
             Mulai belajar
-            <svg viewBox="0 0 16 16" className="size-4" aria-hidden="true">
+            <svg viewBox="0 0 16 16" className="size-4 transition-transform group-hover:translate-x-1" aria-hidden="true">
               <path
                 d="M3 8h10M9 4l4 4-4 4"
                 fill="none"
@@ -121,7 +123,7 @@ export default function SiteHeader() {
             aria-expanded={open}
             aria-controls="menu-ponsel"
             aria-label={open ? 'Tutup menu' : 'Buka menu'}
-            className="grid size-10 place-items-center rounded-full text-teal transition hover:bg-teal-50 lg:hidden"
+            className="grid size-10 place-items-center rounded-full bg-teal-800 text-white transition hover:bg-teal lg:hidden"
           >
             <svg viewBox="0 0 20 20" className="size-5" aria-hidden="true">
               <path
@@ -139,7 +141,7 @@ export default function SiteHeader() {
         <nav
           id="menu-ponsel"
           aria-label="Navigasi utama (ponsel)"
-          className="mx-auto mt-2 max-w-[1360px] rounded-3xl border border-white/70 bg-white/95 p-2 shadow-melayang backdrop-blur motion-safe:animate-[card-in_200ms_ease-out] lg:hidden"
+          className="mx-auto mt-2 grid max-w-[1360px] gap-1 rounded-[26px] bg-white/96 p-2 shadow-[0_16px_34px_-16px_rgb(14_77_75/0.5)] ring-1 ring-emas/40 motion-safe:animate-[card-in_200ms_ease-out] lg:hidden"
         >
           {NAV.map((n) => (
             <NavLink
@@ -148,8 +150,8 @@ export default function SiteHeader() {
               end={n.end}
               onClick={() => setOpen(false)}
               className={({ isActive: a }) =>
-                `flex items-center gap-3 rounded-2xl px-4 py-3 text-[15px] font-bold ${
-                  isActive(n.to, a) ? 'bg-teal-50 text-teal' : 'text-tinta hover:bg-kertas'
+                `flex items-center gap-3 rounded-full px-4 py-3 text-[15px] font-extrabold ${
+                  isActive(n.to, a) ? 'bg-teal-800 text-white' : 'text-tinta hover:bg-amber-50 hover:text-teal-800'
                 }`
               }
             >

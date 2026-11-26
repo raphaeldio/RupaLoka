@@ -1,0 +1,18 @@
+# Refleksi akhir tur (masukan juri, 25 Nov 2026; SDD §16). Opsional per kota.
+# Pemain menulis jawaban bebas; backend mencocokkan dengan kata kunci tiap nilai, lalu (bila
+# tidak cocok) AI HANYA mengklasifikasi jawaban ke id nilai di daftar ini. Teks umpan balik
+# selalu dari berkas ini, bukan dari AI. Jawaban pemain tidak disimpan.
+#
+# values DITULIS TIM BUDAYA (KH), bersumber; jangan dikarang. Selama values kosong, soal ini
+# disembunyikan di UI dan tidak menambah poin. Bentuk satu nilai:
+#   - id: kerja-sama
+#     label: "Kerja sama"
+#     keywords: ["kerja sama", "bekerja sama", "kompak"]      # frasa, cocok per kata utuh
+#     explanation: { text: "...", chunk: angklung-00x }      # mengapa nilai ini ada di angklung
+questions:
+  - id: refleksi-angklung
+    lesson: angklung
+    prompt: "Nilai apa dari angklung yang bisa kamu pakai dalam kehidupanmu sehari-hari?"
+    values: []   # TODO KH
+    feedback_match: "Keren! Kamu menangkap nilai yang hidup dalam budaya ini."
+    feedback_miss: "Jawabanmu sudah tercatat untukmu sendiri. Coba ingat lagi materi angklung, lalu tulis nilai yang kamu temukan."

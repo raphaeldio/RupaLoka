@@ -35,7 +35,7 @@ export function SafeImage({ image, className }: { image: ImageRef; className?: s
 /** Rujukan sumber untuk satu chunk. */
 export function SourceChip({ source, label }: { source: SourceRef | undefined; label?: string }) {
   const title = source && !isPlaceholder(source.title) ? source.title : 'Sumber sedang diverifikasi'
-  const cls = 'inline-flex max-w-full items-center gap-1 rounded-full bg-teal-50 px-2.5 py-1 text-[11px] font-bold text-teal'
+  const cls = 'inline-flex max-w-full items-center gap-1 rounded-full bg-teal-50 px-2.5 py-1 text-[12px] font-bold text-teal-800 ring-1 ring-teal/20'
   const body = (
     <>
       <span aria-hidden="true">📖</span>
@@ -67,7 +67,7 @@ export const Button = forwardRef<
 })
 
 export function Card({ children, className }: { children: ReactNode; className?: string }) {
-  return <div className={`rounded-3xl border border-garis bg-white p-5 shadow-kartu sm:p-6 ${className ?? ''}`}>{children}</div>
+  return <div className={`kartu-nuansa p-5 sm:p-6 ${className ?? ''}`}>{children}</div>
 }
 
 /** Kartu dengan sorotan cahaya mengikuti kursor (React Bits SpotlightCard, palet Rupaloka). */
@@ -79,7 +79,7 @@ export function GlowCard({ children, className, ...rest }: { children: ReactNode
       intensity={0.22}
       spotlightSize={260}
       borderGlow={0.8}
-      className={`border border-garis !p-5 shadow-kartu sm:!p-6 ${className ?? ''}`}
+      className={`!rounded-[22px] border border-emas/40 !p-5 shadow-kartu sm:!p-6 ${className ?? ''}`}
       {...rest}
     >
       {children}

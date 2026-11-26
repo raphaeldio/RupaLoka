@@ -19,12 +19,15 @@ const badge = (id: string, min_points: number) => ({ id, name: id, min_points, d
 const rewards: Rewards = {
   points_per_node: 100,
   points_per_correct: 10,
+  points_per_value: 30,
+  points_per_reflection: 50,
   game_node_points: 100,
   game_score_cap: 1000,
   leaderboard: null,
   badges: [badge('a', 100), badge('b', 300), badge('c', 500)],
 }
 const lessons = ['l1', 'l2', 'l3']
+const caps5 = { facts: 5, values: 0, reflections: 0 }
 
 describe('pathNodes', () => {
   it('membuka titik secara berurutan; game terakhir', () => {
@@ -49,7 +52,7 @@ describe('poin dan lencana', () => {
     expect(pathPoints(lessons, { completed: lessons, correct: {}, gameDone: true }, rewards)).toBe(400)
     // id materi usang tidak dihitung
     expect(pathPoints(lessons, { completed: ['lama'], correct: { lama: 5 }, gameDone: false }, rewards)).toBe(0)
-    expect(maxPathPoints(lessons, 5, rewards)).toBe(450)
+    expect(maxPathPoints(lessons, caps5, rewards)).toBe(450)
   })
 
   it('skor game terbaik ikut dijumlahkan setelah game selesai', () => {
@@ -58,7 +61,7 @@ describe('poin dan lencana', () => {
     expect(gamePoints(p, rewards)).toBe(337)
     // Dibatasi game_score_cap agar batas papan peringkat tetap berlaku.
     expect(gamePoints({ ...p, best: 5000 }, rewards)).toBe(1000)
-    expect(maxCityPoints(lessons, 5, rewards)).toBe(1450)
+    expect(maxCityPoints(lessons, caps5, rewards)).toBe(1450)
     expect(pathPoints(lessons, p, rewards)).toBe(757)
     // Skor tersimpan tapi game belum tamat → belum dihitung.
     expect(gamePoints({ ...p, gameDone: false }, rewards)).toBe(0)
@@ -70,5 +73,24 @@ describe('poin dan lencana', () => {
     expect(nextBadge(600, rewards.badges)).toBeNull()
     expect(newBadges(90, 310, rewards.badges).map((b) => b.id)).toEqual(['a', 'b'])
     expect(newBadges(310, 320, rewards.badges)).toEqual([])
+  })
+})
+
+describe('soal nilai dan refleksi (masukan juri)', () => {
+  it('soal nilai dan refleksi berpoin lebih besar dari soal fakta', () => {
+    const p = { completed: ['l1'], correct: { l1: 1 }, valueCorrect: { l1: 1, l2: 4 }, gameDone: false }
+    // 100 titik + 10 fakta + 30 nilai; nilai milik titik yang belum selesai tidak dihitung
+    expect(lessonPoints(lessons, p, rewards)).toBe(140)
+    expect(lessonPoints(lessons, { ...p, reflection: { r1: true, r2: false } }, rewards)).toBe(190)
+    expect(maxCityPoints(lessons, { facts: 5, values: 3, reflections: 1 }, rewards)).toBe(1450 + 90 + 50)
+  })
+
+  it('API lama tanpa field poin nilai/refleksi -> 0 (data progres lama tetap berlaku)', () => {
+    const old = { ...rewards } as Partial<Rewards>
+    delete old.points_per_value
+    delete old.points_per_reflection
+    const p = { completed: ['l1'], correct: { l1: 1 }, valueCorrect: { l1: 1 }, reflection: { r: true }, gameDone: false }
+    expect(lessonPoints(lessons, p, old as Rewards)).toBe(110)
+    expect(lessonPoints(lessons, { completed: ['l1'], correct: { l1: 1 }, gameDone: false }, rewards)).toBe(110)
   })
 })

@@ -27,14 +27,14 @@ const NOTE = 'Ini soal uji untuk mencoba mekanik kuis, bukan materi budaya.'
 
 /** Bank soal uji: sengaja bukan fakta budaya (CLAUDE.md prinsip 1–2). */
 const BANK: Omit<QuizQuestion, 'id' | 'chunk'>[] = [
-  { question: '[Soal uji] 3 + 4 = ?', options: ['6', '7', '8', '9'], correct: 1, explanation: `${NOTE} 3 + 4 = 7.` },
-  { question: '[Soal uji] Huruf apa yang muncul setelah C?', options: ['B', 'D', 'E', 'F'], correct: 1, explanation: `${NOTE} Urutannya A, B, C, D.` },
-  { question: '[Soal uji] 10 − 6 = ?', options: ['3', '4', '5', '6'], correct: 1, explanation: `${NOTE} 10 − 6 = 4.` },
-  { question: '[Soal uji] Mana bilangan genap?', options: ['3', '7', '8', '11'], correct: 2, explanation: `${NOTE} 8 habis dibagi 2.` },
-  { question: '[Soal uji] 2 × 5 = ?', options: ['7', '10', '12', '25'], correct: 1, explanation: `${NOTE} 2 × 5 = 10.` },
-  { question: '[Soal uji] Hari setelah Senin adalah …', options: ['Minggu', 'Selasa', 'Rabu', 'Kamis'], correct: 1, explanation: `${NOTE} Senin lalu Selasa.` },
-  { question: '[Soal uji] Bangun datar dengan tiga sisi adalah …', options: ['Persegi', 'Lingkaran', 'Segitiga', 'Segi lima'], correct: 2, explanation: `${NOTE} Segitiga punya tiga sisi.` },
-  { question: '[Soal uji] 9 − 3 = ?', options: ['5', '6', '7', '8'], correct: 1, explanation: `${NOTE} 9 − 3 = 6.` },
+  { kind: 'fakta', question: '[Soal uji] 3 + 4 = ?', options: ['6', '7', '8', '9'], correct: 1, explanation: `${NOTE} 3 + 4 = 7.` },
+  { kind: 'fakta', question: '[Soal uji] Huruf apa yang muncul setelah C?', options: ['B', 'D', 'E', 'F'], correct: 1, explanation: `${NOTE} Urutannya A, B, C, D.` },
+  { kind: 'fakta', question: '[Soal uji] 10 − 6 = ?', options: ['3', '4', '5', '6'], correct: 1, explanation: `${NOTE} 10 − 6 = 4.` },
+  { kind: 'fakta', question: '[Soal uji] Mana bilangan genap?', options: ['3', '7', '8', '11'], correct: 2, explanation: `${NOTE} 8 habis dibagi 2.` },
+  { kind: 'fakta', question: '[Soal uji] 2 × 5 = ?', options: ['7', '10', '12', '25'], correct: 1, explanation: `${NOTE} 2 × 5 = 10.` },
+  { kind: 'fakta', question: '[Soal uji] Hari setelah Senin adalah …', options: ['Minggu', 'Selasa', 'Rabu', 'Kamis'], correct: 1, explanation: `${NOTE} Senin lalu Selasa.` },
+  { kind: 'fakta', question: '[Soal uji] Bangun datar dengan tiga sisi adalah …', options: ['Persegi', 'Lingkaran', 'Segitiga', 'Segi lima'], correct: 2, explanation: `${NOTE} Segitiga punya tiga sisi.` },
+  { kind: 'fakta', question: '[Soal uji] 9 − 3 = ?', options: ['5', '6', '7', '8'], correct: 1, explanation: `${NOTE} 9 − 3 = 6.` },
 ]
 
 /**

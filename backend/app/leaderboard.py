@@ -18,7 +18,7 @@ import threading
 import unicodedata
 from dataclasses import dataclass
 from datetime import UTC, datetime
-from typing import Protocol
+from typing import Any, Protocol
 
 import httpx
 
@@ -73,15 +73,42 @@ def clean_nickname(raw: str) -> str:
 
 
 def max_points(cc: CityContent) -> int:
-    """Poin kota tertinggi yang mungkin (sama dengan maxCityPoints di frontend)."""
+    """Poin kota tertinggi yang mungkin (sama dengan maxCityPoints di frontend).
+
+    Per titik, poin kuis = hasil terbaik kuis awal/akhir per jenis soal, jadi batasnya
+    = jumlah soal terbanyak per jenis di antara kedua kuis titik itu.
+    """
     r = cc.config.rewards
-    intro = len(cc.quiz.intro) if cc.quiz else 0
+    facts = values = 0
+    if cc.quiz:
+        for lesson_id in cc.config.lessons:
+
+            def own(qs: list[Any], lid: str = lesson_id) -> list[Any]:
+                return [
+                    q for q in qs if q.chunk in cc.chunks and cc.chunks[q.chunk].lesson_id == lid
+                ]
+
+            pre = own(cc.quiz.intro)
+            post = own(cc.quiz.outro) or pre
+            facts += max(_count(pre, "fakta"), _count(post, "fakta"))
+            values += max(_count(pre, "nilai"), _count(post, "nilai"))
     return (
         len(cc.config.lessons) * r.points_per_node
-        + intro * r.points_per_correct
+        + facts * r.points_per_correct
+        + values * r.points_per_value
+        + len(reflection_questions(cc)) * r.points_per_reflection
         + r.game_node_points
         + r.game_score_cap
     )
+
+
+def _count(questions: list[Any], kind: str) -> int:
+    return sum(1 for q in questions if q.kind == kind)
+
+
+def reflection_questions(cc: CityContent) -> list[Any]:
+    """Soal refleksi yang siap dipakai (punya daftar nilai)."""
+    return [q for q in cc.reflection.questions if q.values] if cc.reflection else []
 
 
 @dataclass(frozen=True)

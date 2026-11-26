@@ -28,6 +28,7 @@ from functools import lru_cache
 from typing import Any
 
 from app.content_loader import CityContent, Content, is_unfilled
+from app.regions import ALIASES, PROVINCES
 from app.schemas import Chunk
 
 TOP_K = 4
@@ -150,6 +151,7 @@ class CityIndex:
         self,
         chunks: Iterable[Chunk],
         lesson_titles: Mapping[str, str] | None = None,
+        regions: Iterable[str] = (),
         k1: float = K1,
         b: float = B,
     ) -> None:
@@ -168,6 +170,14 @@ class CityIndex:
             df.update(tf.keys())
         n = len(self.chunks)
         self._idf = {t: math.log(1 + (n - d + 0.5) / (d + 0.5)) for t, d in df.items()}
+        self.vocabulary = frozenset(self._idf)
+        # Cek wilayah (ADR 43): nama wilayah yang tidak muncul di korpus kota ini = daerah lain.
+        corpus = " | ".join(
+            " ".join(tokenize(f"{c.text} {titles.get(c.lesson_id, '')}")) for c in self.chunks
+        )
+        corpus = f" {corpus} "
+        phrases = {" ".join(tokenize(r)) for r in regions}
+        self.foreign_regions = frozenset(p for p in phrases if p and f" {p} " not in corpus)
 
     def _bm25(self, i: int, terms: list[str]) -> float:
         tf, length = self._tf[i], self._len[i]
@@ -182,6 +192,11 @@ class CityIndex:
     def is_topical(self, query: str) -> bool:
         """Kueri menyebut istilah topik kota (kata dari judul materi)."""
         return not self.topic_terms.isdisjoint(normalize_query(query))
+
+    def mentions_other_region(self, query: str) -> bool:
+        """Kueri menyebut provinsi/kota yang tidak ada di catatan kota ini ("kuliner Jogja")."""
+        q = f" {' '.join(tokenize(query[:MAX_QUERY_CHARS]))} "
+        return any(f" {p} " in q for p in self.foreign_regions)
 
     def search(self, query: str, lesson_id: str | None = None, top_k: int = TOP_K) -> list[Hit]:
         terms = normalize_query(query)
@@ -198,9 +213,12 @@ class CityIndex:
         return hits[:top_k]
 
 
-def passes_gate(hits: Sequence[Hit], topical: bool, min_score: float) -> bool:
-    """Gerbang skor (tanpa LLM): ada kecocokan, dan kueri bertopik atau skor teratas cukup."""
-    return bool(hits) and (topical or hits[0].raw_score >= min_score)
+def passes_gate(
+    hits: Sequence[Hit], topical: bool, min_score: float, other_region: bool = False
+) -> bool:
+    """Gerbang skor (tanpa LLM): ada kecocokan, tidak menyebut daerah lain (ADR 43), dan kueri
+    bertopik atau skor teratas cukup."""
+    return bool(hits) and not other_region and (topical or hits[0].raw_score >= min_score)
 
 
 class Retriever:
@@ -211,7 +229,11 @@ class Retriever:
 
     @classmethod
     def from_content(cls, content: Content) -> Retriever:
-        return cls({city_id: _index_city(cc) for city_id, cc in content.city_content.items()})
+        cities = [c.name for c in content.cities]
+        regions = [*PROVINCES, *ALIASES, *cities]
+        return cls(
+            {city_id: _index_city(cc, regions) for city_id, cc in content.city_content.items()}
+        )
 
     def search(
         self, city_id: str, query: str, lesson_id: str | None = None, top_k: int = TOP_K
@@ -222,14 +244,25 @@ class Retriever:
         return index.search(query, lesson_id=lesson_id, top_k=top_k)
 
     def is_topical(self, city_id: str, query: str) -> bool:
+        return self._index(city_id).is_topical(query)
+
+    def mentions_other_region(self, city_id: str, query: str) -> bool:
+        return self._index(city_id).mentions_other_region(query)
+
+    def vocabulary(self, city_id: str) -> frozenset[str]:
+        """Semua token (sudah di-stem) di korpus kota; dipakai pengaman pertanyaan susulan."""
+        return self._index(city_id).vocabulary
+
+    def _index(self, city_id: str) -> CityIndex:
         index = self._indexes.get(city_id)
         if index is None:
             raise KeyError(city_id)
-        return index.is_topical(query)
+        return index
 
 
-def _index_city(cc: CityContent) -> CityIndex:
+def _index_city(cc: CityContent, regions: Iterable[str] = ()) -> CityIndex:
     """Chunk penanda (`[PERLU DIISI]`, `TODO`) tidak diindeks: tidak berisi fakta, sehingga
     hanya membuat kata seperti "perlu" atau judul materi meloloskan pertanyaan di gerbang."""
     titles = {lesson_id: lesson.title for lesson_id, lesson in cc.lessons.items()}
-    return CityIndex((c for c in cc.chunks.values() if not is_unfilled(c.text)), titles)
+    chunks = (c for c in cc.chunks.values() if not is_unfilled(c.text))
+    return CityIndex(chunks, titles, regions=regions)

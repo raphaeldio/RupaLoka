@@ -143,6 +143,17 @@ Prioritas: **P0** wajib MVP-0, **P1** tahap seleksi berikutnya, **P2** pengemban
 | F-049 | **Path belajar per kota** (keputusan tim 20 Nov 2026): titik berurutan (materi; titik terakhir = game), tiap titik = kuis awal → kartu materi (video YouTube) → kuis akhir, lalu tombol lanjut ke titik berikutnya; titik berikutnya terbuka setelah titik sebelumnya selesai | P0 | Titik terkunci tidak dapat dibuka; progres tersimpan di perangkat |
 | F-049a | **Poin path dan lencana**: +poin per titik selesai, per jawaban kuis benar, dan saat menamatkan game; lencana saat poin melewati ambang (`rewards` di `city.yaml`; angka DRAF 100/300/500) | P0 | Poin tidak dobel saat titik diulang; lencana baru diumumkan sekali |
 
+### 6.5a Masukan juri (25 Nov 2026): kedalaman, nilai, partisipasi, transparansi, manfaat komunitas
+
+| ID | Fitur | Prioritas | Kriteria penerimaan |
+|---|---|---|---|
+| F-080 | **Kartu budaya lengkap** tiap item: nilai, pengetahuan, ekspresi, fungsi, asal komunitas, rujukan utama, nama validator (`card` di `items/*.yaml`) | P0 | Tiap aspek bersumber (`chunk`); aspek kosong tampil "Sedang disusun tim budaya" (bukan karangan); `--release` gagal sampai lengkap dan tervalidasi |
+| F-081 | **Soal nilai**: kuis akhir tiap titik memuat ≥1 soal `kind: nilai`; poin `points_per_value` (30) > soal fakta (10). `game_score_cap` Bandung turun 3000 → 300 | P0 | Peringkat mencerminkan pemahaman; `max_points` backend = `maxCityPoints` frontend |
+| F-082 | **Refleksi akhir tur** (isian bebas, mis. "Nilai apa dari angklung yang bisa kamu pakai?"); dicocokkan dengan nilai + kata kunci tulisan tim budaya, lalu AI hanya mengklasifikasi bila kata kunci tak cocok; poin `points_per_reflection` (50) sekali per soal | P0 | Umpan balik dari konten; label "Dinilai dengan bantuan AI" bila AI dipakai; AI gagal → kata kunci saja; jawaban tidak disimpan |
+| F-083 | **Beri masukan** di tiap kartu budaya dan kartu materi (Google Form, `VITE_FEEDBACK_FORM_URL`) | P0 | URL kosong → tombol tidak tampil; isian otomatis kota/judul/id bila `VITE_FEEDBACK_FORM_ENTRY` diisi |
+| F-084 | **Label "Dijawab AI" + sumber** di tiap jawaban agen **Saloka**; penolakan berlabel "Belum ada sumber yang cocok"; skrip berlabel "Pesan pemandu" | P0 | Tak ada jawaban AI tanpa label |
+| F-085 | **Kunjungi** (perluasan F-032/F-050): rute + tautan situs resmi, sanggar, perajin, jadwal pertunjukan (`location.links`) | P0 | Hanya tautan http(s) dengan `verified_by` yang tampil |
+
 ### 6.6 Lokasi asli dan pendukung
 | ID | Kebutuhan | Prio |
 |---|---|---|
@@ -150,12 +161,12 @@ Prioritas: **P0** wajib MVP-0, **P1** tahap seleksi berikutnya, **P2** pengemban
 | F-051 | Halaman Koleksi (item terbuka) | P0 |
 | F-052 | Halaman Tentang dan Sumber & Atribusi (dari data konten) | P0 |
 | F-053 | Analitik ringan tanpa data pribadi (sesi, kuis selesai, item terbuka, klik lokasi) | P1 |
-| F-054 | Umpan balik (tautan formulir) | P1 |
+| F-054 | Umpan balik (tautan formulir) — kini F-083 (P0) | P1 |
 
 ### 6.7 Fitur berbayar dan mitra (rencana, **bukan MVP-0**)
 | ID | Kebutuhan | Prio |
 |---|---|---|
-| F-060 | Penampil model 3D objek budaya (hotspot) | P2 |
+| F-060 | Galeri 3D (lorong melingkar) + penampil objek (hotspot) + VR; purwarupa demo lomba di balik flag (SDD ADR 40) | P2 |
 | F-061 | Paket langganan individu (akses 3D + konten tambahan) | P2 |
 | F-062 | Paket sekolah: mode kelas, tautan guru, laporan hasil siswa | P2 |
 | F-063 | Portal mitra museum: unggah/validasi konten, atribusi, statistik | P2 |

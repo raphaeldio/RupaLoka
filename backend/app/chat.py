@@ -1,8 +1,9 @@
 """Tanya-jawab bersumber (SDD §8.1, §9).
 
-Alur: retrieval → gerbang `MIN_SCORE` (tolak tanpa memanggil LLM) → LLM → validasi sitasi
-(penanda pada kalimat penolakan dan penanda yang tidak ada di konteks dibuang; tanpa sitasi valid
-= penolakan) → format.
+Alur: basa-basi (teks tim, tanpa LLM; ADR 41) → retrieval (diulang dengan konteks obrolan untuk
+pertanyaan susulan; ADR 41) → gerbang `MIN_SCORE` (tolak tanpa memanggil LLM) → LLM → validasi
+sitasi (penanda pada kalimat penolakan dan penanda yang tidak ada di konteks dibuang; tanpa
+sitasi valid = penolakan) → format.
 """
 
 from __future__ import annotations
@@ -16,10 +17,16 @@ from typing import Literal
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from app.config import Settings
-from app.content_loader import Content
+from app.content_loader import CityContent, Content
+from app.conversation import (
+    SmallTalkKind,
+    contextual_query,
+    detect_small_talk,
+    may_use_context,
+)
 from app.llm import LLM, LLMError, Turn
 from app.prompts import system_prompt, user_prompt
-from app.retrieval import Hit, Retriever, passes_gate
+from app.retrieval import Hit, Retriever, normalize_query, passes_gate
 from app.schemas import Chunk, Id, Phase
 
 MAX_MESSAGE_CHARS = 500
@@ -28,6 +35,7 @@ MAX_SUGGESTIONS = 3
 REFUSAL_TEXT = "Maaf, aku belum punya informasi tentang itu di catatan Rupaloka."
 
 RefusalReason = Literal["out_of_scope", "no_valid_citation"]
+Intent = Literal["question", "small_talk"]
 
 
 # --- skema permintaan/respons ----------------------------------------------
@@ -72,6 +80,8 @@ class ChatResponse(BaseModel):
     citations: list[Citation]
     refusal_reason: RefusalReason | None
     suggestions: list[str] = Field(default_factory=list)
+    # "small_talk": balasan basa-basi tulisan tim (bukan AI, bukan penolakan).
+    intent: Intent = "question"
 
 
 class UnknownContext(ValueError):
@@ -132,6 +142,28 @@ def apply_citations(text: str, allowed: dict[str, Chunk]) -> tuple[str, list[Chu
     return out, [allowed[cid] for cid in order]
 
 
+# --- saran pertanyaan lanjutan ---------------------------------------------
+
+
+def follow_up_suggestions(
+    city: CityContent, cited: Sequence[Chunk], asked: Sequence[str], limit: int = MAX_SUGGESTIONS
+) -> list[str]:
+    """Saran sesudah jawaban bersumber: `suggested_questions` tulisan tim dari materi chunk yang
+    dikutip lebih dulu, lalu materi lain; pertanyaan yang sudah ditanyakan dilewati (ADR 41)."""
+    asked_keys = {frozenset(normalize_query(q)) for q in asked}
+    lesson_ids = list(dict.fromkeys(c.lesson_id for c in cited))
+    lesson_ids += [lid for lid in city.lessons if lid not in lesson_ids]
+    out: list[str] = []
+    for lid in lesson_ids:
+        lesson = city.lessons.get(lid)
+        for q in lesson.suggested_questions if lesson else []:
+            if q not in out and frozenset(normalize_query(q)) not in asked_keys:
+                out.append(q)
+            if len(out) >= limit:
+                return out
+    return out
+
+
 # --- batas laju ------------------------------------------------------------
 
 
@@ -180,9 +212,12 @@ class ChatService:
         if lesson_id is not None and lesson_id not in city.lessons:
             raise UnknownContext(f"lesson_id '{lesson_id}' bukan materi kota ini")
 
-        hits = self.retriever.search(req.city_id, req.message, lesson_id=lesson_id)
-        topical = self.retriever.is_topical(req.city_id, req.message)
-        if not passes_gate(hits, topical, self.settings.min_score):
+        small_talk = detect_small_talk(req.message)
+        if small_talk is not None and city.agent_script and city.agent_script.small_talk:
+            return self._small_talk(small_talk, city, lesson_id)
+
+        hits, topical = self._retrieve(req, city)
+        if not self._passes(req.city_id, req.message, hits, topical):
             return self._refusal("out_of_scope", req.city_id, lesson_id)
 
         if self.llm is None:
@@ -200,7 +235,35 @@ class ChatService:
                 Citation(chunk_id=c.id, title=c.source.title, url=c.source.url) for c in cited
             ],
             refusal_reason=None,
+            suggestions=follow_up_suggestions(
+                city, cited, [req.message, *(t.content for t in req.history if t.role == "user")]
+            ),
         )
+
+    def _passes(self, city_id: str, message: str, hits: Sequence[Hit], topical: bool) -> bool:
+        """Cek wilayah memakai pesan asli: konteks obrolan tidak boleh meloloskan daerah lain."""
+        other = self.retriever.mentions_other_region(city_id, message)
+        return passes_gate(hits, topical, self.settings.min_score, other_region=other)
+
+    def _retrieve(self, req: ChatRequest, city: CityContent) -> tuple[list[Hit], bool]:
+        """Cari dengan pesan saja; bila gagal gerbang dan pesan tampak susulan, ulangi dengan
+        konteks obrolan. Gerbang dan ambangnya sama untuk kedua percobaan."""
+        city_id, lesson_id = req.city_id, req.context.lesson_id
+        hits = self.retriever.search(city_id, req.message, lesson_id=lesson_id)
+        topical = self.retriever.is_topical(city_id, req.message)
+        if self._passes(req.city_id, req.message, hits, topical):
+            return hits, topical
+        if not may_use_context(req.message, self.retriever.vocabulary(city_id)):
+            return hits, topical
+        title = city.lessons[lesson_id].title if lesson_id is not None else None
+        query = contextual_query(req.message, req.history, title)
+        if query is None:
+            return hits, topical
+        ctx_hits = self.retriever.search(city_id, query, lesson_id=lesson_id)
+        ctx_topical = self.retriever.is_topical(city_id, query)
+        if self._passes(city_id, req.message, ctx_hits, ctx_topical):
+            return ctx_hits, ctx_topical
+        return hits, topical
 
     def _turns(self, req: ChatRequest, hits: Sequence[Hit]) -> list[Turn]:
         history = [Turn(role=t.role, text=t.content) for t in req.history]
@@ -208,16 +271,32 @@ class ChatService:
             history.pop(0)
         return [*history, Turn(role="user", text=user_prompt(req.message, hits))]
 
-    def _refusal(self, reason: RefusalReason, city_id: str, lesson_id: str | None) -> ChatResponse:
+    def _suggestions(self, city_id: str, lesson_id: str | None) -> list[str]:
         city = self.content.city_content[city_id]
         if lesson_id is not None:
             pool = city.lessons[lesson_id].suggested_questions
         else:
             pool = [q for lesson in city.lessons.values() for q in lesson.suggested_questions]
+        return pool[:MAX_SUGGESTIONS]
+
+    def _small_talk(
+        self, kind: SmallTalkKind, city: CityContent, lesson_id: str | None
+    ) -> ChatResponse:
+        assert city.agent_script is not None and city.agent_script.small_talk is not None
+        return ChatResponse(
+            answer=getattr(city.agent_script.small_talk, kind),
+            grounded=False,
+            citations=[],
+            refusal_reason=None,
+            suggestions=self._suggestions(city.config.id, lesson_id),
+            intent="small_talk",
+        )
+
+    def _refusal(self, reason: RefusalReason, city_id: str, lesson_id: str | None) -> ChatResponse:
         return ChatResponse(
             answer=REFUSAL_TEXT,
             grounded=False,
             citations=[],
             refusal_reason=reason,
-            suggestions=pool[:MAX_SUGGESTIONS],
+            suggestions=self._suggestions(city_id, lesson_id),
         )

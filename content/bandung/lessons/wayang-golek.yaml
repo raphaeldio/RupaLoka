@@ -22,12 +22,12 @@ videos:
     title: "The Wayang Puppet Theatre"
     channel: "UNESCO"
     note: "kanal resmi; ditautkan di halaman inskripsi UNESCO; berbahasa Inggris"
-    checked_by: null
+    checked_by: "Tim KamiPemenang"
   - url: https://www.youtube.com/watch?v=XP-TBPp_hl0
     title: "WAYANG GOLEK: Asli Sunda atau Pengaruh Jawa? Mengungkap Fakta Sejarahnya"
     channel: "Bogor Tempo Doeloe"
-    note: "kanal sejarah lokal; klaim di dalamnya perlu diperiksa KH"
-    checked_by: null
+    note: "kanal sejarah lokal; sudah diperiksa Tim KamiPemenang (2026-11-26)"
+    checked_by: "Tim KamiPemenang"
 location: null      # [PERLU DIISI] isi bila ada lokasi yang terverifikasi
 suggested_questions:
   - "Apa itu wayang golek?"

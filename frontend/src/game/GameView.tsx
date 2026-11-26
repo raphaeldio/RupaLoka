@@ -308,7 +308,7 @@ export default function GameView({
         {overlay?.kind === 'ready' && (
           <div className="absolute inset-0 grid cursor-pointer place-items-center bg-tinta/25 p-4 text-center">
             <div className="rounded-3xl bg-white/95 px-4 py-3 text-tinta shadow-kartu sm:px-5 sm:py-4">
-              <p className="text-base font-extrabold text-teal sm:text-lg">Ketuk atau tekan Spasi untuk mulai</p>
+              <p className="text-base font-black text-teal-800 sm:text-lg">Ketuk atau tekan Spasi untuk mulai</p>
               <p className="mt-1 hidden text-sm text-redup sm:block">
                 Lompati rintangan. Tiap {detail.game.unlock_every} m kamu bertemu warga yang
                 menceritakan item budaya!
@@ -321,7 +321,7 @@ export default function GameView({
         {overlay?.kind === 'paused' && (
           <div role="dialog" aria-label="Game dijeda" className="absolute inset-0 grid place-items-center bg-tinta/40 p-4">
             <div className="rounded-3xl bg-white px-6 py-5 text-center text-tinta shadow-kartu">
-              <p className="text-lg font-extrabold text-teal">Dijeda</p>
+              <p className="text-lg font-black text-teal-800">Dijeda</p>
               <div className="mt-3 flex justify-center gap-2">
                 {onExit && (
                   <Button variant="secondary" onClick={onExit}>
@@ -345,7 +345,7 @@ export default function GameView({
         {overlay?.kind === 'over' && (
           <div role="dialog" aria-label="Permainan selesai" className="absolute inset-0 grid place-items-center bg-tinta/45 p-4">
             <div className="rounded-3xl bg-white px-6 py-5 text-center text-tinta shadow-kartu">
-              <p className="text-lg font-extrabold text-teal">Ups, tersandung!</p>
+              <p className="text-lg font-black text-teal-800">Ups, tersandung!</p>
               <p className="mt-1 text-sm text-redup">Skor akhir: {hud.score}</p>
               <Button className="mt-3" autoFocus onClick={finish}>
                 Lihat ringkasan
@@ -365,6 +365,8 @@ export default function GameView({
               source={detail.sources[overlay.item.chunk]}
               onAsk={() => onAsk(`Ceritakan lebih lanjut tentang ${labelOr(overlay.item.name, 'item ini')}.`, overlay.item.lesson)}
               onContinue={resumeWithCountdown}
+              cityId={detail.city.id}
+              sources={detail.sources}
             />
           </div>
         )}

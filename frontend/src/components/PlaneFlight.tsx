@@ -88,7 +88,7 @@ export default function PlaneFlight({
           </svg>
         </div>
       </div>
-      <p className="absolute inset-x-0 bottom-6 mx-auto w-fit rounded-full bg-white/90 px-4 py-1.5 text-sm font-extrabold text-teal shadow-kartu">
+      <p className="absolute inset-x-0 bottom-6 mx-auto w-fit rounded-full bg-white/90 px-4 py-1.5 text-sm font-black text-teal-800 shadow-kartu">
         Terbang ke {cityName}…
       </p>
     </div>

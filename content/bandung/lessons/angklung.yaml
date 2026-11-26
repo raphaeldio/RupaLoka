@@ -26,12 +26,12 @@ videos:
     title: "Indonesian Angklung"
     channel: "UNESCO"
     note: "kanal resmi; ditautkan di halaman inskripsi UNESCO; berbahasa Inggris"
-    checked_by: null
+    checked_by: "Tim KamiPemenang"
   - url: https://www.youtube.com/watch?v=sQZHILO1Fqo
     title: "Bohemian Rhapsody & November Rain Cover by Saung Angklung Udjo"
     channel: "Saung Angklung Udjo"
     note: "contoh angklung diatonis; pastikan kanal resmi"
-    checked_by: null
+    checked_by: "Tim KamiPemenang"
 # Lokasi untuk tombol "Lihat lokasi asli" (F-032). Hapus blok ini (location: null) bila tidak ada.
 # Kaitan dengan Saung Angklung Udjo HARUS diverifikasi dulu (T-035).
 location:
@@ -39,6 +39,13 @@ location:
   address: "Padasuka, Bandung"        # alamat lengkap [PERLU DIISI] dari sumber
   lat: null
   lng: null
+  # Tombol "Kunjungi" (masukan juri, 25 Nov 2026): tautan ke situs resmi, sanggar, perajin,
+  # dan jadwal pertunjukan agar pemain terhubung dengan komunitas pemilik budaya.
+  # TODO KH: isi setelah peran Saung Angklung Udjo dan tautannya diverifikasi (T-035). Bentuk:
+  #   - { label: "Situs resmi", url: "https://...", kind: situs, verified_by: "<nama>" }
+  #   - { label: "Jadwal pertunjukan", url: "https://...", kind: jadwal, verified_by: "<nama>" }
+  # kind: situs | sanggar | perajin | jadwal
+  links: []
 suggested_questions:
   - "Apa itu angklung?"
   - "Dari bahan apa angklung dibuat?"

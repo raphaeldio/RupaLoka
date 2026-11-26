@@ -6,6 +6,7 @@ import { featureFlags } from '../lib/flags'
 import { formatClock, MIN_WATCH_SECONDS } from '../lib/watch'
 import { youtubeId } from '../lib/youtube'
 import LessonVideos, { type WatchProgress } from './LessonVideos'
+import FeedbackButton from './FeedbackButton'
 import LocationButton from './LocationButton'
 import { Button, Card, ContentText, SafeImage, SourceChip } from './primitives'
 
@@ -17,6 +18,7 @@ export default function LessonCard({
   onAsk,
   onFinish,
   finishLabel = 'Selesai',
+  cityId,
 }: {
   lesson: Lesson
   /** Teks kecil di atas judul, mis. "Titik 2 · Materi". */
@@ -26,6 +28,8 @@ export default function LessonCard({
   /** `watched` = syarat tonton terpenuhi (selalu true bila materi tanpa video). */
   onFinish: (watched: boolean) => void
   finishLabel?: string
+  /** Untuk tautan "Beri masukan" (tidak tampil bila kosong). */
+  cityId?: string
 }) {
   const hasVideo = lesson.videos.length > 0
   // Syarat tonton 3 menit hanya bila flag aktif (disembunyikan di MVP).
@@ -38,7 +42,7 @@ export default function LessonCard({
       {hasVideo && <LessonVideos videos={lesson.videos} onProgress={setWatch} />}
       {image && <SafeImage image={image} className="aspect-[16/9] w-full" />}
       <div className="p-5 sm:p-6">
-        <p className="text-xs font-extrabold uppercase tracking-[1.6px] text-redup">
+        <p className="eyebrow text-redup">
           {eyebrow}
         </p>
         <h2 className="mt-1 text-2xl font-extrabold tracking-tight text-teal">{labelOr(lesson.title, 'Materi budaya')}</h2>
@@ -57,7 +61,7 @@ export default function LessonCard({
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.08 }}
-                  className="rounded-2xl bg-kertas p-3 text-sm"
+                  className="border border-emas/40 bg-kertas p-3 text-sm rounded-2xl"
                 >
                   <ContentText text={f.text} fallback="Fakta sedang diverifikasi." />
                   <div className="mt-2">
@@ -80,7 +84,7 @@ export default function LessonCard({
                     whileTap={{ scale: 0.95 }}
                     type="button"
                     onClick={() => onAsk(q)}
-                    className="rounded-full border border-teal/40 bg-white px-3 py-1.5 text-sm font-semibold text-teal transition hover:bg-teal hover:text-white"
+                    className="tekan border border-emas/40 bg-white px-3 py-1.5 text-sm font-semibold text-teal shadow-tekan hover:bg-teal hover:text-white rounded-full"
                   >
                     {q}
                   </motion.button>
@@ -93,20 +97,25 @@ export default function LessonCard({
         <div className="mt-5">
           <LocationButton location={lesson.location} />
         </div>
+        {cityId && (
+          <div className="mt-3 flex justify-end">
+            <FeedbackButton target={{ cityId, id: lesson.id, title: labelOr(lesson.title, 'Materi budaya') }} />
+          </div>
+        )}
 
         {image && !image.license.includes('[PERLU DIISI]') && (
           <p className="mt-3 text-[11px] text-redup">Gambar: {image.license}</p>
         )}
 
         {mustWatch && (
-          <div className="mt-6 rounded-2xl bg-kertas p-3" role="status" aria-live="polite">
+          <div className="mt-6 border border-emas/40 bg-kertas p-3 rounded-2xl" role="status" aria-live="polite">
             <p className="text-sm font-bold">
               {watched
                 ? 'Mantap, video sudah ditonton. Poin titik ini bisa kamu dapat!'
                 : `Tonton video minimal ${formatClock(watch.required)} pertama untuk mendapat poin.`}
             </p>
             <div
-              className="mt-2 h-2 overflow-hidden rounded-full bg-pasir"
+              className="mt-2 h-3 overflow-hidden border border-emas/40 bg-white rounded-2xl"
               role="progressbar"
               aria-label="Waktu tonton video"
               aria-valuemin={0}
@@ -114,7 +123,7 @@ export default function LessonCard({
               aria-valuenow={watch.watched}
             >
               <div
-                className="h-full rounded-full bg-teal transition-[width] duration-500"
+                className="h-full bg-teal transition-[width] duration-500"
                 style={{ width: `${watched ? 100 : Math.round((watch.watched / watch.required) * 100)}%` }}
               />
             </div>

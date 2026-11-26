@@ -1,0 +1,244 @@
+/* Bab "Jalan kota" (JalanKota.tsx). Gerak dunia oleh GSAP (transform); di sini hanya tata letak. */
+
+.jk-trek {
+  position: relative;
+}
+.jk-panggung {
+  --r: clamp(118px, 22svh, 190px); /* tinggi jalan (trotoar + aspal) */
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  min-height: 560px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  background: linear-gradient(180deg, #b4e0f3 0%, #a4d9f1 70%);
+  scrollbar-width: thin;
+}
+.jk-trek[data-hidup] .jk-panggung {
+  overflow: hidden;
+}
+
+/* ---------- Latar jauh ---------- */
+.jk-awan {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: calc(100vw + 600px);
+  height: 45%;
+  will-change: transform;
+}
+.jk-awan > span {
+  position: absolute;
+  width: clamp(80px, 9vw, 140px);
+  aspect-ratio: 3 / 1;
+  background: #fdfaf0;
+  clip-path: polygon(0 100%, 0 62%, 14% 62%, 14% 32%, 34% 32%, 34% 0, 66% 0, 66% 32%, 86% 32%, 86% 62%, 100% 62%, 100% 100%);
+  opacity: 0.95;
+}
+.jk-bukit {
+  position: absolute;
+  left: 0;
+  bottom: calc(var(--r) * 0.9);
+  width: calc(100vw + 1400px);
+  height: clamp(70px, 17svh, 170px);
+  will-change: transform;
+}
+.jk-bukit svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* ---------- Dunia yang digeser ---------- */
+.jk-dunia {
+  position: absolute;
+  inset: 0;
+}
+.jk-isi {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  align-items: flex-end;
+  width: max-content;
+  padding-bottom: calc(var(--r) * 0.86);
+  will-change: transform;
+}
+/* Jalan berulang: cukup selebar layar + 2 ubin, digeser modulo satu ubin oleh JS. */
+.jk-jalan {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: calc(100% + var(--r) * 7.415 * 2);
+  height: var(--r);
+  background: var(--jalan) repeat-x left bottom / auto 100%;
+  image-rendering: pixelated;
+  will-change: transform;
+}
+.jk-isi > * {
+  flex: none;
+}
+.jk-jeda {
+  width: 34vw;
+}
+.jk-jeda-akhir {
+  width: 105vw;
+}
+.jk-gerbang {
+  height: min(58svh, 560px);
+  width: auto;
+}
+.jk-gedung {
+  height: min(42svh, 420px);
+  width: auto;
+  margin-left: 8vw;
+}
+.jk-rumah {
+  height: min(40svh, 400px);
+  width: auto;
+  margin-left: 8vw;
+}
+.jk-gerbang,
+.jk-gedung,
+.jk-rumah {
+  margin-bottom: -2px;
+  user-select: none;
+}
+
+/* Papan titik budaya: kartu di atas tiang kayu. */
+.jk-papan {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: min(270px, 70vw);
+  margin-left: 8vw;
+}
+.jk-papan-kartu {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  width: 100%;
+  padding: 14px 16px;
+  transform: scale(0.9);
+  transform-origin: 50% 100%;
+  opacity: 0.88;
+  transition:
+    transform 0.35s cubic-bezier(0.3, 1.5, 0.5, 1),
+    opacity 0.3s ease,
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+.jk-no {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  background: #0e4d4b;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 900;
+  box-shadow: 0 0 0 4px #f8e9c4;
+  transition:
+    background 0.3s ease,
+    color 0.3s ease;
+}
+.jk-tiang {
+  width: 10px;
+  height: clamp(36px, 9svh, 100px);
+  border: 2px solid #3d2a18;
+  border-top: 0;
+  background: linear-gradient(90deg, #8a5d34, #6b4524);
+}
+.jk-papan[data-lewat] .jk-papan-kartu {
+  transform: scale(1);
+  opacity: 1;
+  border-color: #e8b64c;
+  box-shadow:
+    0 0 0 3px rgb(232 182 76 / 0.45),
+    0 18px 34px -14px rgb(14 77 75 / 0.45);
+}
+.jk-papan[data-lewat] .jk-no {
+  background: #e8b64c;
+  color: #1d2a2a;
+}
+.jk-akhir {
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+  margin-left: 10vw;
+}
+.jk-akhir-kartu {
+  width: min(250px, 60vw);
+  margin-bottom: clamp(60px, 12svh, 120px);
+  padding: 14px 16px;
+}
+.jk-bendera {
+  display: block;
+  height: clamp(80px, 16svh, 140px);
+  width: auto;
+}
+
+/* ---------- Pelari & HUD ---------- */
+.jk-pelari {
+  position: absolute;
+  left: 22%;
+  bottom: calc(var(--r) * 0.8);
+  z-index: 3;
+  height: clamp(56px, 12svh, 110px);
+  width: auto;
+  aspect-ratio: 18 / 32;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 4px 0 rgb(0 0 0 / 0.18));
+}
+@media (max-width: 640px) {
+  .jk-pelari {
+    left: 12%;
+  }
+}
+.jk-hud {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  top: 96px;
+  z-index: 4;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .jk-panggung {
+    position: relative;
+    height: clamp(560px, 90svh, 800px);
+  }
+  .jk-papan-kartu {
+    transform: none;
+    opacity: 1;
+    transition: none;
+  }
+}
+
+/* Ujung bawah jalan: aspal memudar ke latar bab berikutnya. */
+.jk-trek::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -60px;
+  height: 60px;
+  background: linear-gradient(180deg, #4f4f53, rgb(79 79 83 / 0));
+  pointer-events: none;
+}
+
+/* Tanpa gerak (JS mati/gerak dikurangi): dunia digeser manual, jalan ikut di dunia. */
+.jk-trek:not([data-hidup]) .jk-jalan {
+  display: none;
+}
+.jk-trek:not([data-hidup]) .jk-isi {
+  background: var(--jalan) repeat-x left bottom / auto var(--r);
+}

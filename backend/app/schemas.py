@@ -97,13 +97,18 @@ class LeaderboardConfig(Strict):
 class Rewards(Strict):
     """Poin path belajar (titik = materi, titik terakhir = game) dan lencana.
 
-    Poin kota = titik materi selesai × points_per_node + jawaban kuis benar ×
-    points_per_correct + (game_node_points bila game sudah dimainkan sekali) +
+    Poin kota = titik materi selesai × points_per_node + jawaban fakta benar ×
+    points_per_correct + jawaban nilai benar × points_per_value + refleksi yang dikenali ×
+    points_per_reflection + (game_node_points bila game sudah dimainkan sekali) +
     skor game terbaik, dibatasi game_score_cap (agar batas papan peringkat tetap ada).
     """
 
     points_per_node: int = Field(default=100, ge=0)
     points_per_correct: int = Field(default=10, ge=0)
+    # Soal nilai (kind: nilai) dan refleksi akhir tur diberi poin lebih besar agar peringkat
+    # mencerminkan pemahaman, bukan kecepatan berlari (masukan juri, 25 Nov 2026).
+    points_per_value: int = Field(default=30, ge=0)
+    points_per_reflection: int = Field(default=50, ge=0)
     game_node_points: int = Field(default=100, ge=0)
     game_score_cap: int = Field(default=1000, ge=0)
     badges: list[Badge] = Field(default_factory=list)
@@ -139,12 +144,24 @@ class CityConfig(Strict):
 ITEM_UNLOCKED_FIELDS = {"item", "short_explanation"}
 
 
+class SmallTalkScript(Strict):
+    """Balasan basa-basi agen (salam, terima kasih, dsb.), ditulis tim; tanpa fakta budaya.
+    Dipakai `app/conversation.py` tanpa memanggil LLM (SDD ADR 41)."""
+
+    greeting: Text
+    thanks: Text
+    goodbye: Text
+    identity: Text
+    help: Text
+
+
 class AgentScript(Strict):
     quiz_intro: Text
     lessons_start: Text
     game_start: Text
     item_unlocked: Text
     summary: Text
+    small_talk: SmallTalkScript | None = None
 
     @model_validator(mode="after")
     def _known_placeholders(self) -> AgentScript:
@@ -161,8 +178,13 @@ class AgentScript(Strict):
 # --- content/<kota>/quiz.yaml ----------------------------------------------
 
 
+QuestionKind = Literal["fakta", "nilai"]
+
+
 class QuizQuestion(Strict):
     id: Id
+    # "nilai" = soal tentang nilai/makna budaya (bukan hafalan fakta); poinnya points_per_value.
+    kind: QuestionKind = "fakta"
     question: Text
     options: list[Text] = Field(min_length=2)
     correct: int = Field(ge=0)
@@ -225,11 +247,31 @@ class KeyFact(Strict):
     chunk: Id
 
 
+VisitKind = Literal["situs", "sanggar", "perajin", "jadwal"]
+
+
+class VisitLink(Strict):
+    """Tautan "Kunjungi": situs resmi, sanggar, perajin, atau jadwal pertunjukan komunitas."""
+
+    label: Text
+    url: Text
+    kind: VisitKind
+    note: str | None = None
+    verified_by: str | None = None  # nama KH yang memeriksa tautan; kosong = tertunda
+
+    @model_validator(mode="after")
+    def _http_only(self) -> VisitLink:
+        if not re.match(r"^https?://", self.url):
+            raise ValueError("url tautan kunjungi harus diawali http:// atau https://")
+        return self
+
+
 class Location(Strict):
     name: Text
     address: Text
     lat: Lat | None = None
     lng: Lng | None = None
+    links: list[VisitLink] = Field(default_factory=list)
 
 
 class Lesson(Strict):
@@ -244,6 +286,62 @@ class Lesson(Strict):
     tier: Tier = "free"
 
 
+class CardAspect(Strict):
+    """Satu bagian kartu budaya: teks ditulis tim budaya, bersumber pada chunk."""
+
+    text: Text
+    chunk: Id
+
+
+class Validator(Strict):
+    """Budayawan/anggota komunitas yang memvalidasi kartu budaya."""
+
+    name: Text
+    role: str | None = None
+    validated_at: date | None = None
+
+
+class CultureCard(Strict):
+    """Kartu budaya lengkap (masukan juri, 25 Nov 2026). Kosong = belum disusun (pending)."""
+
+    nilai: CardAspect | None = None
+    pengetahuan: CardAspect | None = None
+    ekspresi: CardAspect | None = None
+    fungsi: CardAspect | None = None
+    community: CardAspect | None = None  # mis. "ekspresi budaya tradisional masyarakat Sunda"
+    validator: Validator | None = None
+
+
+CARD_ASPECTS = ("nilai", "pengetahuan", "ekspresi", "fungsi", "community")
+
+
+class AccuracyCheck(Strict):
+    """Pemeriksaan bentuk model 3D buatan tim oleh anggota budaya (KH)."""
+
+    by: Text
+    checked_at: date
+
+
+class ItemModel(Strict):
+    """Model 3D objek untuk galeri (SDD ADR 40). Berkas dicatat di sources.yaml → assets."""
+
+    src: Text  # relatif terhadap content/, mis. assets/models/angklung.glb
+    poster: Text | None = None  # gambar cadangan bila 3D gagal; kosong = item.image
+    accuracy_check: AccuracyCheck | None = None
+
+
+class Hotspot(Strict):
+    """Titik penjelasan pada model; posisinya dari node `hotspot_<id>` di GLB.
+
+    Teks dan chunk DIISI TIM BUDAYA; kosong = tidak ditampilkan (pending).
+    """
+
+    id: Id
+    label: Text
+    text: Text | None = None
+    chunk: Id | None = None
+
+
 class Item(Strict):
     id: Id
     name: Text
@@ -253,6 +351,145 @@ class Item(Strict):
     chunk: Id
     lesson: Id
     tier: Tier = "free"
+    card: CultureCard | None = None
+    model: ItemModel | None = None
+    hotspots: list[Hotspot] = Field(default_factory=list)
+
+    @model_validator(mode="after")
+    def _hotspot_ids_unique(self) -> Item:
+        _no_duplicates([h.id for h in self.hotspots], "hotspots")
+        return self
+
+
+# --- content/<kota>/gallery.yaml (opsional; galeri 3D, SDD ADR 40) ----------
+
+
+class GalleryRoom(Strict):
+    model: Text  # GLB lorong melingkar, relatif terhadap content/
+
+
+class GalleryLayout(Strict):
+    """Parameter lorong cincin; dibaca sama oleh frontend (cameraFlow.ts) dan validator."""
+
+    radius: float = Field(default=6.0, ge=6.0)  # jari-jari garis tengah lorong (m)
+    slots: int = Field(default=12, ge=1)  # jumlah pedestal di keliling
+    first_d: float = Field(default=3.0, ge=0.0)  # jarak pedestal pertama dari titik awal (m)
+
+
+class MuseumObject(Strict):
+    """Objek khusus museum 3D (bukan item hadiah game). Teks DIISI dari chunk bersumber."""
+
+    id: Id
+    name: Text
+    short_explanation: CardAspect | None = None  # kosong = "sedang disusun tim budaya"
+    image: ImageRef | None = None
+    model: ItemModel | None = None
+    hotspots: list[Hotspot] = Field(default_factory=list)
+
+    @model_validator(mode="after")
+    def _hotspot_ids_unique(self) -> MuseumObject:
+        _no_duplicates([h.id for h in self.hotspots], "hotspots")
+        return self
+
+
+class GalleryExhibit(Strict):
+    """Satu pedestal: item koleksi yang sudah ada (`item`) ATAU objek khusus museum (`object`)."""
+
+    item: Id | None = None
+    object: MuseumObject | None = None
+    asal_usul: CardAspect | None = None  # cerita asal usul bersumber; kosong = pending
+
+    @model_validator(mode="after")
+    def _one_kind(self) -> GalleryExhibit:
+        if (self.item is None) == (self.object is None):
+            raise ValueError("isi tepat salah satu: item atau object")
+        return self
+
+    @property
+    def key(self) -> str:
+        return self.item if self.item is not None else self.object.id  # type: ignore[union-attr]
+
+
+class GalleryGuide(Strict):
+    """Maskot pemandu di galeri (model GLB); jawabannya tetap lewat agen bersumber."""
+
+    model: Text
+
+
+class WallDecor(Strict):
+    """Pajangan dinding (lukisan) di dinding seberang pedestal ke-`slot`; hiasan, bukan pameran.
+
+    Tidak ada teks fakta: hanya nama/judul. Asal-usul gambar dan lisensinya dicatat di
+    sources.yaml (prinsip 7).
+    """
+
+    id: Id
+    name: Text
+    model: Text  # GLB, asal di tengah permukaan belakang, depan menghadap +Z
+    slot: int = Field(ge=0)
+
+
+class KhApproval(Strict):
+    name: Text
+    approved_at: date
+
+
+class GalleryFile(Strict):
+    room: GalleryRoom
+    layout: GalleryLayout = Field(default_factory=GalleryLayout)
+    exhibits: list[GalleryExhibit] = Field(min_length=1)  # urutan = pedestal_1, pedestal_2, ...
+    guide: GalleryGuide | None = None
+    decor: list[WallDecor] = Field(default_factory=list)
+    approved_by_kh: KhApproval | None = None
+
+    @model_validator(mode="after")
+    def _check(self) -> GalleryFile:
+        _no_duplicates([e.key for e in self.exhibits], "exhibits")
+        _no_duplicates([d.id for d in self.decor], "decor")
+        _no_duplicates([str(d.slot) for d in self.decor], "decor.slot")
+        for d in self.decor:
+            if d.slot >= self.layout.slots:
+                raise ValueError(f"decor '{d.id}': slot {d.slot} di luar layout.slots")
+        if len(self.exhibits) > self.layout.slots:
+            raise ValueError(
+                f"{len(self.exhibits)} exhibits melebihi layout.slots ({self.layout.slots})"
+            )
+        return self
+
+
+# --- content/<kota>/reflection.yaml (opsional) -----------------------------
+
+
+class ReflectionValue(Strict):
+    """Nilai yang diharapkan muncul di jawaban refleksi; kata kunci ditulis tim budaya."""
+
+    id: Id
+    label: Text
+    keywords: list[Text] = Field(default_factory=list)
+    explanation: CardAspect | None = None
+
+
+class ReflectionQuestion(Strict):
+    id: Id
+    lesson: Id | None = None
+    prompt: Text
+    values: list[ReflectionValue] = Field(default_factory=list)
+    feedback_match: Text
+    feedback_miss: Text
+
+    @model_validator(mode="after")
+    def _unique(self) -> ReflectionQuestion:
+        _no_duplicates([v.id for v in self.values], "values")
+        return self
+
+
+class ReflectionFile(Strict):
+    questions: list[ReflectionQuestion] = Field(default_factory=list)
+
+    @model_validator(mode="after")
+    def _unique(self) -> ReflectionFile:
+        _no_duplicates([q.id for q in self.questions], "reflection")
+        return self
 
 
 # --- content/<kota>/knowledge/*.yaml ---------------------------------------

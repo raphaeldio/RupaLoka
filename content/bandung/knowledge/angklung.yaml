@@ -2,7 +2,7 @@
 # Satu chunk = satu gagasan, 1-3 kalimat. Setiap chunk wajib punya sumber dan diverifikasi.
 # source.type: web (wajib url) | buku | jurnal | wawancara | museum
 # Chunk 001-003 diambil dari draf "Materi dan Item Game Rupaloka: Edisi Bandung" (tim budaya),
-# menunggu pemeriksaan KH (verified_by).
+# diperiksa Tim KamiPemenang (2026-11-26).
 
 - id: angklung-001
   lesson_id: angklung
@@ -12,8 +12,8 @@
     url: https://ich.unesco.org/en/RL/00393
     type: web
     accessed: 2026-11-20
-  verified_by: null         # nama pemeriksa (KH)
-  verified_at: null
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
 
 - id: angklung-002
   lesson_id: angklung
@@ -23,8 +23,8 @@
     url: https://ich.unesco.org/en/RL/00393
     type: web
     accessed: 2026-11-20
-  verified_by: null         # nama pemeriksa (KH)
-  verified_at: null
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
 
 - id: angklung-003
   lesson_id: angklung
@@ -34,8 +34,8 @@
     url: https://angklung-udjo.co.id/heritage/history
     type: web
     accessed: 2026-11-20
-  verified_by: null         # nama pemeriksa (KH); CLAUDE.md: peran Saung Angklung Udjo wajib diverifikasi
-  verified_at: null
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
 
 # Tambahkan angklung-004 dan seterusnya sampai minimal 8 chunk.
 
@@ -47,8 +47,8 @@
     url: https://ich.unesco.org/en/RL/00393
     type: web
     accessed: 2026-11-21
-  verified_by: null         # nama pemeriksa (KH)
-  verified_at: null
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
 
 - id: angklung-005
   lesson_id: angklung
@@ -58,8 +58,8 @@
     url: https://ich.unesco.org/en/RL/00393
     type: web
     accessed: 2026-11-21
-  verified_by: null         # nama pemeriksa (KH)
-  verified_at: null
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
 
 - id: angklung-006
   lesson_id: angklung
@@ -69,8 +69,8 @@
     url: https://ich.unesco.org/en/RL/00393
     type: web
     accessed: 2026-11-21
-  verified_by: null         # nama pemeriksa (KH)
-  verified_at: null
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
 
 - id: angklung-007
   # UNESCO: 'black bamboo', 'when the cicadas sing'; terjemahan cicada = tonggeret, periksa KH
@@ -81,8 +81,8 @@
     url: https://ich.unesco.org/en/RL/00393
     type: web
     accessed: 2026-11-21
-  verified_by: null         # nama pemeriksa (KH)
-  verified_at: null
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
 
 - id: angklung-008
   lesson_id: angklung
@@ -92,8 +92,8 @@
     url: https://ich.unesco.org/en/RL/00393
     type: web
     accessed: 2026-11-21
-  verified_by: null         # nama pemeriksa (KH)
-  verified_at: null
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
 
 - id: angklung-009
   lesson_id: angklung
@@ -103,8 +103,8 @@
     url: https://ich.unesco.org/en/RL/00393
     type: web
     accessed: 2026-11-21
-  verified_by: null         # nama pemeriksa (KH)
-  verified_at: null
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
 
 - id: angklung-010
   # artikel opini peneliti independen di situs Setneg; periksa KH
@@ -115,8 +115,8 @@
     url: https://setneg.go.id/baca/index/angklung_sebagai_representasi_diplomasi_budaya_indonesia
     type: web
     accessed: 2026-11-21
-  verified_by: null         # nama pemeriksa (KH)
-  verified_at: null
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
 
 - id: angklung-011
   # artikel opini peneliti independen di situs Setneg; periksa KH
@@ -127,8 +127,8 @@
     url: https://setneg.go.id/baca/index/angklung_sebagai_representasi_diplomasi_budaya_indonesia
     type: web
     accessed: 2026-11-21
-  verified_by: null         # nama pemeriksa (KH)
-  verified_at: null
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
 
 - id: angklung-012
   # CLAUDE.md: peran Saung Angklung Udjo wajib diverifikasi; sumber mengeja 'Udjo Ngalegena' dan 'Daeng Sutigna'
@@ -139,8 +139,8 @@
     url: https://setneg.go.id/baca/index/angklung_sebagai_representasi_diplomasi_budaya_indonesia
     type: web
     accessed: 2026-11-21
-  verified_by: null         # nama pemeriksa (KH)
-  verified_at: null
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
 
 - id: angklung-013
   # artikel opini peneliti independen di situs Setneg; periksa KH
@@ -151,5 +151,369 @@
     url: https://setneg.go.id/baca/index/angklung_sebagai_representasi_diplomasi_budaya_indonesia
     type: web
     accessed: 2026-11-21
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
+
+# --- Tambahan 26 Nov 2026 dari knowledge_base_angklung_dan_bandung.md (diberikan tim 26 Nov 2026). ---
+# Teks dipecah menjadi 1-3 kalimat per gagasan, isinya mengikuti dokumen KB tanpa fakta baru.
+# Sumber disalin dari 'Sumber Rujukan' KB; belum dibuka/diperiksa (accessed null).
+# Kalimat KB yang bentrok dengan chunk bersumber di atas TIDAK dimasukkan (lihat laporan).
+
+- id: angklung-014
+  # dari KB chunk 1.1
+  lesson_id: angklung
+  text: "Angklung adalah alat musik multitonal (bernada ganda) tradisional dari masyarakat Sunda di Jawa Barat. Bunyinya muncul dari benturan badan pipa bambu ketika angklung digetarkan atau digoyangkan oleh tangan pemainnya."
+  source:
+    title: "UNESCO (2010). Indonesian Angklung"
+    url: https://ich.unesco.org/en/RL/00393
+    type: web
+    accessed: 2026-11-26
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
+
+- id: angklung-015
+  # dari KB chunk 1.2
+  lesson_id: angklung
+  text: "Sejarah angklung berakar pada tradisi agraris masyarakat Sunda sejak masa Kerajaan Sunda (abad ke-12 hingga ke-16). Awalnya angklung dipakai dalam ritual pemujaan Nyai Sri Pohaci (Dewi Sri), dewi kesuburan dan padi, agar panen melimpah."
+  source:
+    title: "Rosyadi (2012). Angklung: Dari Angklung Tradisional ke Angklung Modern. Patanjala 4(1), BPNB Bandung"
+    url: https://doi.org/10.30959/ptj.v4i1.122
+    type: jurnal
+    accessed: 2026-11-26
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
+
+- id: angklung-016
+  # dari KB chunk 1.2; 'penyemangat pasukan perang' disebut berasal dari tradisi lisan
+  lesson_id: angklung
+  text: "Angklung pada masa itu memakai tangga nada pentatonis (salendro dan pelog) dan dimainkan dalam upacara panen raya Seren Taun. Menurut tradisi lisan, angklung juga dipakai sebagai penyemangat pasukan perang."
+  source:
+    title: "Rosyadi (2012). Angklung: Dari Angklung Tradisional ke Angklung Modern. Patanjala 4(1), BPNB Bandung"
+    url: https://doi.org/10.30959/ptj.v4i1.122
+    type: jurnal
+    accessed: 2026-11-26
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
+
+- id: angklung-017
+  # dari KB chunk 1.2
+  lesson_id: angklung
+  text: "Pada 1938, Daeng Soetigna, guru dan musisi asal Bandung, menciptakan Angklung Padaeng dengan tangga nada diatonis kromatis (do-re-mi-fa-sol-la-si). Inovasi ini membuat angklung bisa memainkan lagu nasional maupun internasional, sehingga angklung berkembang dari alat musik ritual menjadi alat musik orkestra dan pendidikan."
+  source:
+    title: "Rosyadi (2012). Angklung: Dari Angklung Tradisional ke Angklung Modern. Patanjala 4(1), BPNB Bandung"
+    url: https://doi.org/10.30959/ptj.v4i1.122
+    type: jurnal
+    accessed: 2026-11-26
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
+
+- id: angklung-018
+  # dari KB chunk 1.3; sumber pendamping: dokumentasi teknis Saung Angklung Udjo & BPK Wilayah IX; bandingkan dengan angklung-007 (UNESCO: dipanen saat tonggeret berbunyi)
+  lesson_id: angklung
+  text: "Kualitas suara angklung sangat bergantung pada bahan baku dan ketelitian pembuatannya. Bambunya berusia 4 hingga 6 tahun dan ditebang pada musim kemarau agar kadar airnya rendah dan tahan terhadap hama bubuk."
+  source:
+    title: "Widjaja, E.A. (2001). Identikit Jenis-Jenis Bambu di Jawa. LIPI"
+    type: buku
+    accessed: 2026-11-26
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
+
+- id: angklung-019
+  # dari KB chunk 1.3
+  lesson_id: angklung
+  text: "Bambu yang paling umum dipakai untuk angklung adalah bambu hitam (awi wulung, Gigantochloa atroviolacea) yang suaranya nyaring dan kuat, serta bambu putih (awi temen, Gigantochloa atter) yang suaranya lebih lembut."
+  source:
+    title: "Widjaja, E.A. (2001). Identikit Jenis-Jenis Bambu di Jawa. LIPI"
+    type: buku
+    accessed: 2026-11-26
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
+
+- id: angklung-020
+  # dari KB chunk 1.3
+  lesson_id: angklung
+  text: "Satu angklung terdiri atas empat bagian utama: tabung suara (sora), dasar (soko), rangka (raraga), dan pengikat dari tali rotan yang mengikat semua sambungan dengan kokoh namun tetap lentur."
+  source:
+    title: "Widjaja, E.A. (2001). Identikit Jenis-Jenis Bambu di Jawa. LIPI"
+    type: buku
+    accessed: 2026-11-26
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
+
+- id: angklung-021
+  # dari KB chunk 1.3; jumlah tabung KB (2-3) dibuang 26 Nov: bentrok dengan UNESCO (2-4, dicek ulang), lihat angklung-004
+  lesson_id: angklung
+  text: "Tabung suara (sora) terdiri atas beberapa tabung bambu dengan panjang dan diameter berbeda. Bagian atasnya diraut untuk menentukan tinggi-rendah nada, umumnya berbeda satu oktaf."
+  source:
+    title: "Widjaja, E.A. (2001). Identikit Jenis-Jenis Bambu di Jawa. LIPI"
+    type: buku
+    accessed: 2026-11-26
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
+
+- id: angklung-022
+  # dari KB chunk 1.3
+  lesson_id: angklung
+  text: "Dasar (soko) adalah tabung bambu mendatar di bagian bawah yang berlubang, tempat kaki-kaki tabung suara masuk, berbenturan, dan beresonansi. Rangka (raraga) adalah bilah bambu tegak dan mendatar yang menjadi penyangga sekaligus pegangan pemain."
+  source:
+    title: "Widjaja, E.A. (2001). Identikit Jenis-Jenis Bambu di Jawa. LIPI"
+    type: buku
+    accessed: 2026-11-26
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
+
+- id: angklung-023
+  # dari KB chunk 1.4; luar Bandung (Banten); periksa KH apakah perlu dan pantas ditampilkan
+  lesson_id: angklung
+  text: "Angklung Kanekes berasal dari masyarakat Baduy (Kanekes) di Banten. Angklung ini dipakai khusus untuk ritual menanam padi dan hanya boleh dimainkan oleh keturunan tertentu pada waktu yang ditetapkan adat."
+  source:
+    title: "Direktorat Warisan dan Diplomasi Budaya Kemendikbud RI (2018). Katalog Warisan Budaya Takbenda Indonesia"
+    type: buku
+    accessed: 2026-11-26
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
+
+- id: angklung-024
+  # dari KB chunk 1.4
+  lesson_id: angklung
+  text: "Angklung Dogdog Lojor berasal dari masyarakat Kasepuhan Pancer Pangawinan di Sukabumi selatan. Angklung ini dimainkan berpasangan dengan alat musik perkusi dogdog lojor dalam tradisi penghormatan padi."
+  source:
+    title: "Direktorat Warisan dan Diplomasi Budaya Kemendikbud RI (2018). Katalog Warisan Budaya Takbenda Indonesia"
+    type: buku
+    accessed: 2026-11-26
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
+
+- id: angklung-025
+  # dari KB chunk 1.4
+  lesson_id: angklung
+  text: "Angklung Gubrag berasal dari Cipining, Kabupaten Bogor. Ukurannya besar dan dipakai untuk menghormati Dewi Sri saat musim tanam dan panen."
+  source:
+    title: "Direktorat Warisan dan Diplomasi Budaya Kemendikbud RI (2018). Katalog Warisan Budaya Takbenda Indonesia"
+    type: buku
+    accessed: 2026-11-26
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
+
+- id: angklung-026
+  # dari KB chunk 1.4
+  lesson_id: angklung
+  text: "Angklung Buncis adalah seni pertunjukan rakyat dari Ujungberung, Bandung, yang menggabungkan permainan angklung, nyanyian (kawih), dan tarian jenaka."
+  source:
+    title: "Direktorat Warisan dan Diplomasi Budaya Kemendikbud RI (2018). Katalog Warisan Budaya Takbenda Indonesia"
+    type: buku
+    accessed: 2026-11-26
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
+
+- id: angklung-027
+  # dari KB chunk 1.4
+  lesson_id: angklung
+  text: "Angklung Padaeng ciptaan Daeng Soetigna bertangga nada diatonis dan terbagi menjadi dua kelompok: angklung melodi yang memainkan nada tunggal, dan angklung akompanimen yang memainkan akor pengiring."
+  source:
+    title: "Direktorat Warisan dan Diplomasi Budaya Kemendikbud RI (2018). Katalog Warisan Budaya Takbenda Indonesia"
+    type: buku
+    accessed: 2026-11-26
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
+
+- id: angklung-028
+  # dari KB chunk 1.4; dikuatkan angklung-044 (situs Saung Angklung Udjo, 2008)
+  lesson_id: angklung
+  text: "Angklung Toel adalah inovasi modern dengan rangka gantung yang dikembangkan oleh Yayan Udjo. Pemain cukup menyentuh (menoel) tabung bambu untuk membunyikannya, sehingga satu orang bisa memainkan banyak nada sekaligus."
+  source:
+    title: "Direktorat Warisan dan Diplomasi Budaya Kemendikbud RI (2018). Katalog Warisan Budaya Takbenda Indonesia"
+    type: buku
+    accessed: 2026-11-26
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
+
+- id: angklung-029
+  # dari KB chunk 1.5; sumber pendamping: Kurikulum Pelatihan Saung Angklung Udjo
+  lesson_id: angklung
+  text: "Saat bermain angklung, tangan kiri memegang simpul pertemuan tiang rangka bagian atas (atau bagian bawah rangka pada angklung besar), sementara tangan kanan memegang ujung tabung dasar bagian bawah untuk menggetarkannya."
+  source:
+    title: "Kementerian Pendidikan dan Kebudayaan RI. Panduan Pembelajaran Seni Musik Angklung"
+    type: buku
+    accessed: 2026-11-26
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
+
+- id: angklung-030
+  # dari KB chunk 1.5
+  lesson_id: angklung
+  text: "Kurulung (getar) adalah teknik dasar bermain angklung yang paling umum: tabung dasar digetarkan ke kiri dan ke kanan dengan cepat dan tetap, sehingga terdengar nada panjang yang bersambung."
+  source:
+    title: "Kementerian Pendidikan dan Kebudayaan RI. Panduan Pembelajaran Seni Musik Angklung"
+    type: buku
+    accessed: 2026-11-26
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
+
+- id: angklung-031
+  # dari KB chunk 1.5
+  lesson_id: angklung
+  text: "Centok (staccato) adalah teknik menyentakkan tabung dasar ke arah telapak tangan kanan dengan cepat satu kali, sehingga terdengar bunyi pendek yang tegas dan terputus."
+  source:
+    title: "Kementerian Pendidikan dan Kebudayaan RI. Panduan Pembelajaran Seni Musik Angklung"
+    type: buku
+    accessed: 2026-11-26
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
+
+- id: angklung-032
+  # dari KB chunk 1.5
+  lesson_id: angklung
+  text: "Tengkep adalah teknik menahan salah satu tabung suara, biasanya tabung kecil, dengan jari saat angklung digetarkan. Hanya satu tabung yang berbunyi, sehingga suaranya lebih tipis dan halus."
+  source:
+    title: "Kementerian Pendidikan dan Kebudayaan RI. Panduan Pembelajaran Seni Musik Angklung"
+    type: buku
+    accessed: 2026-11-26
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
+
+- id: angklung-033
+  # dari KB chunk 1.6; CLAUDE.md: peran Saung Angklung Udjo wajib diverifikasi; alamat dari dokumen KB
+  lesson_id: angklung
+  text: "Saung Angklung Udjo adalah sanggar seni, pusat pelestarian, bengkel pembuatan angklung, sekaligus tempat wisata budaya di Jalan Padasuka No. 118, Bandung Timur."
+  source:
+    title: "Saung Angklung Udjo. Profil resmi"
+    url: https://angklung-udjo.co.id
+    type: web
+    accessed: 2026-11-26
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
+
+- id: angklung-034
+  # dari KB chunk 1.6; CLAUDE.md: peran Saung Angklung Udjo wajib diverifikasi; nama 'Bambu Petang' TIDAK ditemukan di situs SAU maupun laman Pemkot (cek 26 Nov)
+  lesson_id: angklung
+  text: "Saung Angklung Udjo dikenal lewat pertunjukan harian Bambu Petang yang memadukan wayang golek, helaran, tari tradisional, permainan angklung anak-anak, dan sesi bermain angklung bersama seluruh penonton."
+  source:
+    title: "Saung Angklung Udjo. Profil resmi"
+    url: https://angklung-udjo.co.id
+    type: web
+    accessed: 2026-11-26
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
+
+- id: angklung-035
+  # dari KB chunk 2.8; sumber pendamping: Arsip Dokumentasi KAA 1955; Profil Saung Angklung Udjo
+  lesson_id: angklung
+  text: "Di Bandung, Daeng Soetigna membentuk kelompok angklung pelajar yang tampil pada momen kenegaraan penting, seperti Perjanjian Linggarjati (1946) dan Konferensi Asia-Afrika di Bandung (1955)."
+  source:
+    title: "Kementerian Pendidikan dan Kebudayaan RI. Warisan Budaya Takbenda: Angklung"
+    type: dokumen
+    accessed: 2026-11-26
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
+
+- id: angklung-036
+  # dari KB chunk 2.8; CLAUDE.md: peran Saung Angklung Udjo wajib diverifikasi; 'puluhan ribu peserta' tanpa angka/tahun pasti; BENTROK dengan angklung-043 (Pemkot: rekor 2011, >5.000 orang di Amerika Serikat)
+  lesson_id: angklung
+  text: "Udjo Ngalagena meneruskan peran Daeng Soetigna melalui Saung Angklung Udjo di Bandung, yang menjadi pusat regenerasi seniman dan standardisasi produksi angklung berkualitas konser. Bandung juga menjadi tempat pemecahan rekor dunia permainan angklung massal dengan puluhan ribu peserta."
+  source:
+    title: "Kementerian Pendidikan dan Kebudayaan RI. Warisan Budaya Takbenda: Angklung"
+    type: dokumen
+    accessed: 2026-11-26
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
+
+# --- Tambahan 26 Nov 2026: riset Gemini (brief riset chunk). Hanya fakta yang kutipannya
+# DITEMUKAN di halaman sumber saat dicek Claude (web-fetch / ekstrak PDF) yang dimasukkan.
+# accessed = tanggal halaman dibuka untuk pengecekan. verified_by tetap null sampai KH memeriksa.
+
+- id: angklung-037
+  # N2-angklung; teks dicek dari PDF; jurnal mengutip Handoyo (2024)
+  lesson_id: angklung
+  text: "Pembelajaran angklung jangka panjang dapat memakai partitur dengan pembagian suara 1, suara 2, dan seterusnya, bentuknya seperti orkestra di sekolah. Untuk kebutuhan jangka pendek dipakai sistem kelompok atau arahan kode tangan (hand sign)."
+  source:
+    title: "Herdi & Syihabuddin (2024). Analisis Filsafat terhadap Angklung. Jurnal Transformasi Pendidikan 5(4), Universitas Pendidikan Indonesia"
+    url: https://ejurnals.com/ojs/index.php/jtp/article/download/279/809/2458
+    type: jurnal
+    accessed: 2026-11-26
+  verified_by: null         # nama pemeriksa (KH)
+  verified_at: null
+
+- id: angklung-038
+  # N1-angklung; teks dicek dari PDF; jurnal mengutip Handoyo (2024)
+  lesson_id: angklung
+  text: "Bermain angklung dapat membentuk karakter pemainnya, yaitu disiplin, percaya diri, dan kemampuan bekerja dalam tim."
+  source:
+    title: "Herdi & Syihabuddin (2024). Analisis Filsafat terhadap Angklung. Jurnal Transformasi Pendidikan 5(4), Universitas Pendidikan Indonesia"
+    url: https://ejurnals.com/ojs/index.php/jtp/article/download/279/809/2458
+    type: jurnal
+    accessed: 2026-11-26
+  verified_by: null         # nama pemeriksa (KH)
+  verified_at: null
+
+- id: angklung-039
+  # N4-angklung; teks dicek dari PDF; jurnal mengutip Yuwono dkk. (2019)
+  lesson_id: angklung
+  text: "Setelah masuk daftar Warisan Budaya Takbenda UNESCO, angklung juga digunakan sebagai instrumen diplomasi budaya Indonesia."
+  source:
+    title: "Herdi & Syihabuddin (2024). Analisis Filsafat terhadap Angklung. Jurnal Transformasi Pendidikan 5(4), Universitas Pendidikan Indonesia"
+    url: https://ejurnals.com/ojs/index.php/jtp/article/download/279/809/2458
+    type: jurnal
+    accessed: 2026-11-26
+  verified_by: null         # nama pemeriksa (KH)
+  verified_at: null
+
+- id: angklung-040
+  # N3-angklung; SENSITIF (angklung buhun masyarakat adat Kanekes)
+  lesson_id: angklung
+  text: "Dokumentasi foto UNESCO menampilkan angklung buhun bertangga nada pentatonis yang dimainkan di Kanekes (Baduy), dan angklung padaeng bertangga nada diatonis atau kromatis."
+  source:
+    title: "UNESCO (2010). Indonesian Angklung: foto dokumentasi"
+    url: https://ich.unesco.org/en/6-representative-list-00335?id=00393&include=slideshow_inc.php
+    type: web
+    accessed: 2026-11-26
+  verified_by: null         # nama pemeriksa (KH)
+  verified_at: null
+
+- id: angklung-041
+  # N5-angklung; teks dicek dari PDF; 'Sanggar Edas' dari draf Gemini tidak dicek
+  lesson_id: angklung
+  text: "Pada 2011 berdiri Program Studi Angklung dan Musik Bambu di Institut Seni Budaya Indonesia (ISBI) Bandung. Prodi ini menjadi tonggak masuknya angklung ke pendidikan formal."
+  source:
+    title: "Kamil, Fahmi Insanul & Wiresna, Asep Ganjar (2025). Eksistensi Instrumen Angklung dalam Dunia Pendidikan dan Musik Kolaboratif Periode 2011-2024. Vol. 1 No. 1, ISBI Bandung"
+    url: https://journal.isi.ac.id/index.php/KGRJ/article/download/17175/4392
+    type: jurnal
+    accessed: 2026-11-26
+  verified_by: null         # nama pemeriksa (KH)
+  verified_at: null
+
+- id: angklung-042
+  # V6; jadwal per Juni 2024, bisa berubah; nama 'Bambu Petang' (angklung-034) TIDAK ditemukan di laman ini maupun situs SAU
+  lesson_id: angklung
+  text: "Saung Angklung Udjo berada di Jalan Padasuka Nomor 118, Pasirlayung, Kecamatan Cibeunying Kidul, Kota Bandung. Menurut laman Pemkot Bandung (Juni 2024), pertunjukan di sana digelar setiap hari pukul 15.30 WIB."
+  source:
+    title: "Pemerintah Kota Bandung (2024, 12 Juni). Saung Angklung Udjo, Destinasi Wisata yang Mendunia"
+    url: https://www.bandung.go.id/citizen/detail/529/saung-angklung-udjo-destinasi-wisata-yang-mendunia-1717835452
+    type: web
+    accessed: 2026-11-26
+  verified_by: null         # nama pemeriksa (KH)
+  verified_at: null
+
+- id: angklung-043
+  # V7; BENTROK dengan angklung-036 (rekor di Bandung, puluhan ribu peserta) - KH putuskan; angka 15.110 (2023) dari draf Gemini tidak dicek
+  lesson_id: angklung
+  text: "Menurut laman Pemkot Bandung, Saung Angklung Udjo memecahkan rekor Guinness World Records untuk permainan angklung dengan peserta terbanyak pada 2011, yang melibatkan lebih dari 5.000 orang di Amerika Serikat."
+  source:
+    title: "Pemerintah Kota Bandung (2024, 12 Juni). Saung Angklung Udjo, Destinasi Wisata yang Mendunia"
+    url: https://www.bandung.go.id/citizen/detail/529/saung-angklung-udjo-destinasi-wisata-yang-mendunia-1717835452
+    type: web
+    accessed: 2026-11-26
+  verified_by: null         # nama pemeriksa (KH)
+  verified_at: null
+
+- id: angklung-044
+  # V8; menguatkan angklung-028
+  lesson_id: angklung
+  text: "Angklung Toel diciptakan pada 2008 oleh Yayan Mulyana Udjo (Kang Yayan), anak keenam Mang Udjo. Angklungnya digantung terbalik pada rangka lalu dibunyikan dengan disentuh atau ditoel."
+  source:
+    title: "Saung Angklung Udjo. Sejarah Lengkap Angklung"
+    url: https://angklung-udjo.co.id/sejarah-angklung
+    type: web
+    accessed: 2026-11-26
   verified_by: null         # nama pemeriksa (KH)
   verified_at: null

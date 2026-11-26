@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
 import { Button, Card } from '../components/primitives'
-import BlurText from '../components/reactbits/BlurText'
 import { getSources } from '../lib/api'
 import type { SourcesResponse } from '../lib/api.types'
 import { isPlaceholder } from '../lib/cities'
+import PageHeading from '../components/PageHeading'
 
 const show = (s: string | null | undefined, fallback = 'Sedang diverifikasi') => (isPlaceholder(s) ? fallback : s)
 
@@ -25,11 +25,9 @@ export default function SourcesPage() {
 
   return (
     <main id="konten" className="mx-auto w-full max-w-[900px] px-4 pb-16 sm:px-8">
-      <h1 className="text-3xl font-extrabold tracking-tight text-teal" aria-label="Sumber dan atribusi">
-        <BlurText text="Sumber dan atribusi" animateBy="words" delay={80} className="inline-flex" />
-      </h1>
+      <PageHeading chip="Transparansi" title="Sumber dan" accent="atribusi" />
       <p className="mt-2 text-redup">
-        Semua fakta budaya di Rupaloka berasal dari sumber di bawah dan diperiksa tim. Pemandu AI hanya menjawab dari
+        Semua fakta budaya di Rupaloka berasal dari sumber di bawah dan diperiksa tim. Saloka, pemandu AI, hanya menjawab dari
         sumber ini.
       </p>
 
@@ -95,7 +93,7 @@ export default function SourcesPage() {
                 <tbody>
                   {data.assets.map((a) => (
                     <tr key={a.path} className="border-t border-garis">
-                      <td className="px-4 py-2 font-mono text-xs">{a.path.replace(/^assets\//, '')}</td>
+                      <td className="px-4 py-2 font-sans text-xs">{a.path.replace(/^assets\//, '')}</td>
                       <td className="px-4 py-2">{show(a.license)}</td>
                       <td className="px-4 py-2">
                         {a.url ? (
@@ -125,7 +123,7 @@ export default function SourcesPage() {
                 </a>
                 , lisensi ODbL 1.0 (disederhanakan oleh tim). Peta ditampilkan dengan Leaflet (BSD-2-Clause).
               </li>
-              <li>Huruf: Nunito Sans (SIL Open Font License 1.1).</li>
+              <li>Huruf: Nunito Sans, Pixelify Sans, dan JetBrains Mono (ketiganya SIL Open Font License 1.1).</li>
               <li>
                 Komponen antarmuka: shadcn/ui (MIT), Radix UI (MIT), ikon Lucide (ISC), animasi Motion (MIT), dan
                 komponen animasi React Bits oleh David Haz (MIT + Commons Clause).

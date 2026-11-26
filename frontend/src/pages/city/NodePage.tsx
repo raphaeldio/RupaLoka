@@ -35,8 +35,12 @@ function Steps({ stage, hasQuiz, hasPost }: { stage: NodeStage; hasQuiz: boolean
       {steps.map((s, i) => (
         <li key={s} aria-current={i === current ? 'step' : undefined}>
           <span
-            className={`rounded-full px-2.5 py-1 ${
-              i === current ? 'bg-teal text-white' : i < current ? 'bg-teal-50 text-teal' : 'bg-pasir/70 text-redup'
+            className={`rounded-full px-3 py-1 text-[12px] font-extrabold ${
+              i === current
+                ? 'bg-teal-800 text-white shadow-[0_6px_14px_-6px_rgb(14_77_75/0.6)]'
+                : i < current
+                  ? 'bg-teal-50 text-teal-800 ring-1 ring-teal/20'
+                  : 'bg-white/80 text-redup ring-1 ring-emas/30'
             }`}
           >
             {names[s]}
@@ -76,11 +80,15 @@ function NodePage() {
   const [state, dispatch] = useReducer(reducer, undefined, () => initialNode(questions.length, postQuestions.length))
 
   const [result, setResult] = useState<{ before: number; after: number; badges: Badge[]; complete: boolean } | null>(null)
+  // Poin jawaban benar per jenis soal (fakta / nilai) memakai hasil terbaik dari kuis awal dan akhir
+  // (cocok dengan quizCaps/maxPathPoints dan max_points backend).
   const preCorrect = quizScore(questions, state.answers)
   const postCorrect = quizScore(postQuestions, state.postAnswers)
-  // Poin jawaban benar memakai hasil terbaik dari kuis awal dan akhir, dibatasi jumlah soal titik ini
-  // (agar cocok dengan maxPathPoints yang menghitung soal kuis awal).
-  const correct = Math.min(Math.max(preCorrect, postCorrect), questions.length || postQuestions.length)
+  const correct = Math.max(quizScore(questions, state.answers, 'fakta'), quizScore(postQuestions, state.postAnswers, 'fakta'))
+  const valueCorrect = Math.max(
+    quizScore(questions, state.answers, 'nilai'),
+    quizScore(postQuestions, state.postAnswers, 'nilai'),
+  )
 
   useEffect(() => {
     if (!lesson) return
@@ -99,7 +107,7 @@ function NodePage() {
       setResult({ before, after: before, badges: [], complete })
       return
     }
-    completeNode(cityId, lesson.id, correct)
+    completeNode(cityId, lesson.id, correct, valueCorrect)
     const after = pathPoints(lessonIds, useProgress.getState().cities[cityId] ?? p, detail.rewards)
     const badges = newBadges(before, after, detail.rewards.badges)
     setResult({ before, after, badges, complete })
@@ -161,21 +169,22 @@ function NodePage() {
         onAsk={(q) => ask(q, lesson.id)}
         onFinish={(watched) => dispatch({ type: 'FINISH_LESSON', watched })}
         finishLabel={postQuestions.length > 0 ? 'Lanjut ke kuis akhir' : 'Selesaikan titik'}
+        cityId={cityId}
       />
     )
   } else if (result && !result.complete) {
     const alreadyDone = progress.completed.includes(lesson.id)
     body = (
       <Card className="text-center">
-        <p className="text-xs font-extrabold uppercase tracking-[1.6px] text-redup">Titik {position} belum selesai</p>
-        <h2 className="mt-1 text-2xl font-extrabold text-teal">{title}</h2>
+        <p className="eyebrow text-redup">Titik {position} belum selesai</p>
+        <h2 className="mt-1 text-2xl font-black text-teal-800">{title}</h2>
         <p className="mt-3 text-sm text-redup">
           Kamu melewati sebagian titik ini, jadi belum ada poin{alreadyDone ? ' baru' : ''} dan path belum bisa dilanjutkan
           {alreadyDone ? ' dari percobaan ini' : ''}. Lengkapi dulu:
         </p>
         <ul className="mx-auto mt-3 grid max-w-sm gap-2 text-left text-sm">
           {missingParts(state).map((m) => (
-            <li key={m} className="flex items-start gap-2 rounded-2xl bg-kertas p-3 font-semibold">
+            <li key={m} className="flex items-start gap-2 border border-emas/40 bg-kertas p-3 font-semibold rounded-2xl">
               <span aria-hidden="true" className="text-amber">
                 ●
               </span>
@@ -207,8 +216,8 @@ function NodePage() {
     const nextTitle = labelOr(detail.lessons.find((l) => l.id === next?.id)?.title, 'titik berikutnya')
     body = (
       <Card className="text-center">
-        <p className="text-xs font-extrabold uppercase tracking-[1.6px] text-redup">Titik {position} selesai</p>
-        <h2 className="mt-1 text-2xl font-extrabold text-teal">{title}</h2>
+        <p className="eyebrow text-redup">Titik {position} selesai</p>
+        <h2 className="mt-1 text-2xl font-black text-teal-800">{title}</h2>
         <Pop className="mt-4">
           <p className="text-5xl font-extrabold tabular-nums text-amber" aria-label={`Bertambah ${gained} poin`}>
             <span aria-hidden="true">
@@ -222,7 +231,7 @@ function NodePage() {
         {(questions.length > 0 || postQuestions.length > 0) && (
           <div className="mx-auto mt-4 grid max-w-xs grid-cols-2 gap-2 text-sm">
             {questions.length > 0 && (
-              <p className="rounded-2xl bg-kertas p-3">
+              <p className="border border-emas/40 bg-kertas p-3 rounded-2xl">
                 <span className="block text-xs font-bold text-redup">Kuis awal</span>
                 <strong className="text-lg tabular-nums">
                   {preCorrect}/{questions.length}
@@ -230,7 +239,7 @@ function NodePage() {
               </p>
             )}
             {postQuestions.length > 0 && (
-              <p className="rounded-2xl bg-teal-50 p-3">
+              <p className="border border-emas/40 bg-teal-50 p-3 rounded-2xl">
                 <span className="block text-xs font-bold text-redup">Kuis akhir</span>
                 <strong className="text-lg tabular-nums text-teal">
                   {postCorrect}/{postQuestions.length}
@@ -242,7 +251,7 @@ function NodePage() {
         {gained === 0 && <p className="mt-2 text-xs text-redup">Titik ini sudah pernah diselesaikan; poin dihitung dari hasil terbaik.</p>}
 
         {r && r.badges.length > 0 && (
-          <Pop delay={0.5} className="mx-auto mt-6 max-w-sm rounded-3xl bg-emas-100 p-4">
+          <Pop delay={0.5} className="mx-auto mt-6 max-w-sm border border-emas/40 bg-emas-100 p-4 shadow-melayang rounded-2xl">
           <div role="status">
             <p className="text-sm font-extrabold text-amber">Lencana baru!</p>
             <ul className="mt-2 grid gap-2">
@@ -283,12 +292,12 @@ function NodePage() {
   return (
     <main id="konten" className="mx-auto w-full max-w-[760px] px-4 pb-28 sm:px-8">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <Link to={`/kota/${cityId}`} className="text-sm font-bold text-redup hover:text-teal">
+        <Link to={`/kota/${cityId}`} className="pil pil-putih !px-4 !py-2 !text-sm">
           ← Path {detail.city.name}
         </Link>
         <Steps stage={state.stage} hasQuiz={questions.length > 0} hasPost={postQuestions.length > 0} />
       </div>
-      <p className="mb-2 text-xs font-extrabold uppercase tracking-[1.6px] text-redup">
+      <p className="mb-2 eyebrow text-redup">
         Titik {position}: {title}
       </p>
       {body}

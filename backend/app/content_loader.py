@@ -18,15 +18,20 @@ from typing import Any, Literal, TypeVar
 import yaml
 from pydantic import BaseModel, ValidationError
 
+from app.glb import GlbError, read_nodes_file
+from app.ring import ring_point
 from app.schemas import (
+    CARD_ASPECTS,
     AgentScript,
     Chunk,
     City,
     CityConfig,
+    GalleryFile,
     ImageRef,
     Item,
     Lesson,
     Quiz,
+    ReflectionFile,
     SourcesFile,
 )
 
@@ -39,6 +44,13 @@ LESSON_COUNT_RANGE = (3, 5)  # titik path materi; titik game ditambah otomatis
 MIN_CHUNKS_PER_LESSON = 8
 NARRATIVE_WORDS = (100, 200)
 ITEM_EXPLANATION_MAX_WORDS = 60
+
+# Galeri 3D (SDD ADR 40): batas ukuran GLB dan toleransi posisi pedestal.
+MB = 1024 * 1024
+MAX_OBJECT_MODEL_BYTES = 3 * MB
+MAX_ROOM_MODEL_BYTES = 8 * MB
+MAX_GALLERY_BYTES = 15 * MB
+PEDESTAL_TOLERANCE_M = 0.1
 
 _BRACKET_PLACEHOLDER = re.compile(r"\[[^\]]*\]")
 
@@ -71,6 +83,11 @@ class CityContent:
     lessons: dict[str, Lesson]
     items: dict[str, Item]
     chunks: dict[str, Chunk]
+    reflection: ReflectionFile | None = None
+    gallery: GalleryFile | None = None
+    # Berkas model galeri (relatif ke content/) yang benar-benar ada; API memakai ini agar
+    # klien tidak meminta berkas yang belum dibuat (langsung pakai pengganti).
+    models_present: set[str] = field(default_factory=set)
 
 
 @dataclass
@@ -220,8 +237,17 @@ class _Loader:
         lessons = self._load_by_id(Lesson, city_dir / "lessons", config.lessons, "materi")
         items = self._load_by_id(Item, city_dir / "items", config.game.items_order, "item")
         chunks = self._load_chunks(city_dir / "knowledge")
+        reflection_path = city_dir / "reflection.yaml"
+        reflection = (
+            self._load_one(ReflectionFile, reflection_path) if reflection_path.is_file() else None
+        )
 
-        content = CityContent(config, agent_script, quiz, lessons, items, chunks)
+        gallery_path = city_dir / "gallery.yaml"
+        gallery = self._load_one(GalleryFile, gallery_path) if gallery_path.is_file() else None
+
+        content = CityContent(
+            config, agent_script, quiz, lessons, items, chunks, reflection, gallery
+        )
         self._check_city(city_dir, content, sources)
         return content
 
@@ -295,6 +321,18 @@ class _Loader:
             for lesson_id in c.config.lessons:
                 if lesson_id not in quiz_lessons:
                     self.pending(quiz_path, f"titik path '{lesson_id}' belum punya soal kuis")
+            # Kuis akhir tiap titik memuat minimal satu soal nilai (masukan juri, 25 Nov 2026).
+            post = c.quiz.outro or c.quiz.intro
+            value_lessons = {
+                c.chunks[q.chunk].lesson_id
+                for q in post
+                if q.kind == "nilai" and q.chunk in c.chunks
+            }
+            for lesson_id in c.config.lessons:
+                if lesson_id not in value_lessons:
+                    self.pending(
+                        quiz_path, f"titik path '{lesson_id}' belum punya soal nilai (kind: nilai)"
+                    )
             if len(c.quiz.intro) != QUIZ_INTRO_COUNT:
                 self.pending(
                     quiz_path,
@@ -319,6 +357,12 @@ class _Loader:
                 lesson.location.lat is None or lesson.location.lng is None
             ):
                 self.pending(path, "location: lat/lng belum diisi (tombol lokasi butuh koordinat)")
+            if lesson.location is not None:
+                for i, link in enumerate(lesson.location.links):
+                    if is_unfilled(link.verified_by):
+                        self.pending(
+                            path, f"location.links[{i}]: tautan belum diperiksa (verified_by)"
+                        )
             for i, image in enumerate(lesson.images):
                 self._check_image(path, f"images[{i}]", image, sources)
             for i, video in enumerate(lesson.videos):
@@ -340,6 +384,38 @@ class _Loader:
                     f"short_explanation {words} kata (maksimal {ITEM_EXPLANATION_MAX_WORDS})",
                 )
             self._check_image(path, "image", item.image, sources)
+            self._check_card(path, item, need_chunk)
+            if item.hotspots and item.model is None:
+                self.error(path, "hotspots butuh model 3D (model.src)")
+            for h in item.hotspots:
+                if h.chunk is not None:
+                    need_chunk(path, f"hotspot '{h.id}'", h.chunk)
+
+        # Galeri 3D (opsional)
+        if c.gallery is not None:
+            self._check_gallery(city_dir, c, sources, need_chunk)
+
+        # Refleksi akhir tur (opsional)
+        if c.reflection is not None:
+            ref_path = city_dir / "reflection.yaml"
+            for q in c.reflection.questions:
+                if q.lesson is not None and q.lesson not in lesson_ids:
+                    self.error(
+                        ref_path, f"refleksi '{q.id}': lesson '{q.lesson}' bukan materi kota ini"
+                    )
+                if not q.values:
+                    self.pending(ref_path, f"refleksi '{q.id}': daftar nilai (values) belum diisi")
+                for v in q.values:
+                    if not v.keywords:
+                        self.pending(ref_path, f"refleksi '{q.id}' nilai '{v.id}': keywords kosong")
+                    if v.explanation is None:
+                        self.pending(
+                            ref_path, f"refleksi '{q.id}' nilai '{v.id}': explanation belum diisi"
+                        )
+                    else:
+                        need_chunk(
+                            ref_path, f"refleksi '{q.id}' nilai '{v.id}'", v.explanation.chunk
+                        )
 
         # Rintangan (PRD §7)
         objects = {o.id: o for o in sources.objects} if sources else {}
@@ -358,6 +434,163 @@ class _Loader:
                 )
             elif is_unfilled(obj.approved_by):
                 self.pending(config_path, f"rintangan '{obstacle}' belum disetujui (approved_by)")
+
+    def _check_gallery(
+        self, city_dir: Path, c: CityContent, sources: SourcesFile | None, need_chunk: Any
+    ) -> None:
+        assert c.gallery is not None
+        g = c.gallery
+        gallery_path = city_dir / "gallery.yaml"
+        registered = {a.path for a in sources.assets} if sources else set()
+        if g.approved_by_kh is None:
+            self.pending(gallery_path, "approved_by_kh: isi galeri belum disetujui anggota budaya")
+
+        room_nodes = self._check_model_file(
+            gallery_path, "room.model", g.room.model, MAX_ROOM_MODEL_BYTES, registered
+        )
+        if room_nodes is not None:
+            c.models_present.add(g.room.model)
+        total = self._size(g.room.model)
+        if room_nodes is not None:
+            self._check_pedestals(gallery_path, c, room_nodes)
+
+        for i, exhibit in enumerate(g.exhibits):
+            where = f"exhibits[{i}] ({exhibit.key})"
+            if exhibit.asal_usul is None:
+                self.pending(gallery_path, f"{where}: asal_usul (cerita asal usul) belum diisi")
+            else:
+                need_chunk(gallery_path, f"{where}.asal_usul", exhibit.asal_usul.chunk)
+
+            if exhibit.item is not None:
+                item = c.items.get(exhibit.item)
+                if item is None:
+                    self.error(gallery_path, f"{where}: item '{exhibit.item}' tidak ada di items/")
+                    continue
+                path = city_dir / "items" / f"{item.id}.yaml"
+                model, hotspots = item.model, item.hotspots
+            else:
+                obj = exhibit.object
+                assert obj is not None
+                path = gallery_path
+                model, hotspots = obj.model, obj.hotspots
+                if obj.short_explanation is None:
+                    self.pending(path, f"{where}: short_explanation belum diisi")
+                else:
+                    need_chunk(path, f"{where}.short_explanation", obj.short_explanation.chunk)
+                if obj.image is not None:
+                    self._check_image(path, f"{where}.image", obj.image, sources)
+                if hotspots and model is None:
+                    self.error(path, f"{where}: hotspots butuh model 3D (model.src)")
+                for h in hotspots:
+                    if h.chunk is not None:
+                        need_chunk(path, f"{where} hotspot '{h.id}'", h.chunk)
+
+            if model is None:
+                self.pending(path, "model 3D belum ada (model.src) untuk galeri")
+                continue
+            if model.accuracy_check is None:
+                self.pending(path, f"{where} model.accuracy_check: bentuk model belum diperiksa KH")
+            if model.poster is not None and not (self.root / model.poster).is_file():
+                self.pending(path, f"model.poster: berkas '{model.poster}' belum ada")
+            for h in hotspots:
+                if h.text is None or h.chunk is None:
+                    self.pending(path, f"hotspot '{h.id}': teks belum diisi (text/chunk)")
+            nodes = self._check_model_file(
+                path, "model.src", model.src, MAX_OBJECT_MODEL_BYTES, registered
+            )
+            if nodes is not None:
+                c.models_present.add(model.src)
+            total += self._size(model.src)
+            if nodes is not None:
+                for h in hotspots:
+                    if f"hotspot_{h.id}" not in nodes:
+                        self.error(
+                            path, f"hotspot '{h.id}': node 'hotspot_{h.id}' tidak ada di GLB"
+                        )
+
+        if g.guide is not None:
+            if (
+                self._check_model_file(
+                    gallery_path, "guide.model", g.guide.model, MAX_OBJECT_MODEL_BYTES, registered
+                )
+                is not None
+            ):
+                c.models_present.add(g.guide.model)
+            total += self._size(g.guide.model)
+
+        for d in g.decor:
+            if (
+                self._check_model_file(
+                    gallery_path, f"decor '{d.id}'", d.model, MAX_OBJECT_MODEL_BYTES, registered
+                )
+                is not None
+            ):
+                c.models_present.add(d.model)
+            total += self._size(d.model)
+
+        if total > MAX_GALLERY_BYTES:
+            self.error(
+                gallery_path,
+                f"total model galeri {total / MB:.1f} MB melebihi {MAX_GALLERY_BYTES // MB} MB",
+            )
+
+    def _size(self, rel: str) -> int:
+        f = self.root / rel
+        return f.stat().st_size if f.is_file() else 0
+
+    def _check_model_file(
+        self, path: Path, where: str, rel: str, max_bytes: int, registered: set[str]
+    ) -> dict[str, tuple[float, float, float]] | None:
+        """Periksa satu GLB; kembalikan node-nya bila berkas ada dan terbaca."""
+        if rel not in registered:
+            self.pending(path, f"{where}: '{rel}' belum tercatat di sources.yaml (assets)")
+        f = self.root / rel
+        if not f.is_file():
+            self.pending(path, f"{where}: berkas model '{rel}' belum ada")
+            return None
+        size = f.stat().st_size
+        if size > max_bytes:
+            self.error(
+                path, f"{where}: '{rel}' {size / MB:.1f} MB melebihi batas {max_bytes // MB} MB"
+            )
+        try:
+            return read_nodes_file(f)
+        except GlbError as exc:
+            self.error(path, f"{where}: '{rel}' tidak terbaca: {exc}")
+            return None
+
+    def _check_pedestals(
+        self, path: Path, c: CityContent, nodes: dict[str, tuple[float, float, float]]
+    ) -> None:
+        assert c.gallery is not None
+        layout = c.gallery.layout
+        for i in range(layout.slots):
+            name = f"pedestal_{i + 1}"
+            if name not in nodes:
+                self.error(path, f"room.model: node '{name}' tidak ada di GLB ruangan")
+                continue
+            x, _, z = nodes[name]
+            ex, ez = ring_point(layout, i)
+            if abs(x - ex) > PEDESTAL_TOLERANCE_M or abs(z - ez) > PEDESTAL_TOLERANCE_M:
+                self.error(
+                    path,
+                    f"room.model: {name} di ({x:.2f}, {z:.2f}), "
+                    f"seharusnya ({ex:.2f}, {ez:.2f}) sesuai layout",
+                )
+
+    def _check_card(self, path: Path, item: Item, need_chunk: Any) -> None:
+        card = item.card
+        if card is None:
+            self.pending(path, "card: kartu budaya belum disusun")
+            return
+        for name in CARD_ASPECTS:
+            aspect = getattr(card, name)
+            if aspect is None:
+                self.pending(path, f"card.{name}: belum diisi")
+            else:
+                need_chunk(path, f"card.{name}", aspect.chunk)
+        if card.validator is None:
+            self.pending(path, "card.validator: kartu belum divalidasi budayawan")
 
     def _check_image(
         self, path: Path, where: str, image: ImageRef, sources: SourcesFile | None

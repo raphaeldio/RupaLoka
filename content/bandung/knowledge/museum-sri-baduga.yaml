@@ -11,8 +11,8 @@
     url: https://www.detik.com/jabar/wisata/d-6976393/memahami-sejarah-dan-budaya-sunda-di-museum-sri-baduga-bandung
     type: web
     accessed: 2026-11-20
-  verified_by: null         # nama pemeriksa (KH)
-  verified_at: null
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
 
 - id: museum-sri-baduga-002
   lesson_id: museum-sri-baduga
@@ -22,8 +22,8 @@
     url: https://www.detik.com/jabar/wisata/d-6976393/memahami-sejarah-dan-budaya-sunda-di-museum-sri-baduga-bandung
     type: web
     accessed: 2026-11-20
-  verified_by: null         # nama pemeriksa (KH)
-  verified_at: null
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
 
 - id: museum-sri-baduga-003
   lesson_id: museum-sri-baduga
@@ -33,8 +33,8 @@
     url: https://www.detik.com/jabar/wisata/d-6976393/memahami-sejarah-dan-budaya-sunda-di-museum-sri-baduga-bandung
     type: web
     accessed: 2026-11-20
-  verified_by: null         # nama pemeriksa (KH)
-  verified_at: null
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
 
 # Tambahkan museum-sri-baduga-004 dan seterusnya sampai minimal 8 chunk.
 
@@ -46,8 +46,8 @@
     url: https://www.indonesia.travel/gb/en/destination/java/west-java/sri-baduga-state-museum--national-museum-collections--west-java-culture
     type: web
     accessed: 2026-11-21
-  verified_by: null         # nama pemeriksa (KH)
-  verified_at: null
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
 
 - id: museum-sri-baduga-005
   lesson_id: museum-sri-baduga
@@ -57,8 +57,8 @@
     url: https://www.indonesia.travel/gb/en/destination/java/west-java/sri-baduga-state-museum--national-museum-collections--west-java-culture
     type: web
     accessed: 2026-11-21
-  verified_by: null         # nama pemeriksa (KH)
-  verified_at: null
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
 
 - id: museum-sri-baduga-006
   # detikJabar 2025 menyebut dikelola Kementerian Kebudayaan; KH pastikan pengelola terkini
@@ -69,8 +69,8 @@
     url: https://www.indonesia.travel/gb/en/destination/java/west-java/sri-baduga-state-museum--national-museum-collections--west-java-culture
     type: web
     accessed: 2026-11-21
-  verified_by: null         # nama pemeriksa (KH)
-  verified_at: null
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
 
 - id: museum-sri-baduga-007
   lesson_id: museum-sri-baduga
@@ -80,8 +80,8 @@
     url: https://www.indonesia.travel/gb/en/destination/java/west-java/sri-baduga-state-museum--national-museum-collections--west-java-culture
     type: web
     accessed: 2026-11-21
-  verified_by: null         # nama pemeriksa (KH)
-  verified_at: null
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
 
 - id: museum-sri-baduga-008
   lesson_id: museum-sri-baduga
@@ -91,8 +91,8 @@
     url: https://www.indonesia.travel/gb/en/destination/java/west-java/sri-baduga-state-museum--national-museum-collections--west-java-culture
     type: web
     accessed: 2026-11-21
-  verified_by: null         # nama pemeriksa (KH)
-  verified_at: null
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
 
 - id: museum-sri-baduga-009
   lesson_id: museum-sri-baduga
@@ -102,5 +102,21 @@
     url: https://www.indonesia.travel/gb/en/destination/java/west-java/sri-baduga-state-museum--national-museum-collections--west-java-culture
     type: web
     accessed: 2026-11-21
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
+
+# --- Tambahan 26 Nov 2026: riset Gemini (brief riset chunk). Hanya fakta yang kutipannya
+# DITEMUKAN di halaman sumber saat dicek Claude (web-fetch / ekstrak PDF) yang dimasukkan.
+# accessed = tanggal halaman dibuka untuk pengecekan. verified_by tetap null sampai KH memeriksa.
+
+- id: museum-sri-baduga-010
+  # M1; klaim sensitif jam buka; laman Pemkot bagian 'citizen', juga menulis 'buka setiap hari' (kontradiktif); sumber lain (Telkomsel 2025) menyebut Sabtu-Minggu sampai 16.00 - KH pastikan ke pengelola
+  lesson_id: museum-sri-baduga
+  text: "Menurut laman Pemerintah Kota Bandung (Desember 2024), Museum Sri Baduga buka Selasa sampai Jumat pukul 08.00-16.00 WIB dan Sabtu sampai Minggu pukul 08.00-14.00 WIB. Museum tutup setiap Senin dan hari libur nasional."
+  source:
+    title: "Pemerintah Kota Bandung (2024, 10 Desember). Yuk Wisata Edukasi ke Museum Sri Baduga: Menyelami Sejarah dan Budaya Tanah Sunda"
+    url: https://www.bandung.go.id/citizen/detail/3007/yuk-wisata-edukasi-ke-museum-sri-baduga-menyelami-sejarah-dan-budaya-tanah-sunda-1733722105
+    type: web
+    accessed: 2026-11-26
   verified_by: null         # nama pemeriksa (KH)
   verified_at: null

@@ -4,6 +4,7 @@ import {
   assetUrl,
   fillTemplate,
   getCity,
+  modelUrl,
   postChat,
   shouldUseScript,
   splitAnswer,
@@ -68,6 +69,11 @@ describe('shouldUseScript', () => {
 describe('helper', () => {
   it('assetUrl memetakan src konten ke /api/assets', () => {
     expect(assetUrl('assets/images/item-angklung.webp')).toBe('/api/assets/images/item-angklung.webp')
+  })
+
+  it('modelUrl memetakan model galeri ke /models (disajikan frontend)', () => {
+    expect(modelUrl('assets/models/item-angklung.glb')).toBe('/models/item-angklung.glb')
+    expect(modelUrl('/assets/models/galeri-bandung.glb')).toBe('/models/galeri-bandung.glb')
   })
 
   it('fillTemplate mengisi variabel yang dikenal dan membiarkan yang lain', () => {

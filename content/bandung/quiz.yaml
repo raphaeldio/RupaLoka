@@ -3,7 +3,7 @@
 # Soal untuk butir "Perlu verifikasi" (A6, B2, C4, D1) dan cadangan kujang (C3) SENGAJA tidak dimasukkan.
 # correct = indeks opsi yang benar, mulai dari 0. chunk = id chunk di knowledge/ yang menjadi sumbernya;
 # soal tampil di titik path milik lesson_id chunk tersebut.
-# Jawaban benar WAJIB diperiksa dua orang (KH) sebelum rilis.
+# Jawaban benar WAJIB diperiksa dua orang (KH) sebelum rilis. Soal intro diperiksa Tim KamiPemenang (2026-11-26).
 intro:
   # --- Titik 1: Pengenalan Bandung (sejarah kota, bangunan) ---
   - id: q1
@@ -97,5 +97,17 @@ intro:
     explanation: "Koleksi Museum Sri Baduga disusun sebagai alur sejarah alam dan budaya Jawa Barat, dari masa prasejarah hingga masa kolonial."
     chunk: museum-sri-baduga-003
 
-# Kuis penutup (P1, F-023). Kosongkan dulu.
+# Kuis akhir (F-023). Bila sebuah titik punya soal di sini, kuis akhirnya memakai soal ini;
+# bila tidak, soal kuis awal diulang terbalik.
+# Masukan juri (25 Nov 2026): kuis akhir TIAP titik memuat minimal satu soal NILAI
+# (kind: nilai, poin = points_per_value), bukan hanya fakta. Soal nilai DITULIS TIM BUDAYA
+# dari chunk bersumber dan diperiksa dua orang; jangan dikarang. Bentuk:
+#   - id: n-angklung-1
+#     kind: nilai
+#     question: "..."
+#     options: ["...", "..."]
+#     correct: 0
+#     explanation: "..."
+#     chunk: angklung-00x
+# TODO KH: satu soal nilai untuk pengenalan-bandung, angklung, wayang-golek, museum-sri-baduga.
 outro: []

@@ -22,15 +22,15 @@ videos:
     title: "Video Profil Museum Sri Baduga"
     channel: "Museum Sri Baduga Official"
     note: "kanal resmi museum; pendek (3:48)"
-    checked_by: null
+    checked_by: "Tim KamiPemenang"
   - url: https://www.youtube.com/watch?v=RdtEbTyp3vo
     title: "Museum Sri Baduga dan Koleksinya"
     channel: "Prodi Ilmu Sejarah Unpad"
     note: "kanal akademik"
-    checked_by: null
+    checked_by: "Tim KamiPemenang"
 location:
   name: "Museum Sri Baduga"
-  address: "Jl. BKR No.185, Bandung"   # verifikasi ulang + jam buka (T-034, T-035)
+  address: "Jl. BKR No.185, Bandung"   # diverifikasi Tim KamiPemenang (2026-11-26)
   lat: null                            # [PERLU DIISI] dari sumber peta, jangan ditebak
   lng: null
 suggested_questions:

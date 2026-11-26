@@ -9,3 +9,27 @@ image:
   license: "milik sendiri (tim KamiPemenang)"
 chunk: angklung-001
 lesson: angklung
+
+# Kartu budaya lengkap (masukan juri, 25 Nov 2026). DIISI TIM BUDAYA (KH), jangan dikarang.
+# Tiap aspek: { text: "...", chunk: <id chunk di knowledge/ yang menjadi sumbernya> }.
+# community contoh bentuk: "ekspresi budaya tradisional masyarakat Sunda" (harus bersumber).
+# validator: { name: "<nama budayawan>", role: "<peran>", validated_at: YYYY-MM-DD }.
+# Kolom null = "sedang disusun tim budaya" di UI; validate_content --release gagal sampai lengkap.
+card:
+  nilai: null
+  pengetahuan: null
+  ekspresi: null
+  fungsi: null
+  community: null
+  validator: null
+
+# Galeri 3D (SDD ADR 40, T-115). Model dibuat tim di Blender (T-121); bentuknya diperiksa KH
+# lalu isi accuracy_check: { by: "<nama>", checked_at: YYYY-MM-DD }. poster null = pakai image.
+model:
+  src: assets/models/item-angklung.glb
+  poster: null
+  accuracy_check: { by: "Tim KamiPemenang", checked_at: 2026-11-26 }
+# Hotspot: DIISI TIM BUDAYA setelah menetapkan bagian objek beserta sumbernya. Nama bagian juga
+# fakta, jadi jangan ditebak. Bentuk: - { id: <id>, label: "...", text: "...", chunk: <id chunk> }
+# dan Blender menaruh empty "hotspot_<id>" di model.
+hotspots: []

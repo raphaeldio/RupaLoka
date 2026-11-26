@@ -42,18 +42,23 @@ export function QuizCard({
   return (
     <Card>
       <div className="flex items-center justify-between gap-3">
-        <p className="text-xs font-extrabold uppercase tracking-[1.6px] text-redup">
-          {kind} · Soal {number} dari {total}
+        <p className="eyebrow flex flex-wrap items-center gap-2 text-redup">
+          <span>
+            {kind} · Soal {number} dari {total}
+          </span>
+          {question.kind === 'nilai' && (
+            <span className="border border-emas/40 bg-emas px-1.5 py-0.5 text-tinta rounded-full">Soal nilai · poin besar</span>
+          )}
         </p>
         <div className="flex gap-1" aria-hidden="true">
           {Array.from({ length: total }, (_, i) => (
-            <span key={i} className={`h-1.5 w-6 rounded-full ${i < number ? 'bg-teal' : 'bg-pasir'}`} />
+            <span key={i} className={`size-3 rounded-full ${i < number ? 'bg-emas' : 'bg-white ring-1 ring-emas/50'}`} />
           ))}
         </div>
       </div>
 
       <fieldset className="mt-4">
-        <legend className="text-xl font-extrabold leading-snug text-tinta">
+        <legend className="text-2xl font-black leading-snug text-teal-800">
           <ContentText text={question.question} fallback="Soal sedang disiapkan tim konten." />
         </legend>
         <ClickSpark sparkColor={['#e8b64c', '#146b68', '#8bb9a0']} sparkCount={10} sparkRadius={26} sparkSize={11}>
@@ -61,10 +66,10 @@ export function QuizCard({
           {question.options.map((opt, i) => {
             const isChosen = answer === i
             const isRight = i === question.correct
-            let tone = 'border-garis bg-white hover:border-teal'
-            if (answered && isRight) tone = 'border-teal bg-teal-50'
-            else if (answered && isChosen) tone = 'border-[#c0563f] bg-[#fbe9e4]'
-            else if (answered) tone = 'border-garis bg-white opacity-70'
+            let tone = 'tekan bg-white shadow-melayang hover:border-emas hover:bg-amber-50'
+            if (answered && isRight) tone = 'bg-teal-50 ring-2 ring-teal shadow-melayang'
+            else if (answered && isChosen) tone = 'bg-bata-50 ring-2 ring-bata shadow-tekan'
+            else if (answered) tone = 'bg-white opacity-60'
             return (
               <li key={i}>
                 <button
@@ -72,13 +77,17 @@ export function QuizCard({
                   disabled={answered}
                   aria-pressed={isChosen}
                   onClick={() => onAnswer(i)}
-                  className={`flex w-full items-center gap-3 rounded-2xl border-2 px-4 py-3 text-left text-[15px] font-semibold transition ${tone}`}
+                  className={`flex w-full items-center gap-3 border border-emas/40 px-4 py-3 text-left text-[15px] font-semibold ${tone} rounded-2xl`}
                 >
-                  <span className="grid size-7 shrink-0 place-items-center rounded-full bg-pasir text-xs font-extrabold">
+                  <span
+                    className={`grid size-8 shrink-0 place-items-center rounded-full text-xs font-black ${
+                      answered && isRight ? 'bg-teal-800 text-white' : answered && isChosen ? 'bg-bata text-white' : 'bg-emas-100 text-amber'
+                    }`}
+                  >
                     {LETTERS[i]}
                   </span>
                   <ContentText text={opt} fallback={`Pilihan ${LETTERS[i]} (segera hadir)`} />
-                  {answered && isRight && <span className="ml-auto text-xs font-extrabold text-teal">Benar</span>}
+                  {answered && isRight && <span className="ml-auto text-xs font-black text-teal-800">Benar</span>}
                   {answered && isChosen && !isRight && (
                     <span className="ml-auto text-xs font-extrabold text-[#a8442f]">Pilihanmu</span>
                   )}
@@ -98,9 +107,9 @@ export function QuizCard({
           initial={{ opacity: 0, y: 10, scale: 0.97 }}
           animate={correct ? { opacity: 1, y: 0, scale: 1 } : { opacity: 1, y: 0, scale: 1, x: [0, -8, 8, -5, 5, 0] }}
           transition={{ duration: 0.45 }}
-          className={`mt-4 rounded-2xl p-4 outline-none ${correct ? 'bg-teal-50' : 'bg-amber-50'}`}
+          className={`kutipan-nuansa mt-4 outline-none ${correct ? '!bg-teal-50' : '!bg-amber-50'}`}
         >
-          <p className={`font-extrabold ${correct ? 'text-teal' : 'text-amber'}`}>
+          <p className={`text-lg font-black ${correct ? 'text-teal-800' : 'text-amber'}`}>
             {correct ? 'Tepat sekali!' : 'Belum tepat, tidak apa-apa.'}
           </p>
           <p className="mt-1 text-sm leading-relaxed">

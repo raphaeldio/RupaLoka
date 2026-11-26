@@ -84,9 +84,37 @@ export function missingParts(s: NodeState): string[] {
 /** Titik selesai bila kedua kuis dijawab semua dan video materi ditonton. */
 export const nodeComplete = (s: NodeState): boolean => s.stage === 'done' && missingParts(s).length === 0
 
-/** Jumlah jawaban benar. */
-export function quizScore(questions: QuizQuestion[], answers: (number | null)[]): number {
-  return questions.reduce((n, q, i) => n + (answers[i] === q.correct ? 1 : 0), 0)
+type Kind = QuizQuestion['kind']
+const kindOf = (q: QuizQuestion): Kind => q.kind ?? 'fakta'
+
+/** Jumlah jawaban benar; dengan `kind`, hanya soal jenis itu (soal tanpa `kind` = fakta). */
+export function quizScore(questions: QuizQuestion[], answers: (number | null)[], kind?: Kind): number {
+  return questions.reduce((n, q, i) => n + (answers[i] === q.correct && (!kind || kindOf(q) === kind) ? 1 : 0), 0)
+}
+
+/** Jumlah soal satu jenis. */
+export const countKind = (questions: QuizQuestion[], kind: Kind): number =>
+  questions.filter((q) => kindOf(q) === kind).length
+
+/**
+ * Batas jawaban benar per jenis di seluruh path (= max_points backend): per titik, jumlah
+ * soal terbanyak per jenis di antara kuis awal dan kuis akhir titik itu.
+ */
+export function quizCaps(
+  lessonIds: string[],
+  quiz: { intro: QuizQuestion[]; outro: QuizQuestion[] },
+  sources: Record<string, SourceRef>,
+  reflections = 0,
+): { facts: number; values: number; reflections: number } {
+  let facts = 0
+  let values = 0
+  for (const id of lessonIds) {
+    const pre = questionsFor(id, quiz.intro, sources)
+    const post = postQuestionsFor(id, quiz, sources)
+    facts += Math.max(countKind(pre, 'fakta'), countKind(post, 'fakta'))
+    values += Math.max(countKind(pre, 'nilai'), countKind(post, 'nilai'))
+  }
+  return { facts, values, reflections }
 }
 
 /** Soal kuis milik satu titik: soal yang chunk-nya berasal dari materi tersebut. */

@@ -1,0 +1,364 @@
+/* Latar hidup bab landing (LatarBudaya.tsx). Gerak hanya transform/opacity; dijeda di luar layar. */
+
+.lb {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  contain: layout paint;
+}
+.lb > *,
+.lb-area > *,
+.lb-bukit > * {
+  position: absolute;
+}
+
+/* ---------- Sorotan per corak ----------
+ * Warna dasar bab datang dari latar bersama ([data-alur-latar]) yang bergradasi antarbab;
+ * di sini hanya sorotan tembus pandang agar tidak ada garis batas antarbab.
+ */
+.lb-kawung {
+  background: radial-gradient(ellipse 60% 50% at 85% 10%, rgb(248 233 196 / 0.7), transparent 70%);
+}
+.lb-parang {
+  background: radial-gradient(ellipse 50% 40% at 10% 90%, rgb(220 235 226 / 0.8), transparent 70%);
+}
+/* Bab gelap: warna sendiri dengan tepi memudar, agar teks putih langsung terbaca saat masuk. */
+.lb-truntum {
+  background:
+    radial-gradient(ellipse 70% 40% at 50% 18%, rgb(23 96 92 / 0.9), transparent 70%),
+    linear-gradient(180deg, rgb(14 77 75 / 0) 0, #0e4d4b 150px, #0a3836 calc(100% - 150px), rgb(10 56 54 / 0) 100%);
+}
+/* Pola hanya di bagian gelap penuh (tanpa mask: mask di atas lapisan bergerak mahal di Chrome). */
+.lb-truntum .lb-penuh {
+  inset: 150px -30px;
+}
+.lb-senja {
+  background:
+    radial-gradient(circle at 50% 120%, rgb(232 182 76 / 0.45), transparent 60%),
+    linear-gradient(160deg, #146b68 0%, #0e4d4b 60%, #0a3836 100%);
+}
+
+/* ---------- Pola berulang ---------- */
+.lb-pola {
+  /* Satu ubin lebih besar di tiap sisi agar geseran satu ubin tidak memperlihatkan tepi. */
+  inset: calc(var(--ubin-h) * -1) calc(var(--ubin) * -1);
+  width: calc(100% + var(--ubin) * 2);
+  height: calc(100% + var(--ubin-h) * 2);
+  will-change: transform;
+}
+.lb-area {
+  will-change: transform;
+}
+.lb-area-kanan {
+  top: 0;
+  right: 0;
+  width: min(62%, 760px);
+  height: 78%;
+  opacity: 0.55;
+  -webkit-mask: radial-gradient(ellipse 100% 100% at 100% 0, #000 25%, transparent 72%);
+  mask: radial-gradient(ellipse 100% 100% at 100% 0, #000 25%, transparent 72%);
+}
+.lb-area-kiri {
+  left: 0;
+  bottom: 0;
+  width: 40%;
+  height: 45%;
+  opacity: 0.35;
+  -webkit-mask: radial-gradient(ellipse 100% 100% at 0 100%, #000 10%, transparent 65%);
+  mask: radial-gradient(ellipse 100% 100% at 0 100%, #000 10%, transparent 65%);
+}
+.lb-penuh {
+  inset: -30px;
+}
+.lb-pudar {
+  opacity: 0.16;
+}
+
+/* ---------- Kawung: bukit bermotif + tanaman piksel ---------- */
+.lb-bukit {
+  /* Bulat penuh di dalam bab (tidak terpotong tepi bab). */
+  bottom: clamp(14px, 3vw, 36px);
+  width: clamp(120px, 17vw, 230px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  overflow: hidden;
+  box-shadow:
+    inset 0 0 0 4px #e8b64c,
+    0 14px 30px -14px rgb(14 77 75 / 0.55);
+}
+.lb-bukit-kiri {
+  left: clamp(10px, 3vw, 48px);
+}
+.lb-bukit-kanan {
+  right: clamp(10px, 3vw, 48px);
+}
+.lb-bukit .lb-pola {
+  inset: -56px;
+}
+.lb-tanaman {
+  left: 50%;
+  bottom: 0;
+  height: auto;
+  translate: -50% 0;
+  transform-origin: 50% 100%;
+  will-change: transform;
+}
+.lb-tanaman-kiri {
+  width: 64%;
+}
+.lb-tanaman-kanan {
+  width: 52%;
+}
+.lb-kilau {
+  width: 14px;
+  height: 14px;
+  background: #e8b64c;
+  clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
+  opacity: 0.7;
+}
+
+/* ---------- Mega mendung + ombak ---------- */
+.lb-awan-wadah {
+  width: clamp(160px, 24vw, 320px);
+  opacity: 0.32;
+}
+.lb-awan-kanan {
+  width: clamp(180px, 28vw, 380px);
+  opacity: 0.26;
+}
+.lb-awan-kecil {
+  width: clamp(110px, 14vw, 200px);
+  opacity: 0.2;
+}
+.lb-awan-mega {
+  display: block;
+  width: 100%;
+  height: auto;
+  will-change: transform;
+}
+.lb-balik {
+  scale: -1 1;
+}
+.lb-ombak {
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 160px;
+  opacity: 0.45;
+  -webkit-mask: linear-gradient(180deg, transparent, #000 60%);
+  mask: linear-gradient(180deg, transparent, #000 60%);
+}
+.lb-ombak > .lb-pola {
+  position: absolute;
+}
+.lb-ombak-2 {
+  top: 9px;
+  opacity: 0.8;
+}
+
+/* ---------- Parang + layang-layang ---------- */
+.lb-pita-parang {
+  left: -10%;
+  right: -10%;
+  top: 38%;
+  height: 210px;
+  rotate: -6deg;
+  opacity: 0.16;
+  -webkit-mask: linear-gradient(90deg, transparent, #000 20% 80%, transparent);
+  mask: linear-gradient(90deg, transparent, #000 20% 80%, transparent);
+}
+.lb-layang-wadah {
+  width: clamp(44px, 5vw, 72px);
+}
+.lb-layang-kecil {
+  width: clamp(30px, 3.4vw, 48px);
+  opacity: 0.8;
+}
+.lb-layang {
+  display: block;
+  width: 100%;
+  height: auto;
+  transform-origin: 50% 10%;
+  will-change: transform;
+}
+
+/* ---------- Truntum ---------- */
+.lb-kerlip {
+  opacity: 0.22;
+}
+.lb-pinggir {
+  left: 0;
+  right: 0;
+  height: 16px;
+  overflow: hidden;
+}
+.lb-pinggir > .lb-pola {
+  position: absolute;
+}
+.lb-pinggir-atas {
+  top: 0;
+}
+
+/* ---------- Senja ---------- */
+.lb-sinar {
+  left: 50%;
+  top: 110%;
+  width: 220%;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: repeating-conic-gradient(rgb(232 182 76 / 0.22) 0deg 5deg, transparent 5deg 16deg);
+  -webkit-mask: radial-gradient(circle, #000 10%, transparent 60%);
+  mask: radial-gradient(circle, #000 10%, transparent 60%);
+  will-change: transform;
+}
+
+/* ---------- Interaksi: sorot kursor + percikan ketuk ---------- */
+.lb-sorot {
+  left: 0;
+  top: 0;
+  width: 520px;
+  height: 520px;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(232 182 76 / 0.2), rgb(232 182 76 / 0) 70%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  will-change: transform;
+}
+.lb-truntum .lb-sorot,
+.lb-senja .lb-sorot {
+  background: radial-gradient(closest-side, rgb(243 213 140 / 0.18), rgb(243 213 140 / 0) 70%);
+}
+.lb[data-sorot] .lb-sorot {
+  opacity: 1;
+}
+.lb-percikan {
+  inset: 0;
+}
+.lb-percik {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  margin: -20px 0 0 -20px;
+  color: #d9a63c;
+  pointer-events: none;
+  animation: lb-percik 0.9s cubic-bezier(0.2, 0.8, 0.3, 1) forwards;
+}
+.lb-truntum .lb-percik,
+.lb-senja .lb-percik {
+  color: #f3d58c;
+}
+.lb-percik svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* ---------- Gerak (hanya bila tidak dikurangi) ---------- */
+@media (prefers-reduced-motion: no-preference) {
+  .lb-geser-miring { animation: lb-ubin-miring 36s linear infinite; }
+  .lb-geser-datar { animation: lb-ubin-datar 14s linear infinite; }
+  .lb-balik-arah { animation-direction: reverse; animation-duration: 19s; }
+  .lb-lambat { animation-duration: 60s; }
+  .lb-tanaman-kiri { animation: lb-ayun 4.8s ease-in-out infinite; }
+  .lb-tanaman-kanan { animation: lb-ayun 5.6s ease-in-out infinite reverse; }
+  .lb-kilau { animation: lb-kilau 3.6s ease-in-out infinite; }
+  .lb-awan-mega { animation: lb-hanyut 16s ease-in-out infinite alternate; }
+  .lb-awan-kanan .lb-awan-mega { animation-duration: 21s; animation-direction: alternate-reverse; }
+  .lb-layang { animation: lb-layang 5s ease-in-out infinite; }
+  .lb-tunda { animation-delay: -2.2s; animation-duration: 6.4s; }
+  .lb-kerlip { animation: lb-kerlip 5s ease-in-out infinite; }
+  .lb-kerlip-2 { animation-delay: -2.5s; }
+  .lb-sinar { animation: lb-putar 90s linear infinite; }
+
+  /* Bab di luar layar: animasi dijeda (hemat baterai di ponsel). */
+  .lb:not([data-aktif]) *,
+  .lb:not([data-aktif]) *::before {
+    animation-play-state: paused !important;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lb-percik,
+  .lb-sorot {
+    display: none;
+  }
+}
+
+@keyframes lb-ubin-miring {
+  to { transform: translate3d(var(--ubin), var(--ubin-h), 0); }
+}
+@keyframes lb-ubin-datar {
+  to { transform: translate3d(var(--ubin), 0, 0); }
+}
+@keyframes lb-ayun {
+  0%, 100% { transform: rotate(-2.5deg); }
+  50% { transform: rotate(2.5deg); }
+}
+@keyframes lb-kilau {
+  0%, 100% { transform: scale(0.4) rotate(0deg); opacity: 0; }
+  50% { transform: scale(1) rotate(45deg); opacity: 0.85; }
+}
+@keyframes lb-hanyut {
+  from { transform: translate3d(-24px, 0, 0); }
+  to { transform: translate3d(24px, -6px, 0); }
+}
+@keyframes lb-layang {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(-6deg); }
+  50% { transform: translate3d(-10px, -14px, 0) rotate(6deg); }
+}
+@keyframes lb-kerlip {
+  0%, 100% { opacity: 0.12; }
+  50% { opacity: 0.32; }
+}
+@keyframes lb-putar {
+  to { transform: rotate(360deg); }
+}
+@keyframes lb-percik {
+  0% { transform: scale(0.2) rotate(0deg); opacity: 1; }
+  100% { transform: scale(1.7) rotate(90deg); opacity: 0; }
+}
+
+/* Pita berjalan bergaya kain: pinggiran belah ketupat emas di atas dan bawah. */
+.pita-batik {
+  position: relative;
+  padding: 10px 0;
+}
+.pita-batik::before,
+.pita-batik::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 10px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='10'%3E%3Crect width='20' height='10' fill='%230a3836'/%3E%3Cpath d='M10 1.5L14 5L10 8.5L6 5Z' fill='none' stroke='%23e8b64c' stroke-width='1.2'/%3E%3Ccircle cx='10' cy='5' r='1' fill='%23e8b64c'/%3E%3Cpath d='M0 5h3M17 5h3' stroke='%23e8b64c' stroke-width='1.2'/%3E%3C/svg%3E") repeat-x;
+  box-shadow: 0 0 0 1px #e8b64c;
+}
+.pita-batik::before {
+  top: 0;
+}
+.pita-batik::after {
+  bottom: 0;
+}
+
+/* Kepala tiket mode: motif garis miring tipis di atas gradasi. */
+.tiket-kepala::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Cpath d='M0 12L12 0M12 24L24 12' stroke='%23fff' stroke-width='2.4' stroke-linecap='round'/%3E%3Ccircle cx='18' cy='18' r='1.6' fill='%23fff'/%3E%3C/svg%3E");
+  opacity: 0.16;
+}
+
+/* Petak item terkunci: motif kawung samar. */
+.koleksi-terkunci {
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28'%3E%3Cg fill='none' stroke='%23d6ad5c' stroke-width='1'%3E%3Cellipse cx='14' cy='7' rx='3.2' ry='5.8'/%3E%3Cellipse cx='14' cy='21' rx='3.2' ry='5.8'/%3E%3Cellipse cx='7' cy='14' rx='5.8' ry='3.2'/%3E%3Cellipse cx='21' cy='14' rx='5.8' ry='3.2'/%3E%3C/g%3E%3C/svg%3E"),
+    #f3ead3;
+}
+
+/* Lenis mengatur gulir halus sendiri; matikan gulir halus bawaan CSS saat Lenis aktif. */
+html.lenis {
+  scroll-behavior: auto !important;
+}

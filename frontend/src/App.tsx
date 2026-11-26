@@ -10,6 +10,8 @@ const CityLayout = lazy(() => import('./pages/city/CityLayout'))
 const PathPage = lazy(() => import('./pages/city/PathPage'))
 const NodePage = lazy(() => import('./pages/city/NodePage'))
 const GamePage = lazy(() => import('./pages/city/GamePage'))
+// Galeri 3D (ADR 40): chunk terpisah; three.js hanya dimuat di dalamnya.
+const GalleryPage = lazy(() => import('./gallery/GalleryPage'))
 const CollectionPage = lazy(() => import('./pages/CollectionPage'))
 const AboutPage = lazy(() => import('./pages/AboutPage'))
 const SourcesPage = lazy(() => import('./pages/SourcesPage'))
@@ -33,6 +35,7 @@ export default function App() {
               <Route index element={<PathPage />} />
               <Route path="titik/:lessonId" element={<NodePage />} />
               <Route path="game" element={<GamePage />} />
+              <Route path="galeri" element={<GalleryPage />} />
             </Route>
             <Route path="/koleksi" element={<CollectionPage />} />
             <Route path="/tentang" element={<AboutPage />} />

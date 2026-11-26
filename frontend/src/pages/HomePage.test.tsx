@@ -24,13 +24,15 @@ describe('HomePage', () => {
   it('Bandung membuka alur; kota segera hadir tidak punya tombol Mulai (F-002)', async () => {
     renderHome()
     const card = () => screen.getByRole('article')
-    expect(within(card()).getByRole('link', { name: /Mulai jelajah Bandung/ })).toHaveAttribute(
-      'href',
-      '/kota/bandung',
-    )
+    const mulaiBtn = within(card()).getByRole('button', { name: /Mulai jelajah Bandung/ })
+    expect(mulaiBtn).toBeInTheDocument()
+
+    await userEvent.click(mulaiBtn)
+    expect(screen.getByRole('alertdialog', { name: /Yakin ke Bandung/ })).toBeInTheDocument()
+    await userEvent.click(screen.getByRole('button', { name: 'Batal' }))
 
     await userEvent.click(screen.getByRole('button', { name: /^Yogyakarta/ }))
-    expect(within(card()).queryByRole('link')).toBeNull()
+    expect(within(card()).queryByRole('button', { name: /Mulai jelajah/ })).toBeNull()
     expect(within(card()).getByText('Segera hadir')).toBeInTheDocument()
   })
 

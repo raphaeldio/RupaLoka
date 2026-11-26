@@ -4,29 +4,29 @@ import { cn } from "@/lib/utils"
 import { Slot } from "radix-ui"
 
 const buttonVariants = cva(
-  "inline-flex shrink-0 items-center justify-center gap-2 rounded-2xl text-sm font-extrabold whitespace-nowrap transition-all active:scale-[0.97] outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+  "inline-flex shrink-0 items-center justify-center gap-2 rounded-full text-sm font-extrabold whitespace-nowrap transition-all hover:-translate-y-0.5 active:translate-y-px active:shadow-tekan motion-reduce:transform-none outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground shadow-melayang hover:bg-teal-600",
-        emas: "bg-emas text-tinta shadow-melayang hover:brightness-95",
+        default: "bg-teal-800 text-white shadow-[0_10px_22px_-8px_rgb(14_77_75/0.55)] hover:bg-teal",
+        emas: "bg-emas text-tinta shadow-[0_10px_22px_-8px_rgb(168_118_26/0.6)] hover:brightness-105",
         destructive:
           "bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:bg-destructive/60 dark:focus-visible:ring-destructive/40",
         outline:
-          "border bg-white text-primary shadow-xs hover:border-primary hover:bg-secondary",
+          "border border-tinta/15 bg-white text-tinta shadow-[0_8px_18px_-10px_rgb(29_42_42/0.25)] hover:bg-amber-50",
         secondary:
           "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost:
-          "text-muted-foreground hover:bg-secondary hover:text-primary",
+          "rounded-full text-muted-foreground hover:bg-amber-50 hover:text-teal-800",
         link: "text-primary underline-offset-4 hover:underline",
       },
       size: {
         default: "h-11 px-5 py-2.5 has-[>svg]:px-4",
-        xs: "h-6 gap-1 rounded-md px-2 text-xs has-[>svg]:px-1.5 [&_svg:not([class*='size-'])]:size-3",
-        sm: "h-9 gap-1.5 rounded-xl px-3 has-[>svg]:px-2.5",
-        lg: "h-12 rounded-2xl px-7 text-base has-[>svg]:px-5",
+        xs: "h-6 gap-1 rounded-full px-2 text-xs has-[>svg]:px-1.5 [&_svg:not([class*='size-'])]:size-3",
+        sm: "h-9 gap-1.5 rounded-full px-3.5 has-[>svg]:px-2.5",
+        lg: "h-12 rounded-full px-7 text-base has-[>svg]:px-5",
         icon: "size-9",
-        "icon-xs": "size-6 rounded-md [&_svg:not([class*='size-'])]:size-3",
+        "icon-xs": "size-6 rounded-full [&_svg:not([class*='size-'])]:size-3",
         "icon-sm": "size-8",
         "icon-lg": "size-10",
       },

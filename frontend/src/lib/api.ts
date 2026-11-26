@@ -12,6 +12,8 @@ import type {
   CityDetail,
   CitySummary,
   LeaderboardResponse,
+  ReflectionRequest,
+  ReflectionResult,
   ScoreSubmit,
   SourcesResponse,
 } from './api.types'
@@ -99,6 +101,20 @@ export function postChat(body: ChatRequest, signal?: AbortSignal): Promise<ChatR
 }
 
 /**
+ * Nilai jawaban refleksi akhir tur. Dicocokkan dengan kata kunci tim budaya; bila tidak cocok,
+ * AI hanya mengklasifikasi ke daftar nilai (`method: "ai"`). 404 soal tidak dikenal,
+ * 422 jawaban terlalu panjang/kosong, 429 terlalu sering. Jawaban tidak disimpan server.
+ */
+export function submitReflection(body: ReflectionRequest, signal?: AbortSignal): Promise<ReflectionResult> {
+  return request('/api/reflection', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+    signal,
+  })
+}
+
+/**
  * True bila agen tidak bisa menjawab saat ini dan panel agen harus kembali ke skrip
  * (F-014): jaringan gagal, batas laju, atau LLM tidak tersedia.
  */
@@ -109,6 +125,14 @@ export function shouldUseScript(err: unknown): boolean {
 /** `src` gambar di konten relatif ke content/: assets/images/x.webp -> /api/assets/images/x.webp */
 export function assetUrl(src: string): string {
   return `${API_BASE}/api/${src.replace(/^\/+/, '')}`
+}
+
+/**
+ * Model 3D galeri disajikan frontend (Vercel), bukan API (ADR 40, vite/contentModels.ts):
+ * assets/models/x.glb -> /models/x.glb
+ */
+export function modelUrl(src: string): string {
+  return `/models/${src.replace(/^\/*(?:assets\/)?models\//, '')}`
 }
 
 /** Isi templat skrip agen, mis. item_unlocked: "Kamu menemukan {item}! {short_explanation}". */

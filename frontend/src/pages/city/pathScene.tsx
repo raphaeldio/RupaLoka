@@ -224,7 +224,7 @@ export function DancerFinale({ cityName }: { cityName: string }) {
           className={`${PIXEL} anim-menari-3 h-[130px] w-auto sm:h-[170px]`}
         />
       </div>
-      <h2 id="judul-tamat" className="mt-3 text-xl font-extrabold text-teal">
+      <h2 id="judul-tamat" className="mt-3 text-xl font-black text-teal-800">
         Hore, path {cityName} tamat!
       </h2>
       <p className="mt-1 max-w-sm text-sm text-redup">Para penari ikut merayakan. Semua titik dan game sudah kamu selesaikan.</p>

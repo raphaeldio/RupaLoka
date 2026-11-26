@@ -75,6 +75,60 @@ Fitur P1 (kuis penutup, rekor, analitik) tidak dikerjakan sebelum semua P0 seles
 - [x] **T-055a (HR)** Mode uji kuis `?demo=1` (khusus pengembangan): 2 soal uji netral per titik, bukan materi budaya; `?demo=0` keluar.
 - [x] **T-059d (HR)** UI interaktif dengan shadcn/ui + React Bits (animasi ringan, hormati `prefers-reduced-motion`). *DoD:* uji, lint, build lolos; 360 px tanpa geser horizontal; fps game di ponsel nyata tetap diukur di T-050.
 
+## Fase 3c — Masukan juri (25 Nov 2026; PRD §6.5a, SDD ADR 34–37)
+
+- [x] **T-080 (HR)** Skema + UI kartu budaya lengkap (F-080), soal nilai + bobot poin (F-081), refleksi akhir tur (F-082), Beri masukan (F-083), label "Dijawab AI" + Saloka (F-084), Kunjungi (F-085). *DoD:* pytest, vitest, lint, build lolos; placeholder tampil di 360 px.
+- [x] **T-087 (HR)** Redesain gaya piksel seluruh UI + landing bab 01–05 (Kenalan, Peta, Pilih jalurmu, Koleksi & peringkat, Titik budaya) + CTA akhir (SDD ADR 38). *DoD:* uji, lint, build lolos; dicek di 360 px dan desktop.
+- [x] **T-088 (HR)** Animasi landing GSAP + ScrollTrigger: hero masuk berurutan, pita judul "dibanting", kartu muncul bertumpuk, pita berjalan miring mengikuti gulir, CTA membesar, HUD bab (SDD ADR 39). *DoD:* uji/lint/build lolos; tanpa animasi bila prefers-reduced-motion.
+- [x] **T-089 (HR)** Adaptasi referensi desain tim (folder referensi, 25 Nov 2026) tanpa menyalin struktur: nama bab landing diganti (Apa itu Rupaloka, Cara menjelajah, Mode, Path belajar, Berangkat); animasi dipindah ke tempat lain dan diberi palet Rupaloka: blok bernapas → `PixelLoader` (pemuat peta dan kota), bilah bersegmen → HUD bab, kendaraan ikut gulir → pelari game di jalur titik budaya (bab 05, layar ≥768 px), topeng dither → gambar item saat terbuka di game. *DoD:* uji/lint/build lolos; tanpa gerak bila prefers-reduced-motion.
+- [x] **T-090 (HR)** Latar hero hidup di belakang maskot (`HeroScene.tsx`): gambar jalan Bandung piksel dari lembar aset tim (`assets/hero/bandung-jalan*.webp`) + lapisan buatan sendiri (awan bergeser, burung mengepak, lampu berpendar, mobil/bus di dua lajur, pejalan kaki dari sprite pelari). Gerak berhenti di luar layar/tab tersembunyi dan bila prefers-reduced-motion. *Terbuka:* lisensi/pembuat gambar di `sources.yaml`.
+- [ ] **T-081 (KH)** Isi `card` ketiga item (nilai, pengetahuan, ekspresi, fungsi, komunitas — masing-masing bersumber `chunk`) dan minta budayawan memvalidasi (`validator`). *DoD:* `validate_content.py` tanpa peringatan `card.*`.
+- [ ] **T-082 (KH)** Tulis ≥1 soal `kind: nilai` per titik di `quiz.yaml` → `outro`, periksa dua orang. *DoD:* tanpa peringatan "belum punya soal nilai".
+- [ ] **T-083 (KH)** Isi `reflection.yaml` → `values` (label, kata kunci, penjelasan bersumber) untuk refleksi angklung. *DoD:* soal refleksi tampil di ringkasan; uji coba 5 jawaban nyata dicatat apa adanya.
+- [ ] **T-084 (HW)** Buat Google Form masukan; isi `VITE_FEEDBACK_FORM_URL` (+ `VITE_FEEDBACK_FORM_ENTRY`) di Vercel. *DoD:* tombol "Beri masukan" tampil dan membuka form.
+- [ ] **T-085 (KH)** Verifikasi peran Saung Angklung Udjo dan isi `location.links` (situs resmi, jadwal pertunjukan, sanggar/perajin) dengan `verified_by`. *DoD:* tautan tampil di "Kunjungi".
+- [ ] **T-086 (HR)** Isi `MASCOT_NAME=Saloka` di dashboard Render; putuskan reset papan peringkat Supabase (skor lama dihitung dengan batas game 3000). *DoD:* keputusan tercatat.
+
+## Fase 3d — Galeri 3D/VR (demo; setelah P0 kode; SDD ADR 40)
+
+Spesifikasi `docs/superpowers/specs/2026-11-25-galeri-3d-vr-design.md`, rencana `docs/superpowers/plans/2026-11-25-galeri-3d-vr.md`, purwarupa kamera `mocks/galeri-kamera/`.
+
+- [x] **T-110 (HR)** Dokumen: ADR 40, F-060, fase ini, CLAUDE.md, `VITE_FLAGS`. *DoD:* dokumen konsisten. *Status:* selesai (ADR 40; ADR 39 dan T-090…T-109 ternyata sudah terpakai, jadi galeri memakai T-110…T-129).
+- [x] **T-111 (HR)** Flag dari `VITE_FLAGS`. *DoD:* uji `parseFlags`; bawaan tetap `false`. *Status:* selesai.
+- [x] **T-112 (HR)** Pembaca node GLB (Python). *DoD:* pytest dengan GLB buatan tes. *Status:* selesai (`app/glb.py`; hanya translasi lokal, empty harus di akar adegan).
+- [x] **T-113 (HR)** Skema `gallery.yaml`, `Item.model`, `Item.hotspots`; `CityDetail.gallery`. *DoD:* pytest; tipe TS dihasilkan ulang. *Status:* selesai. Model dicatat di `sources.yaml` → `assets` per path (seperti gambar), bukan kolom `source`.
+- [x] **T-114 (HR)** Validasi aset galeri (file, ukuran, hotspot, posisi pedestal vs cincin). *DoD:* pytest; `--release` gagal bila isi KH kosong. *Status:* selesai (`app/ring.py`, vektor uji bersama pedestal_1/2).
+- [x] **T-115 (HR)** Kerangka konten galeri Bandung (model/hotspot `null`). *DoD:* `validate_content.py` lolos dengan peringatan. *Status:* selesai; model belum didaftarkan di `sources.yaml` (menyusul di T-121 bersama GLB).
+- [x] **T-116 (HR)** Sajikan GLB dari Vercel (`/models/*`, cache immutable). *DoD:* uji plugin; build memuat `dist/models`. *Status:* selesai; uji plugin lolos. `vite build` penuh belum terverifikasi (mesin kehabisan memori saat dicoba). Cache `/models/*` sementara `must-revalidate`; diganti `immutable` setelah nama ber-hash di T-121.
+- [ ] **T-117 (HR)** Pasang paket 3D + `check:bundle`. *DoD:* peer dependency cocok React 18; three tidak ada di chunk utama. *Status (26 Nov):* three 0.187, R3F 8.18, drei 9.122 terpasang (peer cocok React 18); `@react-three/xr` belum (menyusul T-124). three hanya di chunk `GalleryScene` (build diverifikasi); skrip `check:bundle` belum dibuat.
+- [x] **T-118 (HR)** `cameraFlow.ts` (port mock) + uji. *DoD:* vitest; vektor uji bersama dengan validator. *Status:* selesai (`src/gallery/cameraFlow.ts`, vektor uji bersama lolos).
+- [ ] **T-119 (HR)** `xrSupport.ts` + `galleryConfig.ts`. *DoD:* vitest.
+- [x] **T-120 (HR)** Rute `/kota/:cityId/galeri` di balik flag + tautan. *DoD:* uji gerbang; batas chunk galeri dicatat. *Status:* selesai: `/kota/:cityId/galeri`, tombol "Mode 3D" membuka galeri bila flag aktif; galeri layar penuh (menutupi header, tombol Keluar + Fullscreen API).
+- [ ] **T-121 (HW+KH)** Aset Blender: ruangan cincin + angklung, wayang golek, Cepot; empty `pedestal_N`/`hotspot_<id>`; optimasi GLB. *DoD:* validasi lolos; **bentuk objek disetujui KH** (`accuracy_check`).
+- [ ] **T-122 (HR)** Scene: ruangan, pedestal, rig kamera, input. *DoD:* fallback primitif tampil tanpa GLB. *Status:* sebagian: lorong cincin masih primitif (GLB ruangan belum ada), pedestal = kotak putih berlabel nama + penjelasan singkat, model GLB dipaskan ke pedestal, pengganti bila gagal.
+- [ ] **T-123 (HR)** Inspector + hotspot bersumber + "Tanya Saloka". *DoD:* vitest. *Status:* sebagian: periksa (putar dengan geser/panah) + kartu (penjelasan + asal usul bersumber, "Tanya Saloka"); hotspot belum karena belum ada teks dari KH.
+- [ ] **T-124 (HR)** VR (teleport, grab) + Cardboard (tatapan). *DoD:* uji titik teleport; uji manual di T-128.
+- [ ] **T-125 (HR)** Performa: konfirmasi unduhan, dispose, muat bertahap, decoder self-host. *DoD:* uji `needsConfirm`; heap dicatat.
+- [ ] **T-126 (HR)** Header keamanan Vercel (CSP report-only → ditegakkan). *DoD:* tanpa pelanggaran di semua alur.
+- [x] **T-127 (HR)** Tampilan Daftar + mode tanpa WebGL. *DoD:* vitest. *Status:* selesai (Daftar + mode tanpa WebGL).
+- [x] **T-130 (HR)** Objek khusus museum di `gallery.yaml` (Gedung Sate, keris, rumah adat; bukan hadiah game) + `asal_usul` per pameran + API `GalleryOut`. Teks disalin apa adanya dari chunk. *Terbuka (KH):* penjelasan + asal usul keris dan rumah adat (belum ada sumber), nama/jenis rumah adat, cek bentuk semua model, model angklung (`angklung.blend` tidak ada), apakah `wayang.blend` (WayangPrabu) tepat untuk item Wayang Golek. *Terbuka (HW):* pembuat/lisensi lima model di `sources.yaml`.
+- [x] **T-131 (HR)** Maskot pemandu Saloka di galeri (`maskot_3D.blend`): mengikuti kamera, kalimat navigasi berkala (`src/gallery/guide.ts`, tanpa fakta budaya), klik/T = buka chat Saloka bersumber.
+- [ ] **T-132 (HR+HW)** Aksesibilitas tuna netra: aria-live pengumuman posisi, kontrol keyboard penuh (↑↓ Enter K T F Esc H), suara pemandu opsional (Web Speech id-ID), kartu bisa dibacakan, tampilan Daftar. *Belum diuji* dengan pembaca layar nyata (NVDA/TalkBack) maupun pengguna tuna netra; lakukan dan catat hasilnya apa adanya.
+- [x] **T-134 (HR)** Suara Saloka lewat ElevenLabs (SDD ADR 42): `app/tts.py`, `POST /api/tts`, `GET /api/tts/status`, `src/gallery/speech.ts` (cache, pembatalan, cadangan suara peramban). *Terbuka (HR/HW):* isi `ELEVENLABS_API_KEY` dan `ELEVENLABS_VOICE_ID` di `.env`/Render; voice = George (bawaan; voice Library "Finn" butuh paket berbayar). Uji langsung ke ElevenLabs berhasil (HTTP 200); suara di galeri diuji tim.
+- [ ] **T-128 (HR+HW)** Verifikasi manual per perangkat (desktop, Android 360 px, iOS, Quest/emulator) + ukur fps dan waktu muat. *DoD:* hasil dicatat apa adanya.
+- [ ] **T-129 (HR)** Penutup dokumen. *DoD:* status jujur; perintah baru di CLAUDE.md.
+
+## Fase 3e — Percakapan alami Saloka (26 Nov 2026; SDD ADR 41)
+
+- [x] **T-133a (HR)** Basa-basi (salam, terima kasih, pamit, identitas, bantuan) dijawab teks tim `agent_script.yaml` → `small_talk` tanpa LLM; label "Pesan pemandu" di chat. Uji: `tests/test_conversation.py`, `tests/test_chat.py`, `AgentPanel.test.tsx`.
+- [x] **T-133b (HR)** Pertanyaan susulan: retrieval diulang dengan judul materi aktif + 2 pertanyaan pengguna sebelumnya bila pesan gagal gerbang; pengaman ≤1 kata asing korpus. Gerbang/`MIN_SCORE`/validasi sitasi tidak diubah.
+- [x] **T-133e (HR)** Prompt gaya bicara hangat (aturan 7–10, aturan 1–6 tetap) + saran "Tanya lagi" dari `suggested_questions` pada jawaban bersumber. Dicoba manual 26 Nov 2026 dengan Gemini (1 percakapan, bukan eval); suhu LLM belum diubah.
+- [x] **T-133f (HR)** 51 chunk dari dokumen KB tim (angklung-014…036, pengenalan-bandung-009…036), `verified_by`/`accessed` kosong; cek wilayah di gerbang + `MIN_SCORE` 6.0 (ADR 43). Eval gerbang `--strict` bersih.
+- [ ] **T-133g (KH)** Periksa 51 chunk KB: buka sumbernya, isi `accessed`/`verified_by`; putuskan bentrok jumlah tabung (2–3 vs UNESCO 2–4), tanggal surat Daendels (25 Mei vs 25 Sep 1810), dan butir yang dulu ditahan (Kota Kembang, Bandung Lautan Api, 29 negara KAA).
+- [x] **T-133h (HR)** Riset Gemini (brief riset chunk) dicek per URL/PDF: 24 chunk baru dengan kutipan terbukti (wayang-golek-012…026, museum-sri-baduga-010, angklung-037…044, pengenalan-bandung-037…044); bentrok 25 Mei/25 Sep 1810 terjelaskan; angka tabung KB dibuang; `MIN_SCORE` 6.5. Ditolak: sumber Scribd, halaman jabarprov (403), PDF uninus tak terbaca, belaindika/ResearchGate (403), N3-cepot tanpa URL.
+- [ ] **T-133c (KH)** Sunting teks `small_talk` Bandung (masih draf).
+- [ ] **T-133d (HR)** Dukung `history` di `eval_rag.py` + kasus susulan dan basa-basi di `eval/`; jalankan `--llm` dan catat hasil apa adanya. *Belum diukur.*
+
 ## Fase 4 — Kualitas dan deploy (Hari-4)
 
 - [ ] **T-060 (KH+HR)** Set evaluasi: 30 dalam cakupan, 15 luar cakupan + percobaan injeksi. *DoD:* `eval/*.yaml`. *Status (21 Nov 2026):* `eval/out_of_scope.yaml` selesai (HR): 15 luar cakupan + 6 injeksi. `eval/in_scope.yaml` berisi **draf HR 40 soal** (`ins-01`…`ins-30` + `ins-31`…`ins-40` bahasa santai/obrolan) yang diturunkan dari teks chunk saat ini, dengan `expected_chunks`; **menunggu tinjauan KH** (dan verifikasi chunk T-031).
@@ -102,7 +156,7 @@ Fitur P1 (kuis penutup, rekor, analitik) tidak dikerjakan sebelum semua P0 seles
 ## Pasca pendaftaran (P1/P2)
 
 - [ ] T-100 (P1) Kuis penutup dan perbandingan skor (F-023); rekor (F-047).
-- [ ] T-101 (P1) Analitik ringan (F-053), umpan balik (F-054), streaming (F-013).
+- [ ] T-101 (P1) Analitik ringan (F-053), streaming (F-013). Umpan balik (F-054) dipindah ke F-083/T-084.
 - [ ] T-102 (P1) Survei lebih luas dan wawancara guru/museum; perbarui proposal.
 - [ ] T-103 (P1) Kota kedua bersama mitra museum.
 - [ ] T-104 (P2) Penampil 3D di balik flag (F-060), paket langganan (F-061), mode kelas (F-062), portal museum (F-063).

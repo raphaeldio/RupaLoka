@@ -12,13 +12,32 @@ type Msg =
 
 const MAX_LEN = 500
 
-/** Nama dan visual maskot belum final (T-005); sementara "Pemandu". */
-export const AGENT_NAME = 'Pemandu'
+/** Nama agen pemandu (diputuskan 25 Nov 2026). Visual maskot: T-005. */
+export const AGENT_NAME = 'Saloka'
 
 function Answer({ resp, onSuggest }: { resp: ChatResponse; onSuggest: (q: string) => void }) {
   const parts = splitAnswer(resp.answer, resp.citations)
+  const sourced = resp.grounded && resp.citations.length > 0
+  // Basa-basi (ADR 41): teks tulisan tim, bukan AI dan bukan penolakan.
+  const smallTalk = resp.intent === 'small_talk'
   return (
     <div>
+      {/* Transparansi (masukan juri, 25 Nov 2026): jawaban bebas dihasilkan AI dari sumber;
+          penolakan tidak memakai teks AI. */}
+      <p className="mb-1 flex flex-wrap items-center gap-1.5 eyebrow">
+        {sourced ? (
+          <>
+            <span className="rounded-full bg-teal px-2 py-0.5 text-white">Dijawab AI</span>
+            <span className="text-teal">
+              {resp.citations.length} sumber
+            </span>
+          </>
+        ) : smallTalk ? (
+          <span className="rounded-full bg-white/70 px-2 py-0.5 text-teal">Pesan pemandu</span>
+        ) : (
+          <span className="rounded-full bg-white/70 px-2 py-0.5 text-redup">Belum ada sumber yang cocok</span>
+        )}
+      </p>
       <p className="leading-relaxed">
         {parts.map((p, i) =>
           p.type === 'text' ? (
@@ -30,7 +49,7 @@ function Answer({ resp, onSuggest }: { resp: ChatResponse; onSuggest: (q: string
               target="_blank"
               rel="noopener noreferrer"
               title={p.citation.title}
-              className="mx-0.5 inline-grid min-w-5 place-items-center rounded-md bg-teal-50 px-1 align-baseline text-[11px] font-extrabold text-teal hover:bg-teal hover:text-white"
+              className="mx-0.5 inline-grid min-w-5 place-items-center rounded-xl bg-teal-50 px-1 align-baseline text-[11px] font-black text-teal-800 hover:bg-teal hover:text-white"
             >
               {p.n}
               <span className="sr-only">: sumber {p.citation.title}</span>
@@ -54,8 +73,11 @@ function Answer({ resp, onSuggest }: { resp: ChatResponse; onSuggest: (q: string
           ))}
         </ol>
       )}
-      {!resp.grounded && resp.suggestions.length > 0 && (
-        <ul className="mt-2 flex flex-wrap gap-1.5">
+      {resp.grounded && resp.suggestions.length > 0 && (
+        <p className="mt-2 text-[11px] font-semibold text-redup">Tanya lagi:</p>
+      )}
+      {resp.suggestions.length > 0 && (
+        <ul aria-label="Saran pertanyaan" className="mt-2 flex flex-wrap gap-1.5">
           {resp.suggestions.map((s) => (
             <li key={s}>
               <button
@@ -168,8 +190,8 @@ export default function AgentPanel({ cityId, onClose }: { cityId: string; onClos
       <header className="flex items-center gap-3 border-b border-garis bg-teal-50/60 px-4 py-3">
         <Mascot mood={mood} className="size-10 shrink-0" />
         <div className="min-w-0 flex-1">
-          <p className="font-extrabold text-teal">{AGENT_NAME}</p>
-          <p className="text-[11px] text-redup">Menjawab dari sumber terverifikasi saja</p>
+          <p className="font-black text-teal-800">{AGENT_NAME}</p>
+          <p className="text-[11px] text-redup">Asisten AI · menjawab hanya dari sumber terverifikasi</p>
         </div>
         {onClose && (
           <button
@@ -195,15 +217,24 @@ export default function AgentPanel({ cityId, onClose }: { cityId: string; onClos
             )
           }
           const tone =
-            m.kind === 'notice' ? 'bg-amber-50 text-tinta' : m.kind === 'answer' && !m.resp.grounded ? 'bg-pasir/60' : 'bg-kertas'
+            m.kind === 'notice' ? 'bg-amber-50 text-tinta' : m.kind === 'answer' && !m.resp.grounded && m.resp.intent !== 'small_talk' ? 'bg-pasir/60' : 'bg-kertas'
           return (
             <div key={i} className={`mr-4 rounded-2xl rounded-bl-md px-3 py-2 ${tone}`}>
-              {m.kind === 'answer' ? <Answer resp={m.resp} onSuggest={(q) => void ask(q)} /> : <p>{m.text}</p>}
+              {m.kind === 'answer' ? (
+                <Answer resp={m.resp} onSuggest={(q) => void ask(q)} />
+              ) : m.kind === 'script' ? (
+                <>
+                  <p className="mb-1 eyebrow text-redup">Pesan pemandu</p>
+                  <p>{m.text}</p>
+                </>
+              ) : (
+                <p>{m.text}</p>
+              )}
             </div>
           )
         })}
         {busy && (
-          <p className="mr-4 w-fit rounded-2xl bg-kertas px-3 py-2 text-redup" aria-label="Pemandu sedang mengetik">
+          <p className="mr-4 w-fit rounded-2xl bg-kertas px-3 py-2 text-redup" aria-label={`${AGENT_NAME} sedang mengetik`}>
             <span className="motion-safe:animate-pulse">…</span>
           </p>
         )}

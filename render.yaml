@@ -27,7 +27,7 @@ services:
       - key: GEMINI_MODEL
         value: gemini-3.5-flash-lite
       - key: MIN_SCORE
-        value: "5.45"               # gerbang dua jalur; kalibrasi: eval_rag.py --strict
+        value: "6.5"               # gerbang dua jalur; kalibrasi: eval_rag.py --strict
       - key: RATE_LIMIT_PER_MIN
         value: "20"
       - key: GLOBAL_RATE_LIMIT_PER_MIN
@@ -44,3 +44,16 @@ services:
         sync: false                 # RAHASIA: isi manual di dashboard Render
       - key: LEADERBOARD_RATE_LIMIT_PER_MIN
         value: "10"                 # per IP, untuk POST /api/leaderboard
+      # Suara Saloka (ElevenLabs TTS, SDD ADR 42). Tanpa kunci/voice: klien pakai suara peramban.
+      - key: ELEVENLABS_API_KEY
+        sync: false                 # RAHASIA: isi manual di dashboard Render
+      - key: ELEVENLABS_VOICE_ID
+        value: JBFqnCBsd6RMkjVDRZzb   # voice bawaan "George" (akun gratis tidak bisa voice Library via API)
+      - key: ELEVENLABS_MODEL
+        value: eleven_multilingual_v2
+      - key: TTS_RATE_LIMIT_PER_MIN
+        value: "30"                 # per IP, untuk POST /api/tts
+      - key: TTS_GLOBAL_RATE_LIMIT_PER_MIN
+        value: "120"
+      - key: TTS_DAILY_CHAR_LIMIT
+        value: "20000"              # pengaman kredit ElevenLabs (karakter per hari, semua pengguna)

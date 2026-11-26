@@ -22,7 +22,7 @@ export default function CityRotator({ words, interval = 2200 }: { words: string[
   const longest = words.reduce((a, w) => (w.length > a.length ? w : a), '')
 
   return (
-    <span className="relative inline-grid overflow-y-clip pb-2 align-bottom">
+    <span className="relative -mb-[0.2em] inline-grid overflow-y-clip pb-[0.2em] align-bottom">
       <span aria-hidden="true" className="invisible col-start-1 row-start-1 whitespace-nowrap">
         {longest}
       </span>

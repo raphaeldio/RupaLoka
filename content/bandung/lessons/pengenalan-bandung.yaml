@@ -32,17 +32,17 @@ videos:
     title: "Asal Usul Kota Bandung Dijuluki Paris van Java"
     channel: "MerdekaDotCom"
     note: "media berita; pendek (3:23)"
-    checked_by: null
+    checked_by: "Tim KamiPemenang"
   - url: https://www.youtube.com/watch?v=fi1fUBCbFm8
     title: "Museum Gedung Sate Bandung Jelajah Wisata Sejarah Bandung 2022"
     channel: "Endanesia"
     note: "tur museum; kanal vlog wisata, bukan kanal resmi"
-    checked_by: null
+    checked_by: "Tim KamiPemenang"
   - url: https://www.youtube.com/watch?v=225xAxFqlrI
     title: "Menelusuri Sejarah di Gedung Merdeka Bandung (Museum KAA)"
     channel: "MojangTulolo"
     note: "kanal pribadi; tonton dulu sebelum rilis"
-    checked_by: null
+    checked_by: "Tim KamiPemenang"
 location: null
 suggested_questions:
   - "Bandung ada di provinsi apa?"

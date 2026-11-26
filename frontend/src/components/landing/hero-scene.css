@@ -1,0 +1,172 @@
+/* Latar hero hidup (HeroScene). Ukuran lapisan memakai cqw = persen lebar adegan. */
+
+.hs-wadah {
+  position: absolute;
+  container-type: size;
+  overflow: hidden;
+  pointer-events: none;
+}
+/* Pudar ke kertas di tepi atas agar langit menyatu dengan halaman. */
+.hs-wadah::after {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 22%;
+  background: linear-gradient(to bottom, var(--color-kertas), transparent);
+}
+
+/* Adegan selalu menjaga rasio gambar, menempel di bawah, menutupi wadah. */
+.hs-adegan {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: max(100cqw, calc(100cqh * 1672 / 941));
+  aspect-ratio: 1672 / 941;
+  transform: translateX(-50%);
+  container-type: inline-size;
+}
+.hs-gambar {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+  user-select: none;
+}
+.hs-adegan > span {
+  position: absolute;
+  display: block;
+}
+.hs-adegan svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* ---------- Awan ---------- */
+.hs-awan {
+  width: 8cqw;
+  height: 1.5cqw;
+  background: #f7f0e1;
+  box-shadow:
+    1.6cqw -1.3cqw 0 -0.2cqw #f7f0e1,
+    3.6cqw -1.3cqw 0 -0.2cqw #f7f0e1;
+}
+.hs-awan-1 { top: 7%; left: 0; opacity: 0.95; }
+.hs-awan-2 { top: 19%; left: 0; width: 6cqw; opacity: 0.85; }
+.hs-awan-3 { top: 29%; left: 0; width: 10cqw; opacity: 0.7; }
+
+/* ---------- Burung ---------- */
+.hs-burung {
+  width: 1.9cqw;
+  left: 0;
+}
+.hs-burung svg { position: absolute; inset: 0; }
+.hs-sayap-b { opacity: 0; }
+.hs-burung-1 { top: 12%; }
+.hs-burung-2 { top: 15%; width: 1.5cqw; }
+.hs-burung-3 { top: 10%; width: 1.3cqw; }
+
+/* ---------- Lampu ---------- */
+.hs-pendar {
+  top: 36.7%;
+  width: 6cqw;
+  height: 6cqw;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgb(255 236 170 / 0.75) 0 18%, rgb(255 224 140 / 0.25) 45%, transparent 70%);
+  mix-blend-mode: screen;
+  opacity: 0.6;
+}
+
+/* ---------- Pejalan kaki ---------- */
+.hs-pejalan {
+  --pw: 3.4cqw;
+  bottom: 26.5%;
+  left: 0;
+  width: var(--pw);
+  height: calc(var(--pw) * 32 / 18);
+  background-size: calc(var(--pw) * 8) 100%;
+  background-repeat: no-repeat;
+  image-rendering: pixelated;
+}
+.hs-pejalan-1 { translate: 30cqw 0; }
+.hs-pejalan-2 { translate: 62cqw 0; scale: -1 1; --pw: 3cqw; filter: saturate(0.6) brightness(1.15); }
+
+/* ---------- Kendaraan ---------- */
+.hs-kendaraan { left: 0; }
+.hs-mobil-1 { width: 6.5cqw; bottom: 14.5%; translate: 20cqw 0; }
+.hs-mobil-2 { width: 6.5cqw; bottom: 14.5%; translate: 70cqw 0; }
+.hs-bus { width: 13cqw; bottom: 3%; translate: 45cqw 0; }
+.hs-mobil-3 { width: 7cqw; bottom: 3%; translate: 85cqw 0; }
+/* Lajur bawah menghadap kiri. */
+.hs-bus svg,
+.hs-mobil-3 svg { scale: -1 1; }
+
+/* ---------- Gerak ---------- */
+@media (prefers-reduced-motion: no-preference) {
+  .hs-awan-1 { animation: hs-ke-kanan 80s linear infinite -20s; }
+  .hs-awan-2 { animation: hs-ke-kanan 110s linear infinite -70s; }
+  .hs-awan-3 { animation: hs-ke-kanan 95s linear infinite -45s; }
+
+  .hs-burung-1 { animation: hs-ke-kanan 22s linear infinite -4s, hs-naik-turun 3s ease-in-out infinite; }
+  .hs-burung-2 { animation: hs-ke-kanan 22s linear infinite -5.2s, hs-naik-turun 3.4s ease-in-out infinite -1s; }
+  .hs-burung-3 { animation: hs-ke-kanan 30s linear infinite -18s, hs-naik-turun 2.6s ease-in-out infinite -0.5s; }
+  .hs-sayap-a { animation: hs-kepak-a 0.5s linear infinite; }
+  .hs-sayap-b { animation: hs-kepak-b 0.5s linear infinite; }
+
+  .hs-pendar { animation: hs-pendar 3.2s ease-in-out infinite; }
+
+  .hs-pejalan-1 {
+    animation:
+      hs-ke-kanan 38s linear infinite -12s,
+      hs-langkah 0.7s steps(8) infinite;
+  }
+  .hs-pejalan-2 {
+    animation:
+      hs-ke-kiri 52s linear infinite -30s,
+      hs-langkah 0.8s steps(8) infinite;
+  }
+
+  .hs-mobil-1 { animation: hs-ke-kanan 9s linear infinite -2s, hs-getar 0.3s steps(2) infinite; }
+  .hs-mobil-2 { animation: hs-ke-kanan 13s linear infinite -9s, hs-getar 0.34s steps(2) infinite; }
+  .hs-bus { animation: hs-ke-kiri 16s linear infinite -6s, hs-getar 0.4s steps(2) infinite; }
+  .hs-mobil-3 { animation: hs-ke-kiri 11s linear infinite -1s, hs-getar 0.3s steps(2) infinite; }
+
+  .hs-wadah[data-paused] * {
+    animation-play-state: paused !important;
+  }
+}
+
+@keyframes hs-ke-kanan {
+  from { translate: -15cqw 0; }
+  to { translate: 115cqw 0; }
+}
+@keyframes hs-ke-kiri {
+  from { translate: 115cqw 0; }
+  to { translate: -15cqw 0; }
+}
+@keyframes hs-naik-turun {
+  0%, 100% { margin-top: 0; }
+  50% { margin-top: -0.8cqw; }
+}
+@keyframes hs-kepak-a {
+  0%, 49.9% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+@keyframes hs-kepak-b {
+  0%, 49.9% { opacity: 0; }
+  50%, 100% { opacity: 1; }
+}
+@keyframes hs-pendar {
+  0%, 100% { opacity: 0.45; transform: scale(0.92); }
+  50% { opacity: 0.85; transform: scale(1.06); }
+}
+@keyframes hs-langkah {
+  from { background-position-x: 0; }
+  to { background-position-x: calc(var(--pw) * -8); }
+}
+@keyframes hs-getar {
+  0% { margin-bottom: 0; }
+  50% { margin-bottom: 0.12cqw; }
+}
