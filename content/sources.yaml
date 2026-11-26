@@ -141,6 +141,29 @@ assets:
 # Objek game. Rintangan di city.yaml harus terdaftar di sini dan disetujui KH (approved_by).
 # sensitive: true = objek budaya/sakral/dihormati; validator MENOLAK bila dipakai sebagai rintangan
 # (PRD §7: objek budaya adalah hadiah, bukan sesuatu yang ditabrak).
+  # Model 3D galeri (ADR 40), diekspor dari "Aset 3D/*.blend" (mesh saja, asal di dasar).
+  # Pembuat dan lisensi belum dicatat tim: isi sebelum rilis (prinsip 7).
+  - path: assets/models/item-wayang.glb
+    license: "[PERLU DIISI]"
+    author: "[PERLU DIISI]"
+    note: "Ekspor dari Aset 3D/wayang.blend"
+  - path: assets/models/museum-gedung-sate.glb
+    license: "[PERLU DIISI]"
+    author: "[PERLU DIISI]"
+    note: "Ekspor dari Aset 3D/gedung sate.blend"
+  - path: assets/models/museum-keris.glb
+    license: "[PERLU DIISI]"
+    author: "[PERLU DIISI]"
+    note: "Ekspor dari Aset 3D/keris_3D.blend"
+  - path: assets/models/museum-rumah-adat.glb
+    license: "[PERLU DIISI]"
+    author: "[PERLU DIISI]"
+    note: "Ekspor dari Aset 3D/rumah_adat.blend"
+  - path: assets/models/maskot-saloka.glb
+    license: "[PERLU DIISI]"
+    author: "[PERLU DIISI]"
+    note: "Ekspor dari Aset 3D/maskot_3D.blend"
+
 objects:
   - id: batu
     name: Batu

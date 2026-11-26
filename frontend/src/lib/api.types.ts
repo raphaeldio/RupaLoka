@@ -84,7 +84,7 @@ export interface CityDetail {
   items: Item[]
   sources: Record<string, SourceRef>
   reflection: ReflectionPrompt[]
-  gallery: GalleryFile | null
+  gallery: GalleryOut | null
 }
 
 /** Kartu kota (F-003). Hitungan hanya diisi untuk kota aktif. */
@@ -110,15 +110,19 @@ export interface CultureCard {
   validator: Validator | null
 }
 
-export interface GalleryExhibit {
-  item: string
-}
-
-export interface GalleryFile {
-  room: GalleryRoom
-  layout: GalleryLayout
-  exhibits: GalleryExhibit[]
-  approved_by_kh: KhApproval | null
+/** Satu pedestal galeri, siap tampil. Teks hanya dari konten bersumber; None = pending. */
+export interface ExhibitOut {
+  id: string
+  kind: "item" | "object"
+  name: string
+  short_explanation: string | null
+  short_chunk: string | null
+  asal_usul: CardAspect | null
+  image: ImageRef | null
+  model_src: string | null
+  model_available: boolean
+  accuracy_by: string | null
+  hotspots: Hotspot[]
 }
 
 /** Parameter lorong cincin; dibaca sama oleh frontend (cameraFlow.ts) dan validator. */
@@ -128,8 +132,14 @@ export interface GalleryLayout {
   first_d: number
 }
 
-export interface GalleryRoom {
-  model: string
+export interface GalleryOut {
+  layout: GalleryLayout
+  room_model: string
+  room_available: boolean
+  exhibits: ExhibitOut[]
+  guide_model: string | null
+  guide_available: boolean
+  approved: boolean
 }
 
 export interface GameConfig {
@@ -192,11 +202,6 @@ export interface ItemModel {
 export interface KeyFact {
   text: string
   chunk: string
-}
-
-export interface KhApproval {
-  name: string
-  approved_at: string
 }
 
 /** Papan peringkat akhir tur kota (diputuskan tim 21 Nov 2026). Skor = total poin path. */

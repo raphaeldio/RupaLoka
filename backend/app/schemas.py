@@ -364,8 +364,44 @@ class GalleryLayout(Strict):
     first_d: float = Field(default=3.0, ge=0.0)  # jarak pedestal pertama dari titik awal (m)
 
 
+class MuseumObject(Strict):
+    """Objek khusus museum 3D (bukan item hadiah game). Teks DIISI dari chunk bersumber."""
+
+    id: Id
+    name: Text
+    short_explanation: CardAspect | None = None  # kosong = "sedang disusun tim budaya"
+    image: ImageRef | None = None
+    model: ItemModel | None = None
+    hotspots: list[Hotspot] = Field(default_factory=list)
+
+    @model_validator(mode="after")
+    def _hotspot_ids_unique(self) -> MuseumObject:
+        _no_duplicates([h.id for h in self.hotspots], "hotspots")
+        return self
+
+
 class GalleryExhibit(Strict):
-    item: Id
+    """Satu pedestal: item koleksi yang sudah ada (`item`) ATAU objek khusus museum (`object`)."""
+
+    item: Id | None = None
+    object: MuseumObject | None = None
+    asal_usul: CardAspect | None = None  # cerita asal usul bersumber; kosong = pending
+
+    @model_validator(mode="after")
+    def _one_kind(self) -> GalleryExhibit:
+        if (self.item is None) == (self.object is None):
+            raise ValueError("isi tepat salah satu: item atau object")
+        return self
+
+    @property
+    def key(self) -> str:
+        return self.item if self.item is not None else self.object.id  # type: ignore[union-attr]
+
+
+class GalleryGuide(Strict):
+    """Maskot pemandu di galeri (model GLB); jawabannya tetap lewat agen bersumber."""
+
+    model: Text
 
 
 class KhApproval(Strict):
@@ -377,11 +413,12 @@ class GalleryFile(Strict):
     room: GalleryRoom
     layout: GalleryLayout = Field(default_factory=GalleryLayout)
     exhibits: list[GalleryExhibit] = Field(min_length=1)  # urutan = pedestal_1, pedestal_2, ...
+    guide: GalleryGuide | None = None
     approved_by_kh: KhApproval | None = None
 
     @model_validator(mode="after")
     def _check(self) -> GalleryFile:
-        _no_duplicates([e.item for e in self.exhibits], "exhibits")
+        _no_duplicates([e.key for e in self.exhibits], "exhibits")
         if len(self.exhibits) > self.layout.slots:
             raise ValueError(
                 f"{len(self.exhibits)} exhibits melebihi layout.slots ({self.layout.slots})"

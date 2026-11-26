@@ -85,6 +85,9 @@ class CityContent:
     chunks: dict[str, Chunk]
     reflection: ReflectionFile | None = None
     gallery: GalleryFile | None = None
+    # Berkas model galeri (relatif ke content/) yang benar-benar ada; API memakai ini agar
+    # klien tidak meminta berkas yang belum dibuat (langsung pakai pengganti).
+    models_present: set[str] = field(default_factory=set)
 
 
 @dataclass
@@ -390,7 +393,7 @@ class _Loader:
 
         # Galeri 3D (opsional)
         if c.gallery is not None:
-            self._check_gallery(city_dir, c, sources)
+            self._check_gallery(city_dir, c, sources, need_chunk)
 
         # Refleksi akhir tur (opsional)
         if c.reflection is not None:
@@ -432,7 +435,9 @@ class _Loader:
             elif is_unfilled(obj.approved_by):
                 self.pending(config_path, f"rintangan '{obstacle}' belum disetujui (approved_by)")
 
-    def _check_gallery(self, city_dir: Path, c: CityContent, sources: SourcesFile | None) -> None:
+    def _check_gallery(
+        self, city_dir: Path, c: CityContent, sources: SourcesFile | None, need_chunk: Any
+    ) -> None:
         assert c.gallery is not None
         g = c.gallery
         gallery_path = city_dir / "gallery.yaml"
@@ -443,38 +448,75 @@ class _Loader:
         room_nodes = self._check_model_file(
             gallery_path, "room.model", g.room.model, MAX_ROOM_MODEL_BYTES, registered
         )
+        if room_nodes is not None:
+            c.models_present.add(g.room.model)
         total = self._size(g.room.model)
         if room_nodes is not None:
             self._check_pedestals(gallery_path, c, room_nodes)
 
         for i, exhibit in enumerate(g.exhibits):
-            item = c.items.get(exhibit.item)
-            if item is None:
-                self.error(
-                    gallery_path, f"exhibits[{i}]: item '{exhibit.item}' tidak ada di items/"
-                )
-                continue
-            path = city_dir / "items" / f"{item.id}.yaml"
-            if item.model is None:
+            where = f"exhibits[{i}] ({exhibit.key})"
+            if exhibit.asal_usul is None:
+                self.pending(gallery_path, f"{where}: asal_usul (cerita asal usul) belum diisi")
+            else:
+                need_chunk(gallery_path, f"{where}.asal_usul", exhibit.asal_usul.chunk)
+
+            if exhibit.item is not None:
+                item = c.items.get(exhibit.item)
+                if item is None:
+                    self.error(gallery_path, f"{where}: item '{exhibit.item}' tidak ada di items/")
+                    continue
+                path = city_dir / "items" / f"{item.id}.yaml"
+                model, hotspots = item.model, item.hotspots
+            else:
+                obj = exhibit.object
+                assert obj is not None
+                path = gallery_path
+                model, hotspots = obj.model, obj.hotspots
+                if obj.short_explanation is None:
+                    self.pending(path, f"{where}: short_explanation belum diisi")
+                else:
+                    need_chunk(path, f"{where}.short_explanation", obj.short_explanation.chunk)
+                if obj.image is not None:
+                    self._check_image(path, f"{where}.image", obj.image, sources)
+                if hotspots and model is None:
+                    self.error(path, f"{where}: hotspots butuh model 3D (model.src)")
+                for h in hotspots:
+                    if h.chunk is not None:
+                        need_chunk(path, f"{where} hotspot '{h.id}'", h.chunk)
+
+            if model is None:
                 self.pending(path, "model 3D belum ada (model.src) untuk galeri")
                 continue
-            if item.model.accuracy_check is None:
-                self.pending(path, "model.accuracy_check: bentuk model belum diperiksa KH")
-            if item.model.poster is not None and not (self.root / item.model.poster).is_file():
-                self.pending(path, f"model.poster: berkas '{item.model.poster}' belum ada")
-            for h in item.hotspots:
+            if model.accuracy_check is None:
+                self.pending(path, f"{where} model.accuracy_check: bentuk model belum diperiksa KH")
+            if model.poster is not None and not (self.root / model.poster).is_file():
+                self.pending(path, f"model.poster: berkas '{model.poster}' belum ada")
+            for h in hotspots:
                 if h.text is None or h.chunk is None:
                     self.pending(path, f"hotspot '{h.id}': teks belum diisi (text/chunk)")
             nodes = self._check_model_file(
-                path, "model.src", item.model.src, MAX_OBJECT_MODEL_BYTES, registered
+                path, "model.src", model.src, MAX_OBJECT_MODEL_BYTES, registered
             )
-            total += self._size(item.model.src)
             if nodes is not None:
-                for h in item.hotspots:
+                c.models_present.add(model.src)
+            total += self._size(model.src)
+            if nodes is not None:
+                for h in hotspots:
                     if f"hotspot_{h.id}" not in nodes:
                         self.error(
                             path, f"hotspot '{h.id}': node 'hotspot_{h.id}' tidak ada di GLB"
                         )
+
+        if g.guide is not None:
+            if (
+                self._check_model_file(
+                    gallery_path, "guide.model", g.guide.model, MAX_OBJECT_MODEL_BYTES, registered
+                )
+                is not None
+            ):
+                c.models_present.add(g.guide.model)
+            total += self._size(g.guide.model)
 
         if total > MAX_GALLERY_BYTES:
             self.error(

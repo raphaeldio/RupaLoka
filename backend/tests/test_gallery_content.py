@@ -16,7 +16,10 @@ def with_gallery(files: dict[str, Any], **overrides: Any) -> None:
     gallery: dict[str, Any] = {
         "room": {"model": "assets/models/galeri.glb"},
         "layout": {"radius": 6, "slots": 12, "first_d": 3},
-        "exhibits": [{"item": "item-a"}, {"item": "item-b"}],
+        "exhibits": [
+            {"item": "item-a", "asal_usul": {"text": "Asal usul contoh.", "chunk": "materi-a-006"}},
+            {"item": "item-b", "asal_usul": {"text": "Asal usul contoh.", "chunk": "materi-b-006"}},
+        ],
         "approved_by_kh": {"name": "Penguji", "approved_at": "2026-11-25"},
     }
     gallery.update(overrides)
@@ -117,16 +120,6 @@ def test_pending_fields(make_content: Any) -> None:
 def test_missing_glb_is_pending_not_error(make_content: Any) -> None:
     # write_content tidak menulis berkas .glb: model belum dibuat = pending.
     assert_pending(make_content(with_gallery), "berkas model 'assets/models/item-a.glb' belum ada")
-
-
-def test_hotspot_chunk_is_exposed_in_city_detail(make_content: Any, tmp_path: Path) -> None:
-    from app.main import _city_detail
-
-    result = load_content(make_content(with_gallery))
-    city = next(c for c in result.content.cities if c.id == "kota-uji")
-    detail = _city_detail(city, result.content.city_content["kota-uji"])
-    assert detail.gallery is not None
-    assert "materi-a-005" in detail.sources
 
 
 # --- aset GLB (T-114) --------------------------------------------------------
@@ -234,3 +227,97 @@ def test_unregistered_model_is_pending(make_content: Any) -> None:
     root = make_content(mutate)
     write_glbs(root)
     assert_pending(root, "'assets/models/item-a.glb' belum tercatat")
+
+
+# --- objek khusus museum, asal usul, maskot, bentuk API ----------------------
+
+
+def with_museum_object(files: dict[str, Any]) -> None:
+    with_gallery(files)
+    files[GALLERY]["exhibits"].append(
+        {
+            "object": {
+                "id": "objek-museum",
+                "name": "Objek Museum",
+                "short_explanation": {"text": "Penjelasan contoh.", "chunk": "materi-c-007"},
+                "model": {
+                    "src": "assets/models/objek-museum.glb",
+                    "accuracy_check": {"by": "Penguji", "checked_at": "2026-11-26"},
+                },
+            },
+            "asal_usul": {"text": "Asal usul objek contoh.", "chunk": "materi-c-008"},
+        }
+    )
+    files[GALLERY]["guide"] = {"model": "assets/models/maskot.glb"}
+    files["sources.yaml"]["assets"] += [
+        {"path": p, "license": "milik sendiri (tim)", "author": "Tim"}
+        for p in ("assets/models/objek-museum.glb", "assets/models/maskot.glb")
+    ]
+
+
+def write_extra_glbs(root: Path) -> None:
+    from tests.glbfixture import make_glb
+
+    models = root / "assets" / "models"
+    (models / "objek-museum.glb").write_bytes(make_glb([{"name": "objek"}]))
+    (models / "maskot.glb").write_bytes(make_glb([{"name": "maskot"}]))
+
+
+def test_museum_object_and_guide_pass_release(make_content: Any) -> None:
+    root = make_content(with_museum_object)
+    write_glbs(root)
+    write_extra_glbs(root)
+    result = load_content(root)
+    assert result.ok(release=True), result.errors(release=True)
+    city = result.content.city_content["kota-uji"]
+    assert city.gallery is not None
+    assert [e.key for e in city.gallery.exhibits] == ["item-a", "item-b", "objek-museum"]
+    assert "assets/models/maskot.glb" in city.models_present
+
+
+def test_exhibit_needs_exactly_one_kind(make_content: Any) -> None:
+    def mutate(f: dict[str, Any]) -> None:
+        with_gallery(f)
+        f[GALLERY]["exhibits"].append({"asal_usul": None})
+
+    assert_error(make_content(mutate), "tepat salah satu")
+
+
+def test_museum_object_text_pending_and_chunk_checked(make_content: Any) -> None:
+    def mutate(f: dict[str, Any]) -> None:
+        with_museum_object(f)
+        f[GALLERY]["exhibits"][2]["object"]["short_explanation"] = None
+        f[GALLERY]["exhibits"][2]["asal_usul"] = None
+
+    root = make_content(mutate)
+    assert_pending(root, "(objek-museum): short_explanation belum diisi")
+    assert_pending(root, "(objek-museum): asal_usul")
+
+    def bad(f: dict[str, Any]) -> None:
+        with_museum_object(f)
+        f[GALLERY]["exhibits"][2]["asal_usul"]["chunk"] = "tidak-ada-009"
+
+    assert_error(make_content(bad), "chunk 'tidak-ada-009'")
+
+
+def test_gallery_api_shape(make_content: Any) -> None:
+    from app.main import _city_detail
+
+    root = make_content(with_museum_object)
+    write_glbs(root)  # objek-museum.glb dan maskot.glb sengaja tidak ditulis
+    result = load_content(root)
+    city = next(c for c in result.content.cities if c.id == "kota-uji")
+    detail = _city_detail(city, result.content.city_content["kota-uji"])
+    g = detail.gallery
+    assert g is not None
+    assert g.room_model == "assets/models/galeri.glb" and g.room_available
+    assert g.guide_model == "assets/models/maskot.glb" and not g.guide_available
+    a, _, obj = g.exhibits
+    assert (a.id, a.name, a.kind) == ("item-a", "Item item-a", "item")
+    assert a.short_explanation == "Penjelasan singkat contoh." and a.short_chunk == "materi-a-002"
+    assert a.model_available and a.accuracy_by == "Penguji"
+    assert a.asal_usul is not None and a.asal_usul.chunk == "materi-a-006"
+    assert (obj.id, obj.kind, obj.model_available) == ("objek-museum", "object", False)
+    assert obj.short_chunk == "materi-c-007"
+    for cid in ("materi-a-006", "materi-c-007", "materi-c-008", "materi-a-005"):
+        assert cid in detail.sources

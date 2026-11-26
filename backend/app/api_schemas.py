@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from typing import Literal
 from uuid import UUID
 
 from pydantic import BaseModel, Field
@@ -9,9 +10,12 @@ from pydantic import BaseModel, Field
 from app.schemas import (
     AgentScript,
     AssetEntry,
+    CardAspect,
     City,
-    GalleryFile,
+    GalleryLayout,
     GameConfig,
+    Hotspot,
+    ImageRef,
     Item,
     Lesson,
     Phase,
@@ -49,6 +53,32 @@ class ReflectionPrompt(BaseModel):
     prompt: str
 
 
+class ExhibitOut(BaseModel):
+    """Satu pedestal galeri, siap tampil. Teks hanya dari konten bersumber; None = pending."""
+
+    id: str
+    kind: Literal["item", "object"]  # item koleksi game atau objek khusus museum
+    name: str
+    short_explanation: str | None = None
+    short_chunk: str | None = None
+    asal_usul: CardAspect | None = None
+    image: ImageRef | None = None
+    model_src: str | None = None  # relatif ke content/ (klien: modelUrl)
+    model_available: bool = False  # False = klien langsung memakai pengganti
+    accuracy_by: str | None = None  # pemeriksa bentuk model (KH); None = belum diperiksa
+    hotspots: list[Hotspot] = []  # hanya yang teksnya sudah diisi
+
+
+class GalleryOut(BaseModel):
+    layout: GalleryLayout
+    room_model: str
+    room_available: bool
+    exhibits: list[ExhibitOut]
+    guide_model: str | None = None
+    guide_available: bool = False
+    approved: bool = False  # isi galeri sudah disetujui anggota budaya (KH)
+
+
 class CityDetail(BaseModel):
     city: City
     phases: list[Phase]
@@ -60,7 +90,7 @@ class CityDetail(BaseModel):
     items: list[Item]  # urut sesuai items_order
     sources: dict[str, SourceRef]  # chunk_id -> sumber, hanya chunk yang dirujuk konten
     reflection: list[ReflectionPrompt] = []  # soal refleksi siap pakai (punya daftar nilai)
-    gallery: GalleryFile | None = None  # galeri 3D (ADR 40); klien menampilkan bila flag aktif
+    gallery: GalleryOut | None = None  # galeri 3D (ADR 40); klien menampilkan bila flag aktif
 
 
 class SourcesResponse(BaseModel):
