@@ -113,6 +113,8 @@ export type CamState =
   | { kind: 'walk'; d: number }
   | { kind: 'focus'; index: number }
   | { kind: 'inspect'; index: number }
+  /** Melihat pajangan dinding (lukisan) di seberang pedestal ke-`index`. */
+  | { kind: 'decor'; index: number }
 
 export type CamAction =
   | { type: 'introDone' }
@@ -121,6 +123,7 @@ export type CamAction =
   | { type: 'step'; dir: -1 | 1 }
   | { type: 'back' }
   | { type: 'goto'; index: number }
+  | { type: 'clickDecor'; index: number }
 
 const isEmpty = (e: Exhibit | undefined) => !e || e.source === null
 
@@ -132,7 +135,8 @@ export function reduce(s: CamState, a: CamAction, L: Layout): CamState {
       return s.kind === 'intro' ? { kind: 'walk', d: 0 } : s
     case 'walkBy':
       if (s.kind === 'walk') return { kind: 'walk', d: wrap(s.d + a.delta, L.length) }
-      if (s.kind === 'focus') return { kind: 'walk', d: wrap(standFor(L, ex[s.index]) + a.delta, L.length) }
+      if (s.kind === 'focus' || s.kind === 'decor')
+        return { kind: 'walk', d: wrap(standFor(L, ex[s.index]) + a.delta, L.length) }
       return s
     case 'clickExhibit':
       if (isEmpty(ex[a.index])) return s
@@ -140,8 +144,8 @@ export function reduce(s: CamState, a: CamAction, L: Layout): CamState {
       if (s.kind === 'walk' || s.kind === 'focus' || s.kind === 'intro') return { kind: 'focus', index: a.index }
       return s
     case 'step': {
-      if (s.kind === 'walk' || s.kind === 'intro') {
-        const from = s.kind === 'walk' ? nearestIndex(L, s.d) : n - 1
+      if (s.kind === 'walk' || s.kind === 'intro' || s.kind === 'decor') {
+        const from = s.kind === 'walk' ? nearestIndex(L, s.d) : s.kind === 'decor' ? s.index : n - 1
         const i = wrap(from + a.dir, n)
         return { kind: 'walk', d: standFor(L, ex[i]) }
       }
@@ -152,7 +156,10 @@ export function reduce(s: CamState, a: CamAction, L: Layout): CamState {
       }
       return s
     }
+    case 'clickDecor':
+      return ex[a.index] && s.kind !== 'inspect' ? { kind: 'decor', index: a.index } : s
     case 'back':
+      if (s.kind === 'decor') return { kind: 'walk', d: standFor(L, ex[s.index]) }
       if (s.kind === 'inspect') return { kind: 'focus', index: s.index }
       if (s.kind === 'focus') return { kind: 'walk', d: standFor(L, ex[s.index]) }
       return s
@@ -182,6 +189,15 @@ export function poseFor(s: CamState, L: Layout, portrait = 0): Pose {
       const ahead = L.at(s.d + 3)
       const glance = portrait * 1.1 * L.exhibits[nearestIndex(L, s.d)].side
       return { position: withY(f.p, EYE), target: withY(add(ahead.p, ahead.n, glance), 1.45) }
+    }
+    case 'decor': {
+      // menghadap dinding seberang pedestal, cukup jauh agar lukisan ±1,5 m tampak utuh
+      const e = L.exhibits[s.index]
+      const f = L.at(e.d)
+      const wall = -e.side
+      const dist = 2.1 + portrait * 0.9
+      const pos = add(f.p, f.n, wall * (HALF_W - 0.05 - dist))
+      return { position: withY(pos, 1.8), target: withY(add(f.p, f.n, wall * (HALF_W - 0.05)), 1.9) }
     }
     case 'focus':
     case 'inspect': {

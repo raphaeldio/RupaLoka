@@ -95,6 +95,28 @@ describe('reduce', () => {
   })
 })
 
+describe('pajangan dinding', () => {
+  it('klik lukisan: menoleh ke dinding seberang; Esc kembali berjalan', () => {
+    const d = reduce({ kind: 'walk', d: 0 }, { type: 'clickDecor', index: 0 }, L)
+    expect(d).toEqual({ kind: 'decor', index: 0 })
+    expect(currentIndex(d, L)).toBe(0)
+    expect(reduce(d, { type: 'back' }, L)).toEqual({ kind: 'walk', d: standFor(L, L.exhibits[0]) })
+    expect(reduce(d, { type: 'walkBy', delta: 0.5 }, L).kind).toBe('walk')
+    expect(reduce({ kind: 'inspect', index: 1 }, { type: 'clickDecor', index: 0 }, L)).toEqual({ kind: 'inspect', index: 1 })
+  })
+
+  it('pose lukisan berada di dalam lorong dan menatap dinding seberang pedestal', () => {
+    const c = ringCenter(L)
+    for (const portrait of [0, 1]) {
+      const { position, target } = poseFor({ kind: 'decor', index: 0 }, L, portrait)
+      const r = Math.hypot(position[0] - c[0], position[2] - c[2])
+      expect(Math.abs(r - L.radius)).toBeLessThan(HALF_W)
+      // pedestal 0 di dinding dalam (kiri) → lukisan di dinding luar: target lebih jauh dari pusat
+      expect(Math.hypot(target[0] - c[0], target[2] - c[2])).toBeGreaterThan(r)
+    }
+  })
+})
+
 describe('pose dan bantuan', () => {
   it('objek "dilewati" memakai jarak terpendek di cincin', () => {
     expect(nearestIndex(L, L.length - 0.2)).toBe(0)

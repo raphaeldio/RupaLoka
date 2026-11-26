@@ -45,6 +45,7 @@ export interface SceneProps {
   guideModel: string | null
   guideLine: string | null
   decor?: DecorOut[]
+  onDecor?: (slot: number) => void
   spin: React.MutableRefObject<number>
   wasDrag: () => boolean
   onExhibit: (i: number) => void
@@ -69,7 +70,7 @@ export default function GalleryScene(props: SceneProps) {
       <hemisphereLight args={['#fff1dc', '#3a2016', 0.55]} />
       <directionalLight position={[-6, 8, 4]} intensity={0.35} color="#fff1dc" />
       <CameraRig layout={props.layout} state={props.state} reducedMotion={props.reducedMotion} />
-      <MuseumRoom layout={props.layout} decor={props.decor} />
+      <MuseumRoom layout={props.layout} decor={props.decor} onDecor={props.onDecor} wasDrag={props.wasDrag} />
       {props.layout.exhibits.map((e, i) => (
         <Pedestal key={e.id} index={i} e={e} data={e.source === null ? null : props.exhibits[e.source]} {...props} />
       ))}

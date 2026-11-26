@@ -16,6 +16,18 @@ describe('guideLine', () => {
   })
 })
 
+describe('pajangan dinding', () => {
+  it('kalimat melewati menyebut lukisan di dinding seberang', () => {
+    const line = guideLine({ type: 'pass', index: 0, name: 'Angklung', side: -1, empty: false, decor: 'Lukisan A' })
+    expect(line).toContain('Di dinding seberangnya tergantung Lukisan A')
+    expect(line).toContain('tekan L')
+  })
+
+  it('melihat lukisan', () => {
+    expect(guideLine({ type: 'decor', index: 0, name: 'Lukisan A' })).toContain('Ini Lukisan A, pajangan')
+  })
+})
+
 describe('nextLine', () => {
   it('tidak mengulang kalimat yang sama berturut-turut', () => {
     const e = { type: 'focus', index: 0, name: 'Keris' } as const

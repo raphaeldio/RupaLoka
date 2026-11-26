@@ -96,6 +96,9 @@ function Gallery() {
     return src === null || src === undefined ? null : exhibits[src]
   }
   const idx = currentIndex(state, layout)
+  /** Lukisan di dinding seberang pedestal ke-i (bila modelnya ada). */
+  const decorAt = (i: number) => gallery.decor?.find((d) => d.slot === i && d.model_available) ?? null
+  const viewingDecor = state.kind === 'decor' ? decorAt(state.index) : null
   const current = dataAt(idx)
 
   const dispatch = useCallback((a: CamAction) => {
@@ -130,7 +133,9 @@ function Gallery() {
   useEffect(() => {
     const e = layout.exhibits[idx]
     const name = current?.name ?? 'Segera hadir'
-    if (state.kind === 'walk') guide({ type: 'pass', index: idx, name, side: e.side, empty: current === null })
+    if (state.kind === 'walk')
+      guide({ type: 'pass', index: idx, name, side: e.side, empty: current === null, decor: decorAt(idx)?.name })
+    if (state.kind === 'decor') guide({ type: 'decor', index: idx, name: decorAt(idx)?.name ?? 'Pajangan' })
     if (state.kind === 'focus') guide({ type: 'focus', index: idx, name })
     if (state.kind === 'inspect') guide({ type: 'inspect', index: idx, name })
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -190,6 +195,10 @@ function Gallery() {
         case 'Enter':
           if (target?.tagName === 'BUTTON' || target?.tagName === 'A') return
           dispatch({ type: 'clickExhibit', index: i })
+          break
+        case 'l':
+        case 'L':
+          if (decorAt(i)) dispatch({ type: 'clickDecor', index: i })
           break
         case 'k':
         case 'K':
@@ -263,7 +272,7 @@ function Gallery() {
       <h1 className="sr-only">Galeri 3D {detail.city.name}</h1>
       <p className="sr-only" id="petunjuk-galeri">
         Museum 3D berbentuk lorong melingkar. Panah atas dan bawah untuk berpindah koleksi, Enter untuk mendekat
-        dan memeriksa, K untuk membaca kartu, T untuk bertanya kepada Saloka, F untuk layar penuh, Esc untuk mundur,
+        dan memeriksa, K untuk membaca kartu, L untuk melihat lukisan di dinding seberang, T untuk bertanya kepada Saloka, F untuk layar penuh, Esc untuk mundur,
         H untuk bantuan.
         Pemandu akan mengumumkan posisimu. Tombol Daftar menampilkan semua koleksi sebagai daftar.
       </p>
@@ -298,6 +307,7 @@ function Gallery() {
                 wasDrag={() => lastWasDrag.current}
                 onExhibit={(i) => dispatch({ type: 'clickExhibit', index: i })}
                 onCard={openCard}
+                onDecor={(i) => dispatch({ type: 'clickDecor', index: i })}
                 onMascot={() => askSaloka()}
                 onMiss={() => dispatch({ type: 'back' })}
               />
@@ -361,6 +371,7 @@ function Gallery() {
               <li>Enter atau klik benda: mendekat, lalu periksa</li>
               <li>← / → saat memeriksa: memutar benda</li>
               <li>K atau klik kotak putih: kartu penjelasan</li>
+              <li>L atau klik lukisan: melihat pajangan dinding</li>
               <li>T atau klik Saloka: bertanya</li>
               <li>F: layar penuh</li>
               <li>Esc: mundur · H: tutup bantuan</li>
@@ -372,13 +383,26 @@ function Gallery() {
           <div className="pointer-events-none absolute inset-x-0 bottom-0 flex flex-wrap items-end justify-between gap-2 p-3">
             <div className="pointer-events-auto max-w-md rounded-xl border-l-4 border-emas bg-tinta/85 px-3 py-2 text-kertas">
               <p className="eyebrow opacity-80">
-                {state.kind === 'focus' ? 'Di depanmu' : state.kind === 'inspect' ? 'Memeriksa' : 'Kamu sedang melewati'} · {position}
+                {viewingDecor
+                  ? 'Pajangan dinding'
+                  : state.kind === 'focus'
+                    ? 'Di depanmu'
+                    : state.kind === 'inspect'
+                      ? 'Memeriksa'
+                      : 'Kamu sedang melewati'}{' '}
+                · {position}
               </p>
-              <p className="text-lg font-extrabold">{current?.name ?? 'Pedestal kosong'}</p>
-              <p className="line-clamp-2 text-sm opacity-90">{current ? current.short_explanation ?? PENDING_TEXT : 'Koleksi berikutnya segera hadir.'}</p>
+              <p className="text-lg font-extrabold">{viewingDecor?.name ?? current?.name ?? 'Pedestal kosong'}</p>
+              <p className="line-clamp-2 text-sm opacity-90">
+                {viewingDecor
+                  ? 'Tekan Esc atau klik area kosong untuk kembali berjalan.'
+                  : current
+                    ? current.short_explanation ?? PENDING_TEXT
+                    : 'Koleksi berikutnya segera hadir.'}
+              </p>
             </div>
             <nav aria-label="Navigasi galeri" className="pointer-events-auto flex flex-wrap gap-2">
-              {(state.kind === 'focus' || state.kind === 'inspect') && (
+              {(state.kind === 'focus' || state.kind === 'inspect' || state.kind === 'decor') && (
                 <button type="button" onClick={() => dispatch({ type: 'back' })} className={btn(false)}>
                   ↩ Mundur
                 </button>
@@ -389,7 +413,7 @@ function Gallery() {
               <button type="button" onClick={() => dispatch({ type: 'step', dir: 1 })} className={btn(false)} aria-label="Koleksi berikutnya">
                 ↑
               </button>
-              {current && (
+              {current && !viewingDecor && (
                 <button type="button" onClick={() => openCard(idx)} className={btn(true)}>
                   Kartu {current.name}
                 </button>

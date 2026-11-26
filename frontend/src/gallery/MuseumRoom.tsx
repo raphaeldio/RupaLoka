@@ -1,5 +1,6 @@
 import { Component, Suspense, useEffect, useMemo, type ReactNode } from 'react'
 import { useGLTF } from '@react-three/drei'
+import type { ThreeEvent } from '@react-three/fiber'
 import * as THREE from 'three'
 import { modelUrl } from '../lib/api'
 import type { DecorOut } from '../lib/api.types'
@@ -20,7 +21,17 @@ function useDispose<T extends { dispose: () => void }>(items: T[]) {
  * dinding panel kayu, list krem, plafon terang, lantai ubin dengan garis kuningan, dan
  * bingkai hiasan di dinding seberang tiap pedestal.
  */
-export default function MuseumRoom({ layout, decor = [] }: { layout: Layout; decor?: DecorOut[] }) {
+export default function MuseumRoom({
+  layout,
+  decor = [],
+  onDecor,
+  wasDrag,
+}: {
+  layout: Layout
+  decor?: DecorOut[]
+  onDecor?: (slot: number) => void
+  wasDrag?: () => boolean
+}) {
   const c = ringCenter(layout)
   const R = layout.radius
   const rin = R - HALF_W
@@ -93,7 +104,7 @@ export default function MuseumRoom({ layout, decor = [] }: { layout: Layout; dec
           <meshStandardMaterial color={MUSEUM.ceiling} side={THREE.DoubleSide} roughness={1} />
         </mesh>
       </group>
-      <WallFrames layout={layout} decor={decor} />
+      <WallFrames layout={layout} decor={decor} onDecor={onDecor} wasDrag={wasDrag} />
     </group>
   )
 }
@@ -103,7 +114,17 @@ export default function MuseumRoom({ layout, decor = [] }: { layout: Layout; dec
  * `gallery.yaml` → `decor` bila modelnya ada, selain itu bingkai abstrak (juga sebagai
  * cadangan selama model dimuat atau bila gagal).
  */
-function WallFrames({ layout, decor }: { layout: Layout; decor: DecorOut[] }) {
+function WallFrames({
+  layout,
+  decor,
+  onDecor,
+  wasDrag,
+}: {
+  layout: Layout
+  decor: DecorOut[]
+  onDecor?: (slot: number) => void
+  wasDrag?: () => boolean
+}) {
   const arts = useMemo(() => [artTexture(0), artTexture(1)] as const, [])
   useDispose(useMemo(() => [...arts], [arts]))
   return (
@@ -132,7 +153,19 @@ function WallFrames({ layout, decor }: { layout: Layout; decor: DecorOut[] }) {
         const maxH = 1.5
         const lampY = painting ? maxH / 2 + 0.12 : 0.52
         return (
-          <group key={e.id} position={[pos[0], painting ? 1.95 : pos[1], pos[2]]} rotation={[0, yaw, 0]}>
+          <group
+            key={e.id}
+            position={[pos[0], painting ? 1.95 : pos[1], pos[2]]}
+            rotation={[0, yaw, 0]}
+            onClick={
+              painting && onDecor
+                ? (ev: ThreeEvent<MouseEvent>) => {
+                    ev.stopPropagation()
+                    if (!wasDrag?.()) onDecor(i)
+                  }
+                : undefined
+            }
+          >
             {painting ? (
               <DecorBoundary fallback={abstract}>
                 <Suspense fallback={abstract}>

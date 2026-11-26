@@ -7,7 +7,8 @@
 
 export type GuideEvent =
   | { type: 'enter' }
-  | { type: 'pass'; index: number; name: string; side: -1 | 1; empty: boolean }
+  | { type: 'pass'; index: number; name: string; side: -1 | 1; empty: boolean; decor?: string | null }
+  | { type: 'decor'; index: number; name: string }
   | { type: 'focus'; index: number; name: string }
   | { type: 'inspect'; index: number; name: string }
   | { type: 'idle'; name: string }
@@ -21,11 +22,17 @@ export function guideLine(e: GuideEvent): string {
         'Halo, aku Saloka, pemandumu di Museum Rupaloka. Gulir, geser ke atas, atau tekan panah atas ' +
         'untuk berjalan. Klik aku atau tekan T kapan saja untuk bertanya.'
       )
-    case 'pass':
+    case 'pass': {
+      const wall = e.decor
+        ? ` Di dinding seberangnya tergantung ${e.decor}; tekan L atau klik lukisannya untuk melihat.`
+        : ''
       return e.empty
-        ? `Pedestal di sebelah ${sideWord(e.side)}mu masih kosong. Koleksi berikutnya segera hadir.`
+        ? `Pedestal di sebelah ${sideWord(e.side)}mu masih kosong. Koleksi berikutnya segera hadir.${wall}`
         : `Di sebelah ${sideWord(e.side)}mu ada ${e.name}. Tekan Enter atau klik bendanya untuk melihat ` +
-            'lebih dekat, atau tekan K untuk membaca kartunya.'
+            `lebih dekat, atau tekan K untuk membaca kartunya.${wall}`
+    }
+    case 'decor':
+      return `Ini ${e.name}, pajangan di dinding museum. Tekan Esc untuk kembali berjalan.`
     case 'focus':
       return `Ini ${e.name}. Tekan Enter atau klik bendanya sekali lagi untuk memutar dan memeriksanya. Tekan Esc untuk kembali berjalan.`
     case 'inspect':
