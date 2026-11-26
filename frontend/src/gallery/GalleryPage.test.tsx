@@ -23,6 +23,7 @@ const gallery: GalleryOut = {
   guide_model: null,
   guide_available: false,
   approved: false,
+  decor: [],
   exhibits: [
     {
       id: 'objek-a',
@@ -66,6 +67,11 @@ async function renderGallery(detail: CityDetail = { ...detailFixture, gallery })
   )
 }
 
+/** Tutup popup sambutan (muncul tiap masuk galeri). */
+async function enter() {
+  await userEvent.setup().click(await screen.findByRole('button', { name: 'Mulai menjelajah' }))
+}
+
 beforeEach(() => {
   flags.galleryEnabled = true
   useAgent.getState().reset()
@@ -88,8 +94,18 @@ describe('GalleryPage', () => {
     expect(screen.getByText(/segera hadir/i)).toBeInTheDocument()
   })
 
+  it('popup sambutan tampil saat masuk dan bisa ditutup', async () => {
+    await renderGallery()
+    const dialog = await screen.findByRole('dialog', { name: 'Selamat Datang Di Museum Sri Baduga' })
+    expect(within(dialog).getByText('Galeri virtual Rupaloka')).toBeInTheDocument()
+    expect(within(dialog).getByRole('button', { name: 'Mulai menjelajah' })).toHaveFocus()
+    await enter()
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+  })
+
   it('tanpa WebGL: daftar koleksi, teks pending ditampilkan jujur', async () => {
     await renderGallery()
+    await enter()
     const list = screen.getByRole('region', { name: /daftar koleksi/i })
     expect(within(list).getByText(/tidak mendukung 3D/i)).toBeInTheDocument()
     expect(within(list).getByText('Penjelasan A.')).toBeInTheDocument()
@@ -99,6 +115,7 @@ describe('GalleryPage', () => {
   it('kartu: penjelasan + asal usul dengan sumber; kosong = sedang disusun', async () => {
     const user = userEvent.setup()
     await renderGallery()
+    await enter()
     await user.click(screen.getByRole('button', { name: 'Kartu Objek A' }))
     const dialog = await screen.findByRole('dialog', { name: 'Objek A' })
     expect(within(dialog).getByText('Asal usul A.')).toBeInTheDocument()
@@ -116,6 +133,7 @@ describe('GalleryPage', () => {
 
   it('pemandu mengumumkan lewat aria-live, dan T membuka Saloka', async () => {
     await renderGallery()
+    await enter()
     expect(screen.getByText(/aku Saloka, pemandumu/i, { selector: '[aria-live] *, [aria-live]' })).toBeInTheDocument()
     await act(async () => {
       window.dispatchEvent(new KeyboardEvent('keydown', { key: 't' }))

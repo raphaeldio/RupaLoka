@@ -110,6 +110,15 @@ export interface CultureCard {
   validator: Validator | null
 }
 
+/** Pajangan dinding (lukisan) di seberang pedestal `slot`; hanya hiasan. */
+export interface DecorOut {
+  id: string
+  name: string
+  model_src: string
+  model_available: boolean
+  slot: number
+}
+
 /** Satu pedestal galeri, siap tampil. Teks hanya dari konten bersumber; None = pending. */
 export interface ExhibitOut {
   id: string
@@ -139,6 +148,7 @@ export interface GalleryOut {
   exhibits: ExhibitOut[]
   guide_model: string | null
   guide_available: boolean
+  decor: DecorOut[]
   approved: boolean
 }
 

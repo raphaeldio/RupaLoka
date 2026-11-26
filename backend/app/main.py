@@ -18,6 +18,7 @@ from fastapi.staticfiles import StaticFiles
 from app.api_schemas import (
     CityDetail,
     CitySummary,
+    DecorOut,
     ExhibitOut,
     GalleryOut,
     Health,
@@ -387,6 +388,16 @@ def _gallery_out(cc: CityContent) -> GalleryOut | None:
         exhibits=exhibits,
         guide_model=g.guide.model if g.guide else None,
         guide_available=bool(g.guide and g.guide.model in cc.models_present),
+        decor=[
+            DecorOut(
+                id=d.id,
+                name=d.name,
+                model_src=d.model,
+                model_available=d.model in cc.models_present,
+                slot=d.slot,
+            )
+            for d in g.decor
+        ],
         approved=g.approved_by_kh is not None,
     )
 

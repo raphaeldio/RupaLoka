@@ -321,3 +321,52 @@ def test_gallery_api_shape(make_content: Any) -> None:
     assert obj.short_chunk == "materi-c-007"
     for cid in ("materi-a-006", "materi-c-007", "materi-c-008", "materi-a-005"):
         assert cid in detail.sources
+
+
+# --- pajangan dinding (lukisan) -----------------------------------------------
+
+
+def with_decor(files: dict[str, Any]) -> None:
+    with_gallery(files)
+    files[GALLERY]["decor"] = [
+        {"id": "lukisan-a", "name": "Lukisan A", "model": "assets/models/lukisan-a.glb", "slot": 0}
+    ]
+    files["sources.yaml"]["assets"].append(
+        {"path": "assets/models/lukisan-a.glb", "license": "milik sendiri (tim)", "author": "Tim"}
+    )
+
+
+def test_decor_in_api_when_model_present(make_content: Any) -> None:
+    from app.main import _city_detail
+    from tests.glbfixture import make_glb
+
+    root = make_content(with_decor)
+    write_glbs(root)
+    (root / "assets" / "models" / "lukisan-a.glb").write_bytes(make_glb([{"name": "lukisan"}]))
+    result = load_content(root)
+    assert result.ok(release=True), result.errors(release=True)
+    city = next(c for c in result.content.cities if c.id == "kota-uji")
+    g = _city_detail(city, result.content.city_content["kota-uji"]).gallery
+    assert g is not None
+    (d,) = g.decor
+    assert (d.id, d.name, d.slot, d.model_available) == ("lukisan-a", "Lukisan A", 0, True)
+
+
+def test_decor_missing_model_is_pending(make_content: Any) -> None:
+    root = make_content(with_decor)
+    write_glbs(root)
+    assert_pending(root, "berkas model 'assets/models/lukisan-a.glb' belum ada")
+
+
+def test_decor_slot_out_of_range_and_duplicate(make_content: Any) -> None:
+    def far(f: dict[str, Any]) -> None:
+        with_decor(f)
+        f[GALLERY]["decor"][0]["slot"] = 12
+
+    assert_error(make_content(far), "di luar layout.slots")
+
+    def dup(f: dict[str, Any]) -> None:
+        with_decor(f)
+        f[GALLERY]["decor"].append(dict(f[GALLERY]["decor"][0], id="lukisan-b"))
+
+    assert_error(make_content(dup), "decor.slot memuat id ganda")

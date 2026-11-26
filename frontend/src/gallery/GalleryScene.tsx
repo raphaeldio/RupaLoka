@@ -3,7 +3,7 @@ import { Canvas, useFrame, useThree, type ThreeEvent } from '@react-three/fiber'
 import { Html, useGLTF } from '@react-three/drei'
 import * as THREE from 'three'
 import { modelUrl } from '../lib/api'
-import type { ExhibitOut } from '../lib/api.types'
+import type { DecorOut, ExhibitOut } from '../lib/api.types'
 import {
   damp,
   exhibitPos,
@@ -44,6 +44,7 @@ export interface SceneProps {
   reducedMotion: boolean
   guideModel: string | null
   guideLine: string | null
+  decor?: DecorOut[]
   spin: React.MutableRefObject<number>
   wasDrag: () => boolean
   onExhibit: (i: number) => void
@@ -68,7 +69,7 @@ export default function GalleryScene(props: SceneProps) {
       <hemisphereLight args={['#fff1dc', '#3a2016', 0.55]} />
       <directionalLight position={[-6, 8, 4]} intensity={0.35} color="#fff1dc" />
       <CameraRig layout={props.layout} state={props.state} reducedMotion={props.reducedMotion} />
-      <MuseumRoom layout={props.layout} />
+      <MuseumRoom layout={props.layout} decor={props.decor} />
       {props.layout.exhibits.map((e, i) => (
         <Pedestal key={e.id} index={i} e={e} data={e.source === null ? null : props.exhibits[e.source]} {...props} />
       ))}

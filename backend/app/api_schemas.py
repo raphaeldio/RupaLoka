@@ -69,6 +69,16 @@ class ExhibitOut(BaseModel):
     hotspots: list[Hotspot] = []  # hanya yang teksnya sudah diisi
 
 
+class DecorOut(BaseModel):
+    """Pajangan dinding (lukisan) di seberang pedestal `slot`; hanya hiasan."""
+
+    id: str
+    name: str
+    model_src: str
+    model_available: bool
+    slot: int
+
+
 class GalleryOut(BaseModel):
     layout: GalleryLayout
     room_model: str
@@ -76,6 +86,7 @@ class GalleryOut(BaseModel):
     exhibits: list[ExhibitOut]
     guide_model: str | None = None
     guide_available: bool = False
+    decor: list[DecorOut] = []
     approved: bool = False  # isi galeri sudah disetujui anggota budaya (KH)
 
 

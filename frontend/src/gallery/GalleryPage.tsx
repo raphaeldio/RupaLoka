@@ -47,7 +47,7 @@ function PremiumGate({ cityId }: { cityId: string }) {
       <p className="mt-3 text-redup">Galeri 3D dan VR adalah fitur premium.</p>
       <Link
         to={`/langganan?dari=${encodeURIComponent(`/kota/${cityId}/galeri`)}`}
-        className="tekan mt-6 inline-block rounded-md border-2 border-tinta bg-emas px-4 py-2 font-extrabold"
+        className="tekan mt-6 inline-block rounded-xl border border-emas/40 bg-emas px-4 py-2 font-extrabold"
       >
         Lihat paket langganan
       </Link>
@@ -72,6 +72,8 @@ function Gallery() {
   const [line, setLine] = useState<string | null>(null)
   const [announce, setAnnounce] = useState('')
   const [help, setHelp] = useState(false)
+  // Popup sambutan saat masuk; intro kamera dan sapaan Saloka mulai setelah ditutup.
+  const [welcome, setWelcome] = useState(true)
   const mem = useRef<GuideMemory>({ lastKey: null, lastAt: -Infinity })
   const lastInput = useRef(Date.now())
   const stateRef = useRef(state)
@@ -116,11 +118,13 @@ function Gallery() {
   )
 
   useEffect(() => {
+    if (welcome) return
+    lastInput.current = Date.now()
     const t = window.setTimeout(() => dispatchRaw({ type: 'introDone' }), reducedMotion ? 0 : 900)
     guide({ type: 'enter' })
     return () => window.clearTimeout(t)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [welcome])
 
   // Navigasi berkala: tiap pindah pameran/state, dan pengingat saat lama diam.
   useEffect(() => {
@@ -134,12 +138,12 @@ function Gallery() {
 
   useEffect(() => {
     const t = window.setInterval(() => {
-      if (card !== null || Date.now() - lastInput.current < IDLE_AFTER_MS) return
+      if (welcome || card !== null || Date.now() - lastInput.current < IDLE_AFTER_MS) return
       guide({ type: 'idle', name: dataAt(currentIndex(stateRef.current, layout))?.name ?? 'koleksi ini' })
     }, 5000)
     return () => window.clearInterval(t)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [card, guide, layout])
+  }, [welcome, card, guide, layout])
 
   useEffect(() => () => stopSpeaking(), [])
 
@@ -163,7 +167,7 @@ function Gallery() {
   // Keyboard (juga untuk pengguna tuna netra): panah, Enter, K, T, Esc, H.
   useEffect(() => {
     const onKey = (ev: KeyboardEvent) => {
-      if (card !== null || ev.altKey || ev.ctrlKey || ev.metaKey) return
+      if (welcome || card !== null || ev.altKey || ev.ctrlKey || ev.metaKey) return
       const target = ev.target as HTMLElement | null
       if (target && /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName)) return
       const s = stateRef.current
@@ -214,7 +218,7 @@ function Gallery() {
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [card, layout, dispatch, openCard, askSaloka, fs])
+  }, [welcome, card, layout, dispatch, openCard, askSaloka, fs])
 
   // Drag: geser vertikal = berjalan; horizontal saat periksa = memutar objek.
   const drag = useRef({ down: false, x: 0, y: 0, moved: 0 })
@@ -288,6 +292,7 @@ function Gallery() {
                 state={state}
                 reducedMotion={reducedMotion}
                 guideModel={gallery.guide_available ? gallery.guide_model ?? null : null}
+                decor={gallery.decor ?? []}
                 guideLine={line}
                 spin={spin}
                 wasDrag={() => lastWasDrag.current}
@@ -317,7 +322,7 @@ function Gallery() {
             <Link to={`/kota/${detail.city.id}`} className={btn(false)} aria-label="Keluar dari galeri, kembali ke path belajar">
               ← Keluar
             </Link>
-            <span className="rounded-md bg-tinta/80 px-2 py-1 text-sm font-extrabold text-kertas">
+            <span className="rounded-xl bg-tinta/80 px-2 py-1 text-sm font-extrabold text-kertas">
               Museum Rupaloka · {detail.city.name}
             </span>
           </div>
@@ -349,7 +354,7 @@ function Gallery() {
         </div>
 
         {help && (
-          <section aria-label="Bantuan keyboard" className="absolute right-3 top-16 z-10 w-72 rounded-md border-2 border-tinta bg-white p-3 text-sm text-tinta shadow-kartu">
+          <section aria-label="Bantuan keyboard" className="absolute right-3 top-16 z-10 w-72 rounded-xl border border-emas/40 bg-white p-3 text-sm text-tinta shadow-kartu">
             <h2 className="font-extrabold">Cara menjelajah</h2>
             <ul className="mt-2 grid gap-1">
               <li>↑ / ↓, gulir, atau geser: pindah koleksi</li>
@@ -365,7 +370,7 @@ function Gallery() {
 
         {view === 'galeri' && webgl && (
           <div className="pointer-events-none absolute inset-x-0 bottom-0 flex flex-wrap items-end justify-between gap-2 p-3">
-            <div className="pointer-events-auto max-w-md rounded-md border-l-4 border-emas bg-tinta/85 px-3 py-2 text-kertas">
+            <div className="pointer-events-auto max-w-md rounded-xl border-l-4 border-emas bg-tinta/85 px-3 py-2 text-kertas">
               <p className="eyebrow opacity-80">
                 {state.kind === 'focus' ? 'Di depanmu' : state.kind === 'inspect' ? 'Memeriksa' : 'Kamu sedang melewati'} · {position}
               </p>
@@ -397,10 +402,27 @@ function Gallery() {
         )}
       </div>
 
-      {cardData && <div className="fixed inset-0 z-[56] bg-black/50" aria-hidden="true" />}
+      {(cardData || welcome) && <div className="fixed inset-0 z-[56] bg-black/50" aria-hidden="true" />}
+      <Dialog open={welcome} onOpenChange={(o) => !o && setWelcome(false)}>
+        <DialogContent className="z-[57] max-w-md border-2 border-emas bg-kertas text-center" showCloseButton={false}>
+          <p className="eyebrow text-redup">Galeri virtual Rupaloka</p>
+          <DialogTitle className="text-3xl font-extrabold leading-tight text-tinta">Selamat Datang Di Museum Sri Baduga</DialogTitle>
+          <DialogDescription className="text-redup">
+            Berjalanlah menyusuri lorong, dekati koleksi, dan baca kartunya. Saloka akan memandumu.
+          </DialogDescription>
+          <button
+            type="button"
+            autoFocus
+            onClick={() => setWelcome(false)}
+            className="tekan mx-auto mt-2 rounded-xl border border-emas/40 bg-emas px-5 py-2.5 text-base font-extrabold text-tinta"
+          >
+            Mulai menjelajah
+          </button>
+        </DialogContent>
+      </Dialog>
       <Dialog open={cardData !== null} onOpenChange={(o) => !o && setCard(null)}>
         {cardData && (
-          <DialogContent className="z-[57] max-h-[85dvh] overflow-y-auto border-2 border-tinta bg-kertas">
+          <DialogContent className="z-[57] max-h-[85dvh] overflow-y-auto border border-emas/40 bg-kertas rounded-2xl">
             <DialogTitle className="text-2xl font-extrabold">{cardData.name}</DialogTitle>
             <DialogDescription className="sr-only">Kartu penjelasan dan cerita asal usul {cardData.name}</DialogDescription>
             <ExhibitCard
@@ -421,7 +443,7 @@ function Gallery() {
 }
 
 const btn = (on: boolean) =>
-  `tekan rounded-md border-2 border-tinta px-3 py-1.5 text-sm font-extrabold text-tinta focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-emas ${on ? 'bg-emas' : 'bg-white'}`
+  `tekan rounded-xl border border-emas/40 px-3 py-1.5 text-sm font-extrabold text-tinta focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-emas ${on ? 'bg-emas' : 'bg-white'}`
 
 function Loading() {
   return (
@@ -448,7 +470,7 @@ function ExhibitList({
       {!webgl && <p className="mb-3 text-sm text-redup">Perangkat ini tidak mendukung 3D, jadi koleksi ditampilkan sebagai daftar.</p>}
       <ol className="mx-auto grid max-w-3xl gap-3 sm:grid-cols-2">
         {exhibits.map((e, i) => (
-          <li key={e.id} className="rounded-md border-2 border-tinta bg-white p-3 shadow-kartu">
+          <li key={e.id} className="rounded-xl border border-emas/40 bg-white p-3 shadow-kartu">
             <h2 className="text-lg font-extrabold">
               {i + 1}. {e.name}
             </h2>

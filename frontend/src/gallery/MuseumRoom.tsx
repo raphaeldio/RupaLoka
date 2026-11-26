@@ -1,5 +1,8 @@
-import { useEffect, useMemo } from 'react'
+import { Component, Suspense, useEffect, useMemo, type ReactNode } from 'react'
+import { useGLTF } from '@react-three/drei'
 import * as THREE from 'three'
+import { modelUrl } from '../lib/api'
+import type { DecorOut } from '../lib/api.types'
 import { HALF_W, ringCenter, type Layout } from './cameraFlow'
 import { artTexture, floorTexture, MUSEUM, wallPanelTexture } from './museumTextures'
 
@@ -17,7 +20,7 @@ function useDispose<T extends { dispose: () => void }>(items: T[]) {
  * dinding panel kayu, list krem, plafon terang, lantai ubin dengan garis kuningan, dan
  * bingkai hiasan di dinding seberang tiap pedestal.
  */
-export default function MuseumRoom({ layout }: { layout: Layout }) {
+export default function MuseumRoom({ layout, decor = [] }: { layout: Layout; decor?: DecorOut[] }) {
   const c = ringCenter(layout)
   const R = layout.radius
   const rin = R - HALF_W
@@ -90,13 +93,17 @@ export default function MuseumRoom({ layout }: { layout: Layout }) {
           <meshStandardMaterial color={MUSEUM.ceiling} side={THREE.DoubleSide} roughness={1} />
         </mesh>
       </group>
-      <WallFrames layout={layout} />
+      <WallFrames layout={layout} decor={decor} />
     </group>
   )
 }
 
-/** Bingkai hiasan di dinding seberang tiap pedestal, dengan tiga lampu kecil di atasnya. */
-function WallFrames({ layout }: { layout: Layout }) {
+/**
+ * Hiasan di dinding seberang tiap pedestal, dengan lampu kecil di atasnya: lukisan dari
+ * `gallery.yaml` → `decor` bila modelnya ada, selain itu bingkai abstrak (juga sebagai
+ * cadangan selama model dimuat atau bila gagal).
+ */
+function WallFrames({ layout, decor }: { layout: Layout; decor: DecorOut[] }) {
   const arts = useMemo(() => [artTexture(0), artTexture(1)] as const, [])
   useDispose(useMemo(() => [...arts], [arts]))
   return (
@@ -109,8 +116,9 @@ function WallFrames({ layout }: { layout: Layout }) {
         const pos: [number, number, number] = [f.p[0] + f.n[0] * k, 1.75, f.p[2] + f.n[2] * k]
         const yaw = Math.atan2(-s * f.n[0], -s * f.n[2]) // menghadap garis tengah
         const w = s < 0 ? 1.15 : 1.5
-        return (
-          <group key={e.id} position={pos} rotation={[0, yaw, 0]}>
+        const painting = decor.find((d) => d.slot === i && d.model_available)
+        const abstract = (
+          <>
             <mesh>
               <boxGeometry args={[w + 0.14, 0.86, 0.06]} />
               <meshStandardMaterial color={MUSEUM.frame} roughness={0.8} />
@@ -119,8 +127,23 @@ function WallFrames({ layout }: { layout: Layout }) {
               <planeGeometry args={[w, 0.72]} />
               <meshStandardMaterial map={arts[i % 2]} roughness={0.9} />
             </mesh>
+          </>
+        )
+        const maxH = 1.5
+        const lampY = painting ? maxH / 2 + 0.12 : 0.52
+        return (
+          <group key={e.id} position={[pos[0], painting ? 1.95 : pos[1], pos[2]]} rotation={[0, yaw, 0]}>
+            {painting ? (
+              <DecorBoundary fallback={abstract}>
+                <Suspense fallback={abstract}>
+                  <WallModel url={modelUrl(painting.model_src)} maxW={w + 0.1} maxH={maxH} />
+                </Suspense>
+              </DecorBoundary>
+            ) : (
+              abstract
+            )}
             {[-1, 0, 1].map((x) => (
-              <group key={x} position={[x * w * 0.33, 0.52, 0.06]}>
+              <group key={x} position={[x * w * 0.33, lampY, 0.06]}>
                 <mesh>
                   <boxGeometry args={[0.07, 0.1, 0.07]} />
                   <meshStandardMaterial color="#141110" />
@@ -136,6 +159,31 @@ function WallFrames({ layout }: { layout: Layout }) {
       })}
     </>
   )
+}
+
+/** Model pajangan dinding: dipaskan ke lebar/tinggi maks., tengah di asal, belakang di z=0. */
+function WallModel({ url, maxW, maxH }: { url: string; maxW: number; maxH: number }) {
+  const { scene } = useGLTF(url, false, false)
+  const obj = useMemo(() => {
+    const clone = scene.clone(true)
+    const size = new THREE.Box3().setFromObject(clone).getSize(new THREE.Vector3())
+    clone.scale.setScalar(Math.min(maxW / (size.x || 1), maxH / (size.y || 1)))
+    const b = new THREE.Box3().setFromObject(clone)
+    const c = b.getCenter(new THREE.Vector3())
+    clone.position.set(-c.x, -c.y, -b.min.z + 0.005)
+    return clone
+  }, [scene, maxW, maxH])
+  return <primitive object={obj} />
+}
+
+class DecorBoundary extends Component<{ fallback: ReactNode; children: ReactNode }, { failed: boolean }> {
+  state = { failed: false }
+  static getDerivedStateFromError() {
+    return { failed: true }
+  }
+  render() {
+    return this.state.failed ? this.props.fallback : this.props.children
+  }
 }
 
 /** Lampu sorot plafon (badan hitam, ujung menyala) untuk pedestal. */

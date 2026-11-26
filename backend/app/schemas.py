@@ -404,6 +404,19 @@ class GalleryGuide(Strict):
     model: Text
 
 
+class WallDecor(Strict):
+    """Pajangan dinding (lukisan) di dinding seberang pedestal ke-`slot`; hiasan, bukan pameran.
+
+    Tidak ada teks fakta: hanya nama/judul. Asal-usul gambar dan lisensinya dicatat di
+    sources.yaml (prinsip 7).
+    """
+
+    id: Id
+    name: Text
+    model: Text  # GLB, asal di tengah permukaan belakang, depan menghadap +Z
+    slot: int = Field(ge=0)
+
+
 class KhApproval(Strict):
     name: Text
     approved_at: date
@@ -414,11 +427,17 @@ class GalleryFile(Strict):
     layout: GalleryLayout = Field(default_factory=GalleryLayout)
     exhibits: list[GalleryExhibit] = Field(min_length=1)  # urutan = pedestal_1, pedestal_2, ...
     guide: GalleryGuide | None = None
+    decor: list[WallDecor] = Field(default_factory=list)
     approved_by_kh: KhApproval | None = None
 
     @model_validator(mode="after")
     def _check(self) -> GalleryFile:
         _no_duplicates([e.key for e in self.exhibits], "exhibits")
+        _no_duplicates([d.id for d in self.decor], "decor")
+        _no_duplicates([str(d.slot) for d in self.decor], "decor.slot")
+        for d in self.decor:
+            if d.slot >= self.layout.slots:
+                raise ValueError(f"decor '{d.id}': slot {d.slot} di luar layout.slots")
         if len(self.exhibits) > self.layout.slots:
             raise ValueError(
                 f"{len(self.exhibits)} exhibits melebihi layout.slots ({self.layout.slots})"

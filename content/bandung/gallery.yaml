@@ -65,5 +65,19 @@ exhibits:
 guide:
   model: assets/models/maskot-saloka.glb            # dari Aset 3D/maskot_3D.blend
 
+# Pajangan dinding (lukisan) di dinding seberang pedestal ke-`slot` (0 = pedestal pertama).
+# Hanya hiasan: tanpa teks fakta. Model diekspor dengan asal di tengah permukaan belakang.
+decor:
+  - id: lukisan-prabu-siliwangi
+    name: "Lukisan Prabu Siliwangi"
+    model: assets/models/lukisan-prabu-siliwangi.glb   # dari D:/Lukisan_prabu_siliwangi (1).blend
+    slot: 0
+  # Menunggu gambar kanvas: D:/sejarah_lukisan.blend merujuk painting_pixel_240x156.png yang
+  # tidak ikut tersimpan (kanvas kosong). Aktifkan setelah PNG tersedia dan diekspor ulang:
+  # - id: lukisan-sejarah
+  #   name: "[PERLU DIISI] judul lukisan"
+  #   model: assets/models/lukisan-sejarah.glb
+  #   slot: 2
+
 # Persetujuan anggota budaya (KH) atas isi galeri: { name: "<nama>", approved_at: YYYY-MM-DD }
 approved_by_kh: null

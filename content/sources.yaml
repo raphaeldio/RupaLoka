@@ -163,6 +163,10 @@ assets:
     license: "[PERLU DIISI]"
     author: "[PERLU DIISI]"
     note: "Ekspor dari Aset 3D/maskot_3D.blend"
+  - path: assets/models/lukisan-prabu-siliwangi.glb
+    license: "[PERLU DIISI]"
+    author: "[PERLU DIISI]"
+    note: "Ekspor dari D:/Lukisan_prabu_siliwangi (1).blend (lukisan voxel). Periksa sumber gambar asal lukisan dan izinnya (bila meniru lukisan/foto karya orang lain) sebelum rilis."
 
 objects:
   - id: batu

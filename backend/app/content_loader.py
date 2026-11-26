@@ -518,6 +518,16 @@ class _Loader:
                 c.models_present.add(g.guide.model)
             total += self._size(g.guide.model)
 
+        for d in g.decor:
+            if (
+                self._check_model_file(
+                    gallery_path, f"decor '{d.id}'", d.model, MAX_OBJECT_MODEL_BYTES, registered
+                )
+                is not None
+            ):
+                c.models_present.add(d.model)
+            total += self._size(d.model)
+
         if total > MAX_GALLERY_BYTES:
             self.error(
                 gallery_path,
