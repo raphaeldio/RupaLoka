@@ -19,7 +19,7 @@ const mockFlags = vi.hoisted(() => ({
   premium_content: false,
   strict_node_requirements: false,
 }))
-vi.mock('../../lib/flags', () => ({ featureFlags: mockFlags }))
+vi.mock('../../lib/flags', () => ({ featureFlags: mockFlags, galleryEnabled: false }))
 
 const json = (body: unknown, status = 200) =>
   Promise.resolve(new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } }))

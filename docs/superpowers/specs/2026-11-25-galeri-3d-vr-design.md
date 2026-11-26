@@ -83,6 +83,14 @@ Dicoba di mock `mocks/galeri-kamera/` (tombol "Melingkar"). Pola interaksi "klik
 
 **Layar tegak:** FOV vertikal 55° → hingga 77°, kamera mundur ±0,6 m saat fokus, dan saat berjalan kamera sedikit melirik ke sisi objek terdekat. Tanpa ini, objek di samping berada di luar FOV horizontal ±21° di layar 360 px.
 
+### 2.2 Tambahan 26 Nov 2026 (permintaan tim)
+
+- **Pameran:** angklung dan wayang (item koleksi game) + objek khusus museum di `gallery.yaml` (Gedung Sate, keris, rumah adat) yang tidak menjadi hadiah game. Tiap pameran punya `asal_usul` (teks + chunk).
+- **Kotak putih pedestal** menampilkan nama + penjelasan singkat (tekstur kanvas, tanpa unduhan font luar); klik kotak / tombol K = **kartu** berisi penjelasan singkat + asal usul, masing-masing dengan sumber, label pemeriksaan model, "Bacakan kartu", "Tanya Saloka". Kolom kosong tampil "sedang disusun tim budaya".
+- **Maskot pemandu (Saloka):** melayang di depan-kanan kamera dan menyusul dengan tertunda; kalimat navigasi saat melewati/mendekati/memeriksa pameran dan pengingat setelah 25 dtk diam (`guide.ts`, hanya navigasi). Klik maskot / T = panel chat Saloka (jawaban bersumber).
+- **Aksesibilitas tuna netra:** wilayah aria-live (posisi "N dari 12" + kalimat pemandu), keyboard penuh, suara pemandu opsional (Web Speech, id-ID; mati bawaan agar tidak bertabrakan dengan pembaca layar), tampilan Daftar sebagai alternatif tanpa 3D.
+- **Layar penuh:** galeri menutupi seluruh viewport (di atas header, di bawah panel chat) + tombol/tombol F untuk Fullscreen API seluruh halaman.
+
 **Kontrol per mode** (satu scene, yang berganti hanya lapisan input):
 
 | Mode | Berpindah | Memilih/inspeksi |

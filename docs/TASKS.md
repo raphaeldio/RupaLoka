@@ -100,17 +100,20 @@ Spesifikasi `docs/superpowers/specs/2026-11-25-galeri-3d-vr-design.md`, rencana 
 - [x] **T-114 (HR)** Validasi aset galeri (file, ukuran, hotspot, posisi pedestal vs cincin). *DoD:* pytest; `--release` gagal bila isi KH kosong. *Status:* selesai (`app/ring.py`, vektor uji bersama pedestal_1/2).
 - [x] **T-115 (HR)** Kerangka konten galeri Bandung (model/hotspot `null`). *DoD:* `validate_content.py` lolos dengan peringatan. *Status:* selesai; model belum didaftarkan di `sources.yaml` (menyusul di T-121 bersama GLB).
 - [x] **T-116 (HR)** Sajikan GLB dari Vercel (`/models/*`, cache immutable). *DoD:* uji plugin; build memuat `dist/models`. *Status:* selesai; uji plugin lolos. `vite build` penuh belum terverifikasi (mesin kehabisan memori saat dicoba). Cache `/models/*` sementara `must-revalidate`; diganti `immutable` setelah nama ber-hash di T-121.
-- [ ] **T-117 (HR)** Pasang paket 3D + `check:bundle`. *DoD:* peer dependency cocok React 18; three tidak ada di chunk utama.
-- [ ] **T-118 (HR)** `cameraFlow.ts` (port mock) + uji. *DoD:* vitest; vektor uji bersama dengan validator.
+- [ ] **T-117 (HR)** Pasang paket 3D + `check:bundle`. *DoD:* peer dependency cocok React 18; three tidak ada di chunk utama. *Status (26 Nov):* three 0.187, R3F 8.18, drei 9.122 terpasang (peer cocok React 18); `@react-three/xr` belum (menyusul T-124). three hanya di chunk `GalleryScene` (build diverifikasi); skrip `check:bundle` belum dibuat.
+- [x] **T-118 (HR)** `cameraFlow.ts` (port mock) + uji. *DoD:* vitest; vektor uji bersama dengan validator. *Status:* selesai (`src/gallery/cameraFlow.ts`, vektor uji bersama lolos).
 - [ ] **T-119 (HR)** `xrSupport.ts` + `galleryConfig.ts`. *DoD:* vitest.
-- [ ] **T-120 (HR)** Rute `/kota/:cityId/galeri` di balik flag + tautan. *DoD:* uji gerbang; batas chunk galeri dicatat.
+- [x] **T-120 (HR)** Rute `/kota/:cityId/galeri` di balik flag + tautan. *DoD:* uji gerbang; batas chunk galeri dicatat. *Status:* selesai: `/kota/:cityId/galeri`, tombol "Mode 3D" membuka galeri bila flag aktif; galeri layar penuh (menutupi header, tombol Keluar + Fullscreen API).
 - [ ] **T-121 (HW+KH)** Aset Blender: ruangan cincin + angklung, wayang golek, Cepot; empty `pedestal_N`/`hotspot_<id>`; optimasi GLB. *DoD:* validasi lolos; **bentuk objek disetujui KH** (`accuracy_check`).
-- [ ] **T-122 (HR)** Scene: ruangan, pedestal, rig kamera, input. *DoD:* fallback primitif tampil tanpa GLB.
-- [ ] **T-123 (HR)** Inspector + hotspot bersumber + "Tanya Saloka". *DoD:* vitest.
+- [ ] **T-122 (HR)** Scene: ruangan, pedestal, rig kamera, input. *DoD:* fallback primitif tampil tanpa GLB. *Status:* sebagian: lorong cincin masih primitif (GLB ruangan belum ada), pedestal = kotak putih berlabel nama + penjelasan singkat, model GLB dipaskan ke pedestal, pengganti bila gagal.
+- [ ] **T-123 (HR)** Inspector + hotspot bersumber + "Tanya Saloka". *DoD:* vitest. *Status:* sebagian: periksa (putar dengan geser/panah) + kartu (penjelasan + asal usul bersumber, "Tanya Saloka"); hotspot belum karena belum ada teks dari KH.
 - [ ] **T-124 (HR)** VR (teleport, grab) + Cardboard (tatapan). *DoD:* uji titik teleport; uji manual di T-128.
 - [ ] **T-125 (HR)** Performa: konfirmasi unduhan, dispose, muat bertahap, decoder self-host. *DoD:* uji `needsConfirm`; heap dicatat.
 - [ ] **T-126 (HR)** Header keamanan Vercel (CSP report-only → ditegakkan). *DoD:* tanpa pelanggaran di semua alur.
-- [ ] **T-127 (HR)** Tampilan Daftar + mode tanpa WebGL. *DoD:* vitest.
+- [x] **T-127 (HR)** Tampilan Daftar + mode tanpa WebGL. *DoD:* vitest. *Status:* selesai (Daftar + mode tanpa WebGL).
+- [x] **T-130 (HR)** Objek khusus museum di `gallery.yaml` (Gedung Sate, keris, rumah adat; bukan hadiah game) + `asal_usul` per pameran + API `GalleryOut`. Teks disalin apa adanya dari chunk. *Terbuka (KH):* penjelasan + asal usul keris dan rumah adat (belum ada sumber), nama/jenis rumah adat, cek bentuk semua model, model angklung (`angklung.blend` tidak ada), apakah `wayang.blend` (WayangPrabu) tepat untuk item Wayang Golek. *Terbuka (HW):* pembuat/lisensi lima model di `sources.yaml`.
+- [x] **T-131 (HR)** Maskot pemandu Saloka di galeri (`maskot_3D.blend`): mengikuti kamera, kalimat navigasi berkala (`src/gallery/guide.ts`, tanpa fakta budaya), klik/T = buka chat Saloka bersumber.
+- [ ] **T-132 (HR+HW)** Aksesibilitas tuna netra: aria-live pengumuman posisi, kontrol keyboard penuh (↑↓ Enter K T F Esc H), suara pemandu opsional (Web Speech id-ID), kartu bisa dibacakan, tampilan Daftar. *Belum diuji* dengan pembaca layar nyata (NVDA/TalkBack) maupun pengguna tuna netra; lakukan dan catat hasilnya apa adanya.
 - [ ] **T-128 (HR+HW)** Verifikasi manual per perangkat (desktop, Android 360 px, iOS, Quest/emulator) + ukur fps dan waktu muat. *DoD:* hasil dicatat apa adanya.
 - [ ] **T-129 (HR)** Penutup dokumen. *DoD:* status jujur; perintah baru di CLAUDE.md.
 
