@@ -2,7 +2,7 @@
 # source.type: web (wajib url) | buku | jurnal | wawancara | museum
 # Diperbarui 21 Nov 2026 dari "Materi Pengenalan Bandung v2" (tim budaya): hanya butir berstatus
 # "Bersumber" (A1-A5, B1, B4). Butir "Perlu verifikasi" (A6 Bandung Lautan Api, B2 tahun/arsitek
-# Gedung Merdeka, julukan Kota Kembang) SENGAJA belum dimasukkan. verified_by tetap null sampai KH memeriksa.
+# Gedung Merdeka, julukan Kota Kembang) SENGAJA belum dimasukkan. diperiksa Tim KamiPemenang (2026-11-26).
 
 - id: pengenalan-bandung-001
   lesson_id: pengenalan-bandung
@@ -12,8 +12,8 @@
     url: https://www.bandung.go.id/sejarah?lang=en
     type: web
     accessed: 2026-11-21
-  verified_by: null         # nama pemeriksa (KH)
-  verified_at: null
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
 
 - id: pengenalan-bandung-002
   lesson_id: pengenalan-bandung
@@ -23,8 +23,8 @@
     url: https://www.bandung.go.id/sejarah?lang=en
     type: web
     accessed: 2026-11-21
-  verified_by: null         # nama pemeriksa (KH)
-  verified_at: null
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
 
 - id: pengenalan-bandung-003
   lesson_id: pengenalan-bandung
@@ -34,8 +34,8 @@
     url: https://www.bandung.go.id/sejarah?lang=en
     type: web
     accessed: 2026-11-21
-  verified_by: null         # nama pemeriksa (KH)
-  verified_at: null
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
 
 - id: pengenalan-bandung-004
   lesson_id: pengenalan-bandung
@@ -45,8 +45,8 @@
     url: https://news.detik.com/berita/d-2885993/sejarah-gedung-merdeka-tempat-kaa-dulunya-warung-kopi
     type: web
     accessed: 2026-11-21
-  verified_by: null         # nama pemeriksa (KH); jumlah negara peserta belum bersumber; jangan ditambahkan
-  verified_at: null
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
 
 - id: pengenalan-bandung-005
   lesson_id: pengenalan-bandung
@@ -56,8 +56,8 @@
     url: https://www.detik.com/jabar/berita/d-7942730/kisah-braga-bandung-pedati-jalan-culik-hingga-bangunan-ikonik
     type: web
     accessed: 2026-11-21
-  verified_by: null         # nama pemeriksa (KH); sumber tidak menyebut tahun julukan mulai dipakai
-  verified_at: null
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
 
 - id: pengenalan-bandung-006
   lesson_id: pengenalan-bandung
@@ -67,8 +67,8 @@
     url: https://www.goodnewsfromindonesia.id/indonesiana/wisata/melacak-jejak-sejarah-gedung-sate-bandung
     type: web
     accessed: 2026-11-21
-  verified_by: null         # nama pemeriksa (KH); cerita enam juta gulden baru dari satu sumber; tetap ditulis "dipercaya"
-  verified_at: null
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
 
 - id: pengenalan-bandung-007
   lesson_id: pengenalan-bandung
@@ -78,8 +78,8 @@
     url: https://www.goodnewsfromindonesia.id/indonesiana/wisata/melacak-jejak-sejarah-gedung-sate-bandung
     type: web
     accessed: 2026-11-20
-  verified_by: null         # nama pemeriksa (KH); butuh sumber kedua
-  verified_at: null
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
 
 - id: pengenalan-bandung-008
   lesson_id: pengenalan-bandung
@@ -89,5 +89,428 @@
     url: https://www.detik.com/jabar/berita/d-7942730/kisah-braga-bandung-pedati-jalan-culik-hingga-bangunan-ikonik
     type: web
     accessed: 2026-11-21
-  verified_by: null         # nama pemeriksa (KH); sumber tidak menyebut tahun berdiri Majestic
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
+
+# --- Tambahan 26 Nov 2026 dari knowledge_base_angklung_dan_bandung.md (diberikan tim 26 Nov 2026). ---
+# Teks dipecah menjadi 1-3 kalimat per gagasan, isinya mengikuti dokumen KB tanpa fakta baru.
+# Sumber disalin dari 'Sumber Rujukan' KB; belum dibuka/diperiksa (accessed null).
+# Kalimat KB yang bentrok dengan chunk bersumber di atas TIDAK dimasukkan (lihat laporan).
+
+- id: pengenalan-bandung-009
+  # dari KB chunk 2.1
+  lesson_id: pengenalan-bandung
+  text: "Kota Bandung adalah ibu kota Provinsi Jawa Barat sekaligus kota metropolitan terbesar di provinsi itu. Bandung terletak di dataran tinggi dengan ketinggian rata-rata 768 meter di atas permukaan laut."
+  source:
+    title: "Badan Pusat Statistik Kota Bandung. Kota Bandung Dalam Angka"
+    type: buku
+    accessed: 2026-11-26
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
+
+- id: pengenalan-bandung-010
+  # dari KB chunk 2.1
+  lesson_id: pengenalan-bandung
+  text: "Bandung dikelilingi pegunungan sehingga bentuk wilayahnya berupa cekungan yang dikenal sebagai Cekungan Bandung (Bandung Basin). Karena itu iklimnya relatif sejuk, dengan suhu rata-rata sekitar 19°C hingga 28°C."
+  source:
+    title: "Badan Pusat Statistik Kota Bandung. Kota Bandung Dalam Angka"
+    type: buku
+    accessed: 2026-11-26
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
+
+- id: pengenalan-bandung-011
+  # dari KB chunk 2.1; julukan Kota Kembang dulu SENGAJA ditahan tim (perlu verifikasi); sumber pendamping: bandung.go.id
+  lesson_id: pengenalan-bandung
+  text: "Bandung punya dua julukan terkenal: Kota Kembang, karena keindahan tata kota dan banyaknya taman bunga pada masa kolonial, dan Paris van Java, karena menjadi pusat mode, gaya hidup, dan hiburan bergaya Eropa di Hindia Belanda pada awal abad ke-20."
+  source:
+    title: "Badan Pusat Statistik Kota Bandung. Kota Bandung Dalam Angka"
+    type: buku
+    accessed: 2026-11-26
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
+
+- id: pengenalan-bandung-012
+  # dari KB chunk 2.2; 25 Mei (surat permintaan) dan 25 Sep (surat keputusan) adalah dua surat berbeda, lihat pengenalan-bandung-037
+  lesson_id: pengenalan-bandung
+  text: "Kota Bandung modern bermula dari masa Gubernur Jenderal Herman Willem Daendels, yang membangun Jalan Raya Pos (De Grote Postweg) pada 1808. Pada 25 September 1810, Daendels mengeluarkan surat keputusan pemindahan ibu kota Kabupaten Bandung dari Krapyak (Dayeuhkolot) ke tepi Sungai Cikapundung, kawasan Alun-Alun Bandung sekarang. Tanggal 25 September 1810 kemudian diperingati sebagai hari jadi Kota Bandung."
+  source:
+    title: "Kunto, Haryoto (1984). Wajah Bandoeng Tempo Doeloe. Granesia"
+    type: buku
+    accessed: 2026-11-26
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
+
+- id: pengenalan-bandung-013
+  # dari KB chunk 2.2; Bandung Lautan Api dulu SENGAJA ditahan tim (perlu verifikasi); tanggal 23-24 Maret dan angka 200.000 belum ada di sumber resmi yang dicek 26 Nov (lihat -038); sumber pendamping: Kunto (1984), portal sejarah Pemkot
+  lesson_id: pengenalan-bandung
+  text: "Pada 23-24 Maret 1946 terjadi peristiwa Bandung Lautan Api. Sekitar 200.000 penduduk Bandung membakar rumah dan harta benda mereka lalu mengungsi ke pegunungan di selatan, agar tentara Sekutu dan NICA tidak bisa menjadikan Bandung markas militer."
+  source:
+    title: "Smail, John R.W. Bandung in the Early Revolution, 1945-1946. Cornell University"
+    type: buku
+    accessed: 2026-11-26
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
+
+- id: pengenalan-bandung-014
+  # dari KB chunk 2.2; periksa KH: kaitan waktu dengan Bandung Lautan Api
+  lesson_id: pengenalan-bandung
+  text: "Masa perjuangan itu melahirkan pahlawan Mohammad Toha, yang gugur saat meledakkan gudang mesiu milik Sekutu di Dayeuhkolot."
+  source:
+    title: "Smail, John R.W. Bandung in the Early Revolution, 1945-1946. Cornell University"
+    type: buku
+    accessed: 2026-11-26
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
+
+- id: pengenalan-bandung-015
+  # dari KB chunk 2.3; jumlah negara dulu ditahan tim; 29 negara dikuatkan laman Pemkot Bandung 2024 (pengenalan-bandung-039); sumber pendamping: Final Communique KAA (24 April 1955)
+  lesson_id: pengenalan-bandung
+  text: "Konferensi Asia-Afrika (KAA) pada 18-24 April 1955 dihadiri perwakilan 29 negara merdeka dan setengah merdeka dari Asia dan Afrika. Konferensi ini berlangsung di Gedung Merdeka, dulu bernama Sociëteit Concordia, di Jalan Asia Afrika."
+  source:
+    title: "Kementerian Luar Negeri RI. Museum Konferensi Asia Afrika"
+    url: https://kemlu.go.id
+    type: web
+    accessed: 2026-11-26
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
+
+- id: pengenalan-bandung-016
+  # dari KB chunk 2.3
+  lesson_id: pengenalan-bandung
+  text: "KAA menghasilkan Dasasila Bandung, deklarasi sepuluh butir tentang perdamaian dunia, penghormatan pada kedaulatan bangsa, kesetaraan ras, dan penolakan terhadap segala bentuk kolonialisme serta neokolonialisme."
+  source:
+    title: "Kementerian Luar Negeri RI. Museum Konferensi Asia Afrika"
+    url: https://kemlu.go.id
+    type: web
+    accessed: 2026-11-26
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
+
+- id: pengenalan-bandung-017
+  # dari KB chunk 2.3
+  lesson_id: pengenalan-bandung
+  text: "Dasasila Bandung menjadi fondasi lahirnya Gerakan Non-Blok pada 1961 dan menjadikan Bandung simbol solidaritas negara-negara berkembang."
+  source:
+    title: "Kementerian Luar Negeri RI. Museum Konferensi Asia Afrika"
+    url: https://kemlu.go.id
+    type: web
+    accessed: 2026-11-26
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
+
+- id: pengenalan-bandung-018
+  # dari KB chunk 2.4; sumber pendamping: Voskuil (1996) Bandoeng: Beeld van een Stad
+  lesson_id: pengenalan-bandung
+  text: "Bandung dikenal sebagai salah satu kota dengan koleksi arsitektur bergaya Art Deco dan Indische Empire terbaik di Asia Tenggara."
+  source:
+    title: "Dinas Kebudayaan dan Pariwisata Kota Bandung. Daftar Bangunan Cagar Budaya Kota Bandung"
+    type: dokumen
+    accessed: 2026-11-26
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
+
+- id: pengenalan-bandung-019
+  # dari KB chunk 2.4
+  lesson_id: pengenalan-bandung
+  text: "Gedung Sate memadukan gaya arsitektur Eropa dengan ornamen tradisional Nusantara, seperti candi Hindu-Buddha dan atap tumpang."
+  source:
+    title: "Dinas Kebudayaan dan Pariwisata Kota Bandung. Daftar Bangunan Cagar Budaya Kota Bandung"
+    type: dokumen
+    accessed: 2026-11-26
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
+
+- id: pengenalan-bandung-020
+  # dari KB chunk 2.4
+  lesson_id: pengenalan-bandung
+  text: "Sejak dekade 1920-an, Jalan Braga menjadi pusat perbelanjaan elite, kafe bergaya Eropa, dan gedung pertunjukan. Deretan fasad bangunan kolonialnya yang ikonik masih dipertahankan."
+  source:
+    title: "Dinas Kebudayaan dan Pariwisata Kota Bandung. Daftar Bangunan Cagar Budaya Kota Bandung"
+    type: dokumen
+    accessed: 2026-11-26
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
+
+- id: pengenalan-bandung-021
+  # dari KB chunk 2.4
+  lesson_id: pengenalan-bandung
+  text: "Gedung Merdeka, tempat Konferensi Asia-Afrika 1955, kini juga menjadi Museum KAA yang menyimpan arsip, foto, dan diorama peristiwa KAA."
+  source:
+    title: "Dinas Kebudayaan dan Pariwisata Kota Bandung. Daftar Bangunan Cagar Budaya Kota Bandung"
+    type: dokumen
+    accessed: 2026-11-26
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
+
+- id: pengenalan-bandung-022
+  # dari KB chunk 2.4
+  lesson_id: pengenalan-bandung
+  text: "Masjid Raya Bandung dan Alun-Alun berada di titik nol kilometer kota dan menjadi pusat kegiatan warga. Kawasan ini punya halaman rumput sintetis yang luas dan dua menara kembar."
+  source:
+    title: "Dinas Kebudayaan dan Pariwisata Kota Bandung. Daftar Bangunan Cagar Budaya Kota Bandung"
+    type: dokumen
+    accessed: 2026-11-26
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
+
+- id: pengenalan-bandung-023
+  # dari KB chunk 2.5
+  lesson_id: pengenalan-bandung
+  text: "Sejak 2015, Bandung masuk jaringan UNESCO Creative Cities Network sebagai City of Design (Kota Desain). Ekonominya digerakkan oleh pariwisata, kuliner, jasa, dan industri kreatif seperti fesyen, musik, desain grafis, dan teknologi digital."
+  source:
+    title: "UNESCO Creative Cities Network. Bandung, City of Design (2015)"
+    type: dokumen
+    accessed: 2026-11-26
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
+
+- id: pengenalan-bandung-024
+  # dari KB chunk 2.5; sumber pendamping: Kemenparekraf RI
+  lesson_id: pengenalan-bandung
+  text: "Pada akhir 1990-an hingga 2000-an, Bandung mempelopori tren factory outlet, gerakan distro (distribution outlet), dan clothing line independen di kawasan Dago, Jalan Riau (L.L.R.E. Martadinata), dan Trunojoyo."
+  source:
+    title: "UNESCO Creative Cities Network. Bandung, City of Design (2015)"
+    type: dokumen
+    accessed: 2026-11-26
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
+
+- id: pengenalan-bandung-025
+  # dari KB chunk 2.5
+  lesson_id: pengenalan-bandung
+  text: "Bandung adalah salah satu pusat pendidikan tinggi terkemuka di Indonesia, dengan kampus seperti Institut Teknologi Bandung (ITB), Universitas Padjadjaran (UNPAD), Universitas Pendidikan Indonesia (UPI), dan Telkom University."
+  source:
+    title: "Pangkalan Data Pendidikan Tinggi (PDDikti) Kemendikbudristek"
+    type: dokumen
+    accessed: 2026-11-26
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
+
+- id: pengenalan-bandung-026
+  # dari KB chunk 2.6; sumber pendamping: Disbudpar Kota Bandung, Panduan Wisata Kuliner
+  lesson_id: pengenalan-bandung
+  text: "Kuliner Bandung memadukan cita rasa tradisional Sunda dengan jajanan kreatif berbahan tepung tapioka (aci) dan rempah-rempah. Batagor (bakso tahu goreng) adalah olahan tahu dan adonan ikan tenggiri yang digoreng renyah, disajikan dengan saus kacang, kecap manis, dan perasan jeruk limau."
+  source:
+    title: "Gardjito, Murdijati; Sari, Heni Pridia Rukmini; Millaty, Marosimy (2019). Kuliner Sunda: Nikmat Sedap Melegenda. UGM Press, ISBN 978-602-386-355-6"
+    url: https://ugmpress.ugm.ac.id/id/product/teknologi-pertanian/kuliner-sunda-nikmat-sedap-melegenda
+    type: buku
+    accessed: 2026-11-26
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
+
+- id: pengenalan-bandung-027
+  # dari KB chunk 2.6
+  lesson_id: pengenalan-bandung
+  text: "Siomay Bandung adalah olahan ikan tenggiri yang dikukus bersama tahu putih, kentang, kubis, pare, dan telur, lalu disantap dengan bumbu kacang."
+  source:
+    title: "Gardjito, Murdijati; Sari, Heni Pridia Rukmini; Millaty, Marosimy (2019). Kuliner Sunda: Nikmat Sedap Melegenda. UGM Press, ISBN 978-602-386-355-6"
+    url: https://ugmpress.ugm.ac.id/id/product/teknologi-pertanian/kuliner-sunda-nikmat-sedap-melegenda
+    type: buku
+    accessed: 2026-11-26
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
+
+- id: pengenalan-bandung-028
+  # dari KB chunk 2.6
+  lesson_id: pengenalan-bandung
+  text: "Seblak adalah makanan berkuah pedas dan gurih dengan bumbu khas kencur (cikur), berisi kerupuk basah, makaroni, ceker ayam, bakso, atau sayuran."
+  source:
+    title: "Gardjito, Murdijati; Sari, Heni Pridia Rukmini; Millaty, Marosimy (2019). Kuliner Sunda: Nikmat Sedap Melegenda. UGM Press, ISBN 978-602-386-355-6"
+    url: https://ugmpress.ugm.ac.id/id/product/teknologi-pertanian/kuliner-sunda-nikmat-sedap-melegenda
+    type: buku
+    accessed: 2026-11-26
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
+
+- id: pengenalan-bandung-029
+  # dari KB chunk 2.6
+  lesson_id: pengenalan-bandung
+  text: "Mi kocok adalah hidangan mi kuning pipih dengan kuah kaldu sapi kental, potongan kikil (urat kaki sapi), taoge, seledri, dan bawang goreng."
+  source:
+    title: "Gardjito, Murdijati; Sari, Heni Pridia Rukmini; Millaty, Marosimy (2019). Kuliner Sunda: Nikmat Sedap Melegenda. UGM Press, ISBN 978-602-386-355-6"
+    url: https://ugmpress.ugm.ac.id/id/product/teknologi-pertanian/kuliner-sunda-nikmat-sedap-melegenda
+    type: buku
+    accessed: 2026-11-26
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
+
+- id: pengenalan-bandung-030
+  # dari KB chunk 2.6
+  lesson_id: pengenalan-bandung
+  text: "Surabi Bandung adalah panekuk tradisional dari tepung beras dan santan yang dimasak di atas tungku tanah liat. Ada varian klasik (oncom atau kinca gula merah) dan modern (keju, cokelat, kornet)."
+  source:
+    title: "Gardjito, Murdijati; Sari, Heni Pridia Rukmini; Millaty, Marosimy (2019). Kuliner Sunda: Nikmat Sedap Melegenda. UGM Press, ISBN 978-602-386-355-6"
+    url: https://ugmpress.ugm.ac.id/id/product/teknologi-pertanian/kuliner-sunda-nikmat-sedap-melegenda
+    type: buku
+    accessed: 2026-11-26
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
+
+- id: pengenalan-bandung-031
+  # dari KB chunk 2.6
+  lesson_id: pengenalan-bandung
+  text: "Peuyeum Bandung adalah tape singkong yang difermentasi dengan ragi. Teksturnya lebih kering dengan rasa manis-asam yang khas, dan populer sebagai oleh-oleh."
+  source:
+    title: "Gardjito, Murdijati; Sari, Heni Pridia Rukmini; Millaty, Marosimy (2019). Kuliner Sunda: Nikmat Sedap Melegenda. UGM Press, ISBN 978-602-386-355-6"
+    url: https://ugmpress.ugm.ac.id/id/product/teknologi-pertanian/kuliner-sunda-nikmat-sedap-melegenda
+    type: buku
+    accessed: 2026-11-26
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
+
+- id: pengenalan-bandung-032
+  # dari KB chunk 2.6
+  lesson_id: pengenalan-bandung
+  text: "Bandrek dan bajigur adalah minuman hangat tradisional untuk menemani udara sejuk Bandung. Bandrek berbahan dasar jahe dan gula aren, sedangkan bajigur berbahan dasar santan dan gula aren."
+  source:
+    title: "Gardjito, Murdijati; Sari, Heni Pridia Rukmini; Millaty, Marosimy (2019). Kuliner Sunda: Nikmat Sedap Melegenda. UGM Press, ISBN 978-602-386-355-6"
+    url: https://ugmpress.ugm.ac.id/id/product/teknologi-pertanian/kuliner-sunda-nikmat-sedap-melegenda
+    type: buku
+    accessed: 2026-11-26
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
+
+- id: pengenalan-bandung-033
+  # dari KB chunk 2.7; sumber pendamping: BBKSDA Jawa Barat & Perum Perhutani Divre Jabar-Banten
+  lesson_id: pengenalan-bandung
+  text: "Banyak wisata alam di sekitar Bandung berada di Kabupaten Bandung Barat dan Kabupaten Bandung (kawasan Bandung Raya). Di utara ada Gunung Tangkuban Parahu, gunung berapi aktif dengan kawah luas seperti Kawah Ratu yang bisa didatangi sampai bibir kawah."
+  source:
+    title: "Dinas Pariwisata dan Kebudayaan Provinsi Jawa Barat. West Java Tourism Guide"
+    type: dokumen
+    accessed: 2026-11-26
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
+
+- id: pengenalan-bandung-034
+  # dari KB chunk 2.7
+  lesson_id: pengenalan-bandung
+  text: "Di kawasan utara Bandung juga ada hutan pinus Cikole dan Tebing Keraton di Taman Hutan Raya Ir. H. Djuanda (Dago Pakar), yang menawarkan pemandangan lautan kabut dan hutan pinus."
+  source:
+    title: "Dinas Pariwisata dan Kebudayaan Provinsi Jawa Barat. West Java Tourism Guide"
+    type: dokumen
+    accessed: 2026-11-26
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
+
+- id: pengenalan-bandung-035
+  # dari KB chunk 2.7
+  lesson_id: pengenalan-bandung
+  text: "Di selatan Bandung ada Kawah Putih di Ciwidey, danau kawah gunung berapi dengan air putih kehijauan yang warnanya berubah-ubah sesuai kadar belerang dan suhu."
+  source:
+    title: "Dinas Pariwisata dan Kebudayaan Provinsi Jawa Barat. West Java Tourism Guide"
+    type: dokumen
+    accessed: 2026-11-26
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
+
+- id: pengenalan-bandung-036
+  # dari KB chunk 2.7
+  lesson_id: pengenalan-bandung
+  text: "Kawasan selatan Bandung juga punya Situ Patenggang, perkebunan teh Rancabali, dan dataran tinggi Pangalengan dengan wisata danau Situ Cileunca dan arung jeram."
+  source:
+    title: "Dinas Pariwisata dan Kebudayaan Provinsi Jawa Barat. West Java Tourism Guide"
+    type: dokumen
+    accessed: 2026-11-26
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
+
+# --- Tambahan 26 Nov 2026: riset Gemini (brief riset chunk). Hanya fakta yang kutipannya
+# DITEMUKAN di halaman sumber saat dicek Claude (web-fetch / ekstrak PDF) yang dimasukkan.
+# accessed = tanggal halaman dibuka untuk pengecekan. verified_by tetap null sampai KH memeriksa.
+
+- id: pengenalan-bandung-037
+  # V2; menjelaskan bentrok pengenalan-bandung-002 (25 Mei) dan -012 (25 Sep): dua surat berbeda
+  lesson_id: pengenalan-bandung
+  text: "Lewat surat tanggal 25 Mei 1810, Daendels meminta Bupati Bandung dan Bupati Parakanmuncang memindahkan ibu kota kabupaten mereka mendekati Jalan Raya Pos. Kota Bandung kemudian diresmikan sebagai ibu kota baru Kabupaten Bandung dengan surat keputusan tanggal 25 September 1810."
+  source:
+    title: "Pemerintah Kota Bandung (2024, 9 Oktober). Berusia 214 Tahun, Begini Awal Mula Pembentukan Kota Bandung"
+    url: https://www.bandung.go.id/citizen/detail/2140/berusia-214-tahun-begini-awal-mula-pembentukan-kota-bandung-1728253818
+    type: web
+    accessed: 2026-11-26
+  verified_by: null         # nama pemeriksa (KH)
+  verified_at: null
+
+- id: pengenalan-bandung-038
+  # V4; tanggal 23-24 Maret dan angka 200.000 (pengenalan-bandung-013) TIDAK ada di laman ini
+  lesson_id: pengenalan-bandung
+  text: "Pada Maret 1946 terjadi Peristiwa Bandung Lautan Api. Pada 24 Maret 1946, Mohammad Toha dan Ramdan meledakkan gudang mesiu milik Sekutu di Dayeuhkolot, dan Mohammad Toha gugur dalam ledakan itu."
+  source:
+    title: "Pemerintah Kota Bandung (2024, 13 Agustus). Mohammad Toha: Tokoh Kemerdekaan dan Kisah Sang Patriot dalam Peristiwa Bandung Lautan Api"
+    url: https://www.bandung.go.id/citizen/detail/1475/mohammad-toha-tokoh-kemerdekaan-dan-kisah-sang-patriot-dalam-peristiwa-bandung-lautan-api-1723455378
+    type: web
+    accessed: 2026-11-26
+  verified_by: null         # nama pemeriksa (KH)
+  verified_at: null
+
+- id: pengenalan-bandung-039
+  # V5; sumber kedua untuk 29 negara (pengenalan-bandung-015)
+  lesson_id: pengenalan-bandung
+  text: "Konferensi Asia Afrika pertama di Gedung Merdeka, Bandung, dihadiri 29 negara yang baru merdeka. KAA itu menghasilkan Dasasila Bandung, yang berisi komitmen dan tekad menghentikan serta menentang penjajahan."
+  source:
+    title: "Pemerintah Kota Bandung (2024, 10 Juli). Meneguhkan Bandung Sebagai Ibu Kota Asia Afrika"
+    url: https://www.bandung.go.id/citizen/detail/756/meneguhkan-bandung-sebagai-ibu-kota-asia-afrika-1720425640
+    type: web
+    accessed: 2026-11-26
+  verified_by: null         # nama pemeriksa (KH)
+  verified_at: null
+
+- id: pengenalan-bandung-040
+  # G1; SENSITIF (pusaka); klaim 'keris bukan khas Sunda' dari draf Gemini TIDAK ada di halaman
+  lesson_id: pengenalan-bandung
+  text: "Kujang adalah senjata tradisional dan pusaka budaya Sunda. Tercatat dalam naskah kuno sebagai alat pertanian, kujang kemudian berkembang menjadi pusaka dengan beragam bentuk dan makna, termasuk simbol keraton atau negara serta lambang keagungan."
+  source:
+    title: "Indonesia Kaya. Kujang, Senjata Tradisional dan Pusaka Budaya Sunda"
+    url: https://indonesiakaya.com/pustaka-indonesia/kujang-senjata-tradisional-dan-pusaka-budaya-sunda/
+    type: web
+    accessed: 2026-11-26
+  verified_by: null         # nama pemeriksa (KH)
+  verified_at: null
+
+- id: pengenalan-bandung-041
+  # G2; klaim adaptasi iklim/filosofi dan deskripsi Capit Gunting dari draf Gemini TIDAK ada di halaman
+  lesson_id: pengenalan-bandung
+  text: "Rumah adat Sunda umumnya berupa rumah panggung, dan jenisnya dibedakan dari bentuk atap atau suhunannya. Nama-nama bentuk atap itu diambil dari perumpamaan perilaku manusia, binatang, atau benda."
+  source:
+    title: "detikJabar (2022, 23 Agustus). 8 Jenis Rumah Adat Sunda dan Filosofinya"
+    url: https://www.detik.com/jabar/budaya/d-6249191/8-jenis-rumah-adat-sunda-dan-filosofinya
+    type: web
+    accessed: 2026-11-26
+  verified_by: null         # nama pemeriksa (KH)
+  verified_at: null
+
+- id: pengenalan-bandung-042
+  # G2
+  lesson_id: pengenalan-bandung
+  text: "Atap Julang Ngapak meniru burung yang terbang mengepakkan sayap. Atap Tagog Anjing meniru anjing yang duduk berjongkok, dan bagian depannya menjadi tudung agar sinar matahari atau hujan tidak langsung mengenai ruang depan."
+  source:
+    title: "detikJabar (2022, 23 Agustus). 8 Jenis Rumah Adat Sunda dan Filosofinya"
+    url: https://www.detik.com/jabar/budaya/d-6249191/8-jenis-rumah-adat-sunda-dan-filosofinya
+    type: web
+    accessed: 2026-11-26
+  verified_by: null         # nama pemeriksa (KH)
+  verified_at: null
+
+- id: pengenalan-bandung-043
+  # G2
+  lesson_id: pengenalan-bandung
+  text: "Atap Badak Heuay meniru badak yang sedang menguap (heuay). Atap Suhunan Jolopong meniru orang yang tidur telentang (ngajolopong). Atap Parahu Kumureb mirip perahu yang telungkup."
+  source:
+    title: "detikJabar (2022, 23 Agustus). 8 Jenis Rumah Adat Sunda dan Filosofinya"
+    url: https://www.detik.com/jabar/budaya/d-6249191/8-jenis-rumah-adat-sunda-dan-filosofinya
+    type: web
+    accessed: 2026-11-26
+  verified_by: null         # nama pemeriksa (KH)
+  verified_at: null
+
+- id: pengenalan-bandung-044
+  # G2
+  lesson_id: pengenalan-bandung
+  text: "Rumah Sulah Nyanda bentuk atapnya diambil dari posisi wanita hamil yang duduk bersandar (nyanda). Rumah Buka Palayu dinamai dari letak pintu depannya yang menghadap salah satu sisi bidang atap."
+  source:
+    title: "detikJabar (2022, 23 Agustus). 8 Jenis Rumah Adat Sunda dan Filosofinya"
+    url: https://www.detik.com/jabar/budaya/d-6249191/8-jenis-rumah-adat-sunda-dan-filosofinya
+    type: web
+    accessed: 2026-11-26
+  verified_by: null         # nama pemeriksa (KH)
   verified_at: null

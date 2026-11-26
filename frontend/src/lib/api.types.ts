@@ -13,6 +13,7 @@ export interface AgentScript {
   game_start: string
   item_unlocked: string
   summary: string
+  small_talk: SmallTalkScript | null
 }
 
 export interface AssetEntry {
@@ -55,6 +56,7 @@ export interface ChatResponse {
   citations: Citation[]
   refusal_reason: "out_of_scope" | "no_valid_citation" | null
   suggestions: string[]
+  intent: "question" | "small_talk"
 }
 
 export interface Citation {
@@ -319,6 +321,18 @@ export interface ScoreSubmit {
   player_id: string
   nickname: string
   points: number
+}
+
+/**
+ * Balasan basa-basi agen (salam, terima kasih, dsb.), ditulis tim; tanpa fakta budaya.
+ * Dipakai `app/conversation.py` tanpa memanggil LLM (SDD ADR 41).
+ */
+export interface SmallTalkScript {
+  greeting: string
+  thanks: string
+  goodbye: string
+  identity: string
+  help: string
 }
 
 export interface Source {

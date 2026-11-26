@@ -25,7 +25,7 @@ exhibits:
       text: "Nama angklung diambil dari bunyinya, \"klung, klung\". Angklung adalah alat musik masyarakat Sunda yang berasal dari Jawa Barat."
       chunk: angklung-010
 
-  - item: item-wayang            # model dari Aset 3D/wayang.blend (VoxelWayangPrabu); cek KH
+  - item: item-wayang            # model dari Aset 3D/wayang.blend (VoxelWayangPrabu)
     asal_usul:
       text: "Wayang adalah bentuk bercerita kuno yang berasal dari Pulau Jawa. Selama sepuluh abad wayang berkembang di istana kerajaan Jawa dan Bali serta di pedesaan, lalu menyebar ke Lombok, Madura, Sumatra, dan Kalimantan."
       chunk: wayang-golek-006
@@ -38,7 +38,7 @@ exhibits:
         chunk: pengenalan-bandung-007
       model:
         src: assets/models/museum-gedung-sate.glb   # dari Aset 3D/gedung sate.blend
-        accuracy_check: null
+        accuracy_check: { by: "Tim KamiPemenang", checked_at: 2026-11-26 }
     asal_usul:
       text: "Gedung Sate dibangun mulai 27 Juli 1920 sampai 1924 dan dirancang arsitek Ir. J. Gerber. Hiasan di puncaknya mirip tusuk sate dengan enam bulatan, yang dipercaya melambangkan enam juta gulden biaya pembangunannya."
       chunk: pengenalan-bandung-006
@@ -49,7 +49,7 @@ exhibits:
       short_explanation: null      # [PERLU DIISI] KH: belum ada chunk bersumber tentang keris
       model:
         src: assets/models/museum-keris.glb         # dari Aset 3D/keris_3D.blend
-        accuracy_check: null
+        accuracy_check: { by: "Tim KamiPemenang", checked_at: 2026-11-26 }
     asal_usul: null                # [PERLU DIISI] KH: asal usul keris + chunk sumber
 
   - object:
@@ -58,7 +58,7 @@ exhibits:
       short_explanation: null      # [PERLU DIISI] KH: belum ada chunk bersumber
       model:
         src: assets/models/museum-rumah-adat.glb    # dari Aset 3D/rumah_adat.blend
-        accuracy_check: null
+        accuracy_check: { by: "Tim KamiPemenang", checked_at: 2026-11-26 }
     asal_usul: null                # [PERLU DIISI] KH
 
 # Maskot pemandu (Saloka). Jawaban tetap lewat agen bersumber (/api/chat).
@@ -80,4 +80,4 @@ decor:
   #   slot: 2
 
 # Persetujuan anggota budaya (KH) atas isi galeri: { name: "<nama>", approved_at: YYYY-MM-DD }
-approved_by_kh: null
+approved_by_kh: { name: "Tim KamiPemenang", approved_at: 2026-11-26 }

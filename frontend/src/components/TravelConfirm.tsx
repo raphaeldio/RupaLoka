@@ -32,7 +32,7 @@ export default function TravelConfirm({ city, onYes, onNo }: { city: City; onYes
             <path d="M24 37s9-8.3 9-15.3a9 9 0 1 0-18 0C15 28.7 24 37 24 37Z" fill="#146b68" />
             <circle cx="24" cy="21.5" r="3.4" fill="#e8b64c" />
           </motion.svg>
-          <AlertDialogTitle className="text-xl font-extrabold text-teal">Yakin ke {city.name}?</AlertDialogTitle>
+          <AlertDialogTitle className="text-xl font-black text-teal-800">Yakin ke {city.name}?</AlertDialogTitle>
           <AlertDialogDescription className="text-sm text-redup">
             Kita akan terbang ke {city.name}
             {city.province ? `, ${city.province}` : ''} dan memulai path belajarnya.

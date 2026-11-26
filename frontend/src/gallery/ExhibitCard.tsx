@@ -58,7 +58,7 @@ export default function ExhibitCard({
         <SourceLine chunk={exhibit.asal_usul?.chunk} sources={sources} />
       </section>
       {exhibit.model_src && (
-        <p className="rounded-md bg-pasir/60 px-3 py-2 text-xs text-redup">
+        <p className="rounded-xl bg-pasir/60 px-3 py-2 text-xs text-redup">
           {exhibit.accuracy_by
             ? `Model 3D buatan tim, bentuknya dicek oleh ${exhibit.accuracy_by}.`
             : 'Model 3D buatan tim; bentuknya belum diperiksa tim budaya.'}
@@ -67,11 +67,11 @@ export default function ExhibitCard({
       )}
       <div className="flex flex-wrap gap-2">
         {canSpeak && (
-          <button type="button" onClick={onRead} className="tekan rounded-md border-2 border-tinta bg-white px-3 py-2 text-sm font-extrabold">
+          <button type="button" onClick={onRead} className="tekan rounded-xl border border-emas/40 bg-white px-3 py-2 text-sm font-extrabold">
             Bacakan kartu
           </button>
         )}
-        <button type="button" onClick={onAsk} className="tekan rounded-md border-2 border-tinta bg-emas px-3 py-2 text-sm font-extrabold">
+        <button type="button" onClick={onAsk} className="tekan rounded-xl border border-emas/40 bg-emas px-3 py-2 text-sm font-extrabold">
           Tanya Saloka tentang {exhibit.name}
         </button>
       </div>

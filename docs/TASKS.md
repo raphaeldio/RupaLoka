@@ -118,6 +118,17 @@ Spesifikasi `docs/superpowers/specs/2026-11-25-galeri-3d-vr-design.md`, rencana 
 - [ ] **T-128 (HR+HW)** Verifikasi manual per perangkat (desktop, Android 360 px, iOS, Quest/emulator) + ukur fps dan waktu muat. *DoD:* hasil dicatat apa adanya.
 - [ ] **T-129 (HR)** Penutup dokumen. *DoD:* status jujur; perintah baru di CLAUDE.md.
 
+## Fase 3e — Percakapan alami Saloka (26 Nov 2026; SDD ADR 41)
+
+- [x] **T-133a (HR)** Basa-basi (salam, terima kasih, pamit, identitas, bantuan) dijawab teks tim `agent_script.yaml` → `small_talk` tanpa LLM; label "Pesan pemandu" di chat. Uji: `tests/test_conversation.py`, `tests/test_chat.py`, `AgentPanel.test.tsx`.
+- [x] **T-133b (HR)** Pertanyaan susulan: retrieval diulang dengan judul materi aktif + 2 pertanyaan pengguna sebelumnya bila pesan gagal gerbang; pengaman ≤1 kata asing korpus. Gerbang/`MIN_SCORE`/validasi sitasi tidak diubah.
+- [x] **T-133e (HR)** Prompt gaya bicara hangat (aturan 7–10, aturan 1–6 tetap) + saran "Tanya lagi" dari `suggested_questions` pada jawaban bersumber. Dicoba manual 26 Nov 2026 dengan Gemini (1 percakapan, bukan eval); suhu LLM belum diubah.
+- [x] **T-133f (HR)** 51 chunk dari dokumen KB tim (angklung-014…036, pengenalan-bandung-009…036), `verified_by`/`accessed` kosong; cek wilayah di gerbang + `MIN_SCORE` 6.0 (ADR 43). Eval gerbang `--strict` bersih.
+- [ ] **T-133g (KH)** Periksa 51 chunk KB: buka sumbernya, isi `accessed`/`verified_by`; putuskan bentrok jumlah tabung (2–3 vs UNESCO 2–4), tanggal surat Daendels (25 Mei vs 25 Sep 1810), dan butir yang dulu ditahan (Kota Kembang, Bandung Lautan Api, 29 negara KAA).
+- [x] **T-133h (HR)** Riset Gemini (brief riset chunk) dicek per URL/PDF: 24 chunk baru dengan kutipan terbukti (wayang-golek-012…026, museum-sri-baduga-010, angklung-037…044, pengenalan-bandung-037…044); bentrok 25 Mei/25 Sep 1810 terjelaskan; angka tabung KB dibuang; `MIN_SCORE` 6.5. Ditolak: sumber Scribd, halaman jabarprov (403), PDF uninus tak terbaca, belaindika/ResearchGate (403), N3-cepot tanpa URL.
+- [ ] **T-133c (KH)** Sunting teks `small_talk` Bandung (masih draf).
+- [ ] **T-133d (HR)** Dukung `history` di `eval_rag.py` + kasus susulan dan basa-basi di `eval/`; jalankan `--llm` dan catat hasil apa adanya. *Belum diukur.*
+
 ## Fase 4 — Kualitas dan deploy (Hari-4)
 
 - [ ] **T-060 (KH+HR)** Set evaluasi: 30 dalam cakupan, 15 luar cakupan + percobaan injeksi. *DoD:* `eval/*.yaml`. *Status (21 Nov 2026):* `eval/out_of_scope.yaml` selesai (HR): 15 luar cakupan + 6 injeksi. `eval/in_scope.yaml` berisi **draf HR 40 soal** (`ins-01`…`ins-30` + `ins-31`…`ins-40` bahasa santai/obrolan) yang diturunkan dari teks chunk saat ini, dengan `expected_chunks`; **menunggu tinjauan KH** (dan verifikasi chunk T-031).

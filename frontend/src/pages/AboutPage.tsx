@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import { Reveal } from '../components/motion'
 import { GlowCard } from '../components/primitives'
-import BlurText from '../components/reactbits/BlurText'
+import PageHeading from '../components/PageHeading'
 
 const STEPS = [
   { title: 'Pilih kota di peta', text: 'Mulai dari peta Nusantara. Saat ini Bandung sudah bisa dijelajahi; kota lain segera hadir.' },
@@ -14,9 +14,7 @@ const STEPS = [
 export default function AboutPage() {
   return (
     <main id="konten" className="mx-auto w-full max-w-[900px] px-4 pb-16 sm:px-8">
-      <h1 className="text-3xl font-extrabold tracking-tight text-teal" aria-label="Tentang Rupaloka">
-        <BlurText text="Tentang Rupaloka" animateBy="words" delay={80} className="inline-flex" />
-      </h1>
+      <PageHeading chip="Rupaloka" title="Tentang" accent="Rupaloka" />
       <p className="mt-3 text-[15px] leading-relaxed">
         Rupaloka adalah web edukasi budaya Nusantara yang mengajak pelajar belajar lewat kuis, kartu materi, dan game,
         ditemani pemandu AI yang hanya menjawab dari sumber yang sudah diperiksa tim.
@@ -28,7 +26,7 @@ export default function AboutPage() {
             <Reveal delay={i * 0.08} className="h-full">
             <GlowCard className="h-full">
               <p className="text-xs font-extrabold text-amber">Langkah {i + 1}</p>
-              <h2 className="mt-1 text-lg font-extrabold text-teal">{s.title}</h2>
+              <h2 className="mt-1 text-lg font-black text-teal-800">{s.title}</h2>
               <p className="mt-1 text-sm text-redup">{s.text}</p>
             </GlowCard>
             </Reveal>

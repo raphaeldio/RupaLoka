@@ -39,6 +39,7 @@ export const detailFixture: CityDetail = {
     game_start: 'Skrip game.',
     item_unlocked: 'Kamu menemukan {item}! {short_explanation}',
     summary: 'Skrip ringkasan.',
+    small_talk: null,
   },
   quiz: {
     intro: [

@@ -99,12 +99,12 @@ function PathStep({ detail, node, isNext, offset }: { detail: CityDetail; node: 
   const locked = node.status === 'locked'
   const tone =
     node.status === 'done'
-      ? 'border-[3px] border-tinta bg-teal text-white shadow-[5px_5px_0_#1d2a2a]'
+      ? 'bg-gradient-to-br from-teal to-teal-800 text-white ring-4 ring-emas/70 shadow-[0_14px_26px_-12px_rgb(14_77_75/0.7)]'
       : locked
-        ? 'border-[3px] border-dashed border-tinta/40 bg-[#e4e1d7] text-[#8f9284]'
+        ? 'border-[3px] border-dashed border-teal/25 bg-[#ece6d6] text-[#8f9284]'
         : node.id === GAME_NODE
-          ? 'border-[3px] border-tinta bg-emas text-tinta shadow-[5px_5px_0_#1d2a2a]'
-          : 'border-[3px] border-tinta bg-white text-teal shadow-[5px_5px_0_#146b68]'
+          ? 'bg-gradient-to-br from-[#f3cf74] to-emas text-tinta ring-4 ring-white shadow-[0_14px_26px_-12px_rgb(168_118_26/0.7)]'
+          : 'bg-white text-teal-800 ring-4 ring-emas shadow-[0_14px_26px_-12px_rgb(14_77_75/0.5)]'
   const label = `Titik ${node.index + 1}: ${title}. ${meta}. ${locked ? 'Terkunci' : node.status === 'done' ? 'Selesai' : 'Terbuka'}`
 
   // Pembungkus tombol: menampung efek gerak hover/tekan.
@@ -115,7 +115,7 @@ function PathStep({ detail, node, isNext, offset }: { detail: CityDetail; node: 
       }`}
     >
       <span
-        className={`relative grid size-[76px] place-items-center rounded-md transition ${tone} ${
+        className={`relative grid size-[76px] place-items-center rounded-full transition ${tone} ${
           locked ? '' : 'group-active:shadow-none'
         }`}
       >
@@ -133,7 +133,7 @@ function PathStep({ detail, node, isNext, offset }: { detail: CityDetail; node: 
       transition={{ type: 'spring', stiffness: 260, damping: 20, delay }}
     >
       {isNext && (
-        <span className="mb-2 rounded-xl bg-teal px-3 py-1 text-xs font-extrabold shadow-kartu motion-safe:animate-bounce">
+        <span className="mb-2 rounded-full bg-teal-800 px-3.5 py-1 text-xs font-extrabold shadow-kartu motion-safe:animate-bounce">
           <ShinyText
             text={node.status === 'open' && node.index === 0 ? 'Mulai' : 'Lanjut'}
             color="#ffffff"
@@ -150,14 +150,14 @@ function PathStep({ detail, node, isNext, offset }: { detail: CityDetail; node: 
           </div>
         ) : (
           <Magnet padding={50} magnetStrength={5} disabled={!isNext}>
-            <Link to={to} aria-label={label} className="group block rounded-md">
+            <Link to={to} aria-label={label} className="group block rounded-full">
               {circle}
             </Link>
           </Magnet>
         )}
       </div>
       <p
-        className={`mt-3 max-w-[200px] text-center text-[15px] font-extrabold leading-tight ${locked ? 'text-redup' : 'text-tinta'}`}
+        className={`mt-3 max-w-[200px] text-center text-[15px] font-black leading-tight ${locked ? 'text-redup' : 'text-teal-800'}`}
       >
         {title}
       </p>
@@ -173,7 +173,7 @@ function Connector({ from, to }: { from: number; to: number }) {
       <path
         d={`M${130 + from} 0 C ${130 + from} 24, ${130 + to} 24, ${130 + to} 48`}
         fill="none"
-        stroke="#c9c3b2"
+        stroke="#d6ad5c"
         strokeWidth="4"
         strokeDasharray="2 10"
         strokeLinecap="round"
@@ -216,7 +216,7 @@ export default function PathPage() {
 
   return (
     <main id="konten" className="mx-auto w-full max-w-[1200px] px-4 pb-28 sm:px-8">
-      <Link to="/" className="text-sm font-bold text-redup hover:text-teal">
+      <Link to="/" className="pil pil-putih !px-4 !py-2 !text-sm">
         ← Peta
       </Link>
 
@@ -226,7 +226,7 @@ export default function PathPage() {
             {/* Spanduk kota: ornamen di dalam, terpotong tepi lengkung (overflow-clip); konten z-10 */}
             <section
               aria-labelledby="judul-kota"
-              className="relative overflow-hidden border-2 border-tinta bg-teal px-6 py-6 pb-14 text-white shadow-melayang [overflow:clip] sm:px-8 sm:pb-16 sm:pr-28"
+              className="relative overflow-hidden rounded-[28px] bg-gradient-to-br from-teal to-teal-800 px-6 py-6 pb-14 text-white shadow-[0_24px_50px_-26px_rgb(14_77_75/0.8)] ring-1 ring-emas/50 [overflow:clip] sm:px-8 sm:pb-16 sm:pr-28"
             >
               <BatikCorner corner="kiri-atas" className="left-0 top-0 w-12 sm:w-14" />
               <BatikEdge side="kiri" className="left-0 top-14 h-12 w-auto sm:top-16" />
@@ -243,7 +243,7 @@ export default function PathPage() {
               </svg>
               <div className="relative z-10 flex items-center gap-5">
                 <div
-                  className="grid size-16 shrink-0 place-items-center border-4 border-white/40 font-display text-xl font-bold"
+                  className="grid size-16 shrink-0 place-items-center rounded-full bg-white/10 text-xl font-black text-[#f6d98e] ring-4 ring-emas/60"
                   aria-label={`${doneCount} dari ${nodes.length} titik selesai`}
                 >
                   {doneCount}/{nodes.length}
@@ -252,7 +252,7 @@ export default function PathPage() {
                   <p className="eyebrow text-white/70">{detail.city.province}</p>
                   <h1
                     id="judul-kota"
-                    className="text-3xl font-extrabold tracking-tight"
+                    className="text-3xl font-black tracking-tight sm:text-4xl"
                     aria-label={`Jelajah ${detail.city.name}`}
                   >
                     <BlurText text={`Jelajah ${detail.city.name}`} animateBy="words" delay={90} className="inline-flex" />
@@ -314,11 +314,11 @@ export default function PathPage() {
             <BatikCorner corner="kanan-atas" className="right-0 top-0 w-14" />
             <div className="relative z-10">
               <p className="eyebrow text-redup">Poin {detail.city.name}</p>
-              <p className="mt-1 text-4xl font-extrabold tabular-nums text-teal">
+              <p className="mt-1 text-4xl font-black tabular-nums text-teal-800">
                 <CountUp to={points} duration={1.2} trigger="load" />
               </p>
               <dl className="mt-2 grid grid-cols-2 gap-2 text-xs">
-                <div className="rounded-xl bg-kertas px-2.5 py-1.5">
+                <div className="rounded-xl bg-[#f6f2e8] px-2.5 py-1.5">
                   <dt className="font-bold text-redup">Materi & kuis</dt>
                   <dd className="font-extrabold tabular-nums text-tinta">
                     {lessonPoints(lessonIds, progress, detail.rewards)} <span className="font-semibold text-redup">/ {max}</span>
@@ -362,11 +362,11 @@ export default function PathPage() {
 
           {badges.length > 0 && (
             <section
-              className="relative overflow-hidden border-2 border-tinta bg-white p-5 shadow-kartu [overflow:clip]"
+              className="kartu-nuansa relative overflow-hidden p-5 [overflow:clip]"
               aria-labelledby="judul-lencana"
             >
               <BatikCorner corner="kanan-atas" className="right-0 top-0 w-12" />
-              <h2 id="judul-lencana" className="relative z-10 font-extrabold">
+              <h2 id="judul-lencana" className="relative z-10 text-lg font-black text-teal-800">
                 Lencana{' '}
                 <span className="text-sm text-redup">
                   ({earned.length}/{badges.length})
@@ -410,13 +410,13 @@ export default function PathPage() {
             </div>
           )}
 
-          <section className="relative overflow-hidden border-2 border-tinta bg-white p-5 shadow-kartu [overflow:clip]">
+          <section className="kartu-nuansa relative overflow-hidden p-5 [overflow:clip]">
             <BatikCorner corner="kanan-atas" className="right-0 top-0 w-12" />
-            <h2 className="relative z-10 font-extrabold">Koleksi item</h2>
+            <h2 className="relative z-10 text-lg font-black text-teal-800">Koleksi item</h2>
             <p className="relative z-10 mt-1 text-sm text-redup">
               {collected?.length ?? 0}/{detail.items.length} item budaya ditemukan di game.
             </p>
-            <Link to="/koleksi" className="relative z-10 mt-3 inline-block text-sm font-extrabold text-teal hover:underline">
+            <Link to="/koleksi" className="relative z-10 mt-3 inline-block text-sm font-black text-teal-800 hover:underline">
               Lihat koleksi →
             </Link>
           </section>

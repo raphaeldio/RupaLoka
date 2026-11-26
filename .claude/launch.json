@@ -14,6 +14,18 @@
       "port": 8000
     },
     {
+      "name": "api-8001",
+      "runtimeExecutable": "backend/.venv/Scripts/uvicorn.exe",
+      "runtimeArgs": [
+        "app.main:app",
+        "--app-dir",
+        "backend",
+        "--port",
+        "8001"
+      ],
+      "port": 8001
+    },
+    {
       "name": "web",
       "runtimeExecutable": "npm",
       "runtimeArgs": [

@@ -12,6 +12,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { City, PlacedCity } from '../lib/cities'
 import PlaneFlight, { FLIGHT_MS } from './PlaneFlight'
+import PixelLoader from './PixelLoader'
 import ProvincePanel from './ProvincePanel'
 import TravelConfirm from './TravelConfirm'
 import { PROVINCES, type RegionId } from '../lib/provinces'
@@ -259,9 +260,9 @@ export default function LeafletMap({ cities, selectedId, onSelect }: Props) {
         role="region"
       />
       {status === 'loading' && (
-        <p className="pointer-events-none absolute inset-0 grid place-items-center text-sm font-bold text-redup motion-safe:animate-pulse">
-          Memuat peta…
-        </p>
+        <div className="pointer-events-none absolute inset-0 grid place-items-center">
+          <PixelLoader label="Memuat peta…" />
+        </div>
       )}
       {status === 'error' && (
         <p className="absolute inset-x-4 top-4 rounded-2xl bg-white/90 p-3 text-center text-sm text-redup shadow-kartu">

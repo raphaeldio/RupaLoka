@@ -93,7 +93,7 @@ export default function LocationButton({ location, compact = false }: { location
                 href={l.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 rounded-full border border-teal/40 bg-white px-3 py-1.5 text-xs font-extrabold text-teal transition hover:bg-teal hover:text-white"
+                className="inline-flex items-center gap-1.5 rounded-full border border-teal/40 bg-white px-3 py-1.5 text-xs font-black text-teal-800 transition hover:bg-teal hover:text-white"
               >
                 <span aria-hidden="true">{KIND_LABEL[l.kind].icon}</span>
                 <span className="sr-only">{KIND_LABEL[l.kind].label}: </span>

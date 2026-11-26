@@ -5,3 +5,11 @@ lessons_start: "Sekarang kita kenalan dengan beberapa budaya Bandung. Kalau ada 
 game_start: "Siap keliling kota? Ketuk layar atau tekan spasi untuk melompat. Setiap 100 meter, kamu bertemu warga yang bercerita tentang budaya!"
 item_unlocked: "Kamu menemukan {item}! {short_explanation}"
 summary: "Perjalanan selesai! Lihat koleksi yang kamu temukan, dan kunjungi lokasi aslinya kalau sempat."
+# Balasan basa-basi chat (ADR 41): dipakai bila pesan HANYA berisi salam/terima kasih/dsb.
+# Tanpa fakta budaya. Draf 26 Nov 2026, silakan disunting tim.
+small_talk:
+  greeting: "Halo! Aku Saloka, pemandu ekspedisimu di Rupaloka. Mau tahu apa tentang budaya Bandung? Coba salah satu pertanyaan di bawah, atau tulis pertanyaanmu sendiri."
+  thanks: "Sama-sama! Senang bisa menemani belajar. Kalau masih penasaran, tanya lagi saja, ya."
+  goodbye: "Sampai jumpa! Lanjutkan petualanganmu, dan kembali kapan saja kalau ada yang ingin ditanyakan."
+  identity: "Aku Saloka, pemandu AI di Rupaloka. Aku menjawab pertanyaan tentang budaya yang sedang kamu pelajari, hanya dari catatan bersumber, dan selalu menunjukkan sumbernya. Kalau catatannya belum ada, aku akan bilang terus terang."
+  help: "Boleh banget! Kamu bisa bertanya tentang materi yang sedang kamu pelajari, misalnya asal-usul, cara memainkan, atau maknanya. Tulis saja dengan bahasamu sendiri, atau pilih contoh pertanyaan di bawah."

@@ -27,7 +27,7 @@ services:
       - key: GEMINI_MODEL
         value: gemini-3.5-flash-lite
       - key: MIN_SCORE
-        value: "5.45"               # gerbang dua jalur; kalibrasi: eval_rag.py --strict
+        value: "6.5"               # gerbang dua jalur; kalibrasi: eval_rag.py --strict
       - key: RATE_LIMIT_PER_MIN
         value: "20"
       - key: GLOBAL_RATE_LIMIT_PER_MIN

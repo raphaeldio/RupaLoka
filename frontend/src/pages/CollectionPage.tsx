@@ -2,12 +2,12 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ContentText, SafeImage, SourceChip } from '../components/primitives'
 import CultureCard from '../components/CultureCard'
-import BlurText from '../components/reactbits/BlurText'
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '../components/ui/dialog'
 import { getCity } from '../lib/api'
 import type { CityDetail } from '../lib/api.types'
 import { bundledCities, labelOr } from '../lib/cities'
 import { useProgress } from '../lib/store'
+import PageHeading from '../components/PageHeading'
 
 /** Koleksi item budaya yang sudah terbuka, tersimpan di perangkat (F-044, F-051). */
 export default function CollectionPage() {
@@ -35,9 +35,7 @@ export default function CollectionPage() {
 
   return (
     <main id="konten" className="mx-auto w-full max-w-[1000px] px-4 pb-16 sm:px-8">
-      <h1 className="text-3xl font-extrabold tracking-tight text-teal" aria-label="Koleksi">
-        <BlurText text="Koleksi" animateBy="words" delay={80} className="inline-flex" />
-      </h1>
+      <PageHeading chip="Koleksi budaya" title="Koleksi" accent="kamu" />
       <p className="mt-2 text-redup">
         Item budaya yang kamu temukan saat bermain. Tersimpan di perangkat ini saja ({total} item).
       </p>
@@ -74,8 +72,8 @@ export default function CollectionPage() {
                         aria-haspopup="dialog"
                         className="tekan kotak flex w-full flex-col p-3 text-left sm:p-4"
                       >
-                        <SafeImage image={item.image} className="aspect-square w-full border-2 border-tinta" />
-                        <h3 className="mt-3 font-display text-lg font-bold leading-tight text-teal">{name}</h3>
+                        <SafeImage image={item.image} className="aspect-square w-full border border-emas/40 rounded-2xl" />
+                        <h3 className="mt-3 text-lg font-black leading-tight text-teal-800">{name}</h3>
                         <p className="mt-1 line-clamp-3 text-xs leading-relaxed">
                           <ContentText text={item.short_explanation} fallback="Penjelasan sedang disiapkan." />
                         </p>
@@ -84,7 +82,7 @@ export default function CollectionPage() {
                         </span>
                       </button>
                     ) : (
-                      <div className="flex w-full flex-col border-2 border-dashed border-tinta/40 bg-white/60 p-3 sm:p-4">
+                      <div className="flex w-full flex-col border-2 border-dashed border-teal/25 bg-white/60 p-3 sm:p-4">
                         <div className="grid aspect-square place-items-center bg-pasir/60 text-center">
                           <div>
                             <p className="font-display text-4xl text-redup" aria-hidden="true">
@@ -100,7 +98,7 @@ export default function CollectionPage() {
               })}
             </ul>
             {have.length < d.items.length && (
-              <Link to={`/kota/${d.city.id}`} className="mt-3 inline-block text-sm font-extrabold text-teal hover:underline">
+              <Link to={`/kota/${d.city.id}`} className="mt-3 inline-block text-sm font-black text-teal-800 hover:underline">
                 Main di {d.city.name} untuk menemukan sisanya →
               </Link>
             )}
@@ -110,12 +108,12 @@ export default function CollectionPage() {
 
       <Dialog open={!!openItem} onOpenChange={(v) => !v && setOpen(null)}>
         {open && openItem && (
-          <DialogContent className="max-h-[90dvh] gap-0 overflow-y-auto border-2 border-tinta bg-white p-0 shadow-kartu sm:max-w-2xl">
-            <div className="grid gap-4 border-b-2 border-tinta bg-kertas p-5 sm:grid-cols-[160px_1fr] sm:p-6">
-              <SafeImage image={openItem.image} className="aspect-square w-32 border-2 border-tinta sm:w-full" />
+          <DialogContent className="max-h-[90dvh] gap-0 overflow-y-auto border border-emas/40 bg-white p-0 shadow-kartu sm:max-w-2xl rounded-2xl">
+            <div className="grid gap-4 border-b border-garis bg-kertas p-5 sm:grid-cols-[160px_1fr] sm:p-6">
+              <SafeImage image={openItem.image} className="aspect-square w-32 border border-emas/40 sm:w-full rounded-2xl" />
               <div className="min-w-0 pr-6">
                 <p className="eyebrow text-amber">Kartu budaya · {open.city.city.name}</p>
-                <DialogTitle className="mt-1 font-display text-3xl font-bold leading-tight text-teal">
+                <DialogTitle className="mt-1 text-3xl font-black leading-tight text-teal-800">
                   {labelOr(openItem.name, 'Item budaya')}
                 </DialogTitle>
                 <DialogDescription asChild>

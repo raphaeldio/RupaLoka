@@ -31,7 +31,7 @@ export default function SubscriptionPage() {
         ← {back ? 'Kembali ke path' : 'Kembali ke peta'}
       </Link>
 
-      <section className="mt-4 rounded-[32px] bg-teal px-6 py-8 text-white shadow-melayang sm:px-10">
+      <section className="mt-4 rounded-[32px] bg-gradient-to-br from-teal to-teal-800 px-6 py-8 text-white shadow-[0_24px_50px_-26px_rgb(14_77_75/0.8)] ring-1 ring-emas/50 sm:px-10">
         <p className="eyebrow text-white/70">Langganan Rupaloka</p>
         <h1 className="mt-1 text-3xl font-extrabold tracking-tight">Mode 3D khusus pelanggan</h1>
         <p className="mt-3 max-w-xl text-sm leading-relaxed text-white/85">
@@ -43,8 +43,8 @@ export default function SubscriptionPage() {
 
       <ul className="mt-6 grid gap-4 sm:grid-cols-2" aria-label="Paket langganan">
         {PLANS.map((p) => (
-          <li key={p.name} className="rounded-3xl border border-garis bg-white p-6 shadow-kartu">
-            <h2 className="text-xl font-extrabold text-teal">Paket {p.name}</h2>
+          <li key={p.name} className="kartu-nuansa p-6">
+            <h2 className="text-xl font-black text-teal-800">Paket {p.name}</h2>
             <p className="mt-1 text-sm font-bold text-redup">Harga akan diumumkan</p>
             <ul className="mt-4 grid gap-2 text-sm">
               {p.points.map((pt) => (
@@ -66,7 +66,7 @@ export default function SubscriptionPage() {
       <div className="mt-8 flex flex-wrap items-center gap-3">
         <Link
           to={back ?? '/'}
-          className="rounded-2xl bg-teal px-5 py-3 text-sm font-extrabold text-white hover:bg-teal-600"
+          className="pil pil-teal"
         >
           Lanjut belajar di mode 2D
         </Link>

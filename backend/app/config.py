@@ -13,7 +13,11 @@ DEFAULT_GEMINI_MODEL = "gemini-3.5-flash-lite"
 # Ambang jalur skor gerbang dua jalur (T-062, eval_rag.py, 21 Nov 2026; 41 chunk, tokenizer
 # dengan stemmer + kata gaul): luar cakupan tanpa istilah topik tertinggi 4.999, dalam cakupan/saran
 # tanpa istilah topik terendah 5.892. Kalibrasi ulang tiap chunk bertambah (`eval_rag.py --strict`).
-DEFAULT_MIN_SCORE = 5.45
+# 26 Nov 2026 (92 chunk, setelah tambahan dokumen KB + cek wilayah ADR 43): luar cakupan tanpa
+# istilah topik tertinggi 5.941 ("cara membuat rumah gadang"), dalam cakupan terendah 6.086.
+# 26 Nov 2026 (malam, 116 chunk setelah riset Gemini terverifikasi): luar cakupan tertinggi 6.133
+# (rumah gadang naik karena chunk rumah adat Sunda), dalam cakupan terendah 6.830.
+DEFAULT_MIN_SCORE = 6.5
 
 
 def _bool(value: str | None, default: bool = False) -> bool:

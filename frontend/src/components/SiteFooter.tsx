@@ -3,12 +3,12 @@ import { LogoMark } from './landing/Logo'
 
 export default function SiteFooter() {
   return (
-    <footer className="relative mt-auto overflow-hidden border-t-4 border-tinta bg-teal-800 text-white">
+    <footer className="relative mt-auto overflow-hidden border-t-4 border-emas/40 bg-teal-800 text-white">
       <div className="mx-auto flex max-w-[1360px] flex-col gap-6 px-6 pb-8 pt-10 sm:flex-row sm:items-center sm:justify-between lg:px-10">
         <div className="flex items-center gap-4">
           <LogoMark className="size-10 text-teal" />
           <div>
-            <p className="font-display text-xl font-bold tracking-[0.06em]">RUPALOKA</p>
+            <p className="font-piksel text-xl font-bold tracking-[0.06em]">RUPALOKA</p>
             <p className="text-sm italic text-white/75">Menjaga Budaya, Merangkai Masa Depan</p>
           </div>
         </div>

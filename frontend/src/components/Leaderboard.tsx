@@ -172,7 +172,7 @@ export default function Leaderboard({ cityId, points, canSubmit }: { cityId: str
               setStatus('loading')
               void load()
             }}
-            className="mt-1 font-extrabold text-teal hover:underline"
+            className="mt-1 font-black text-teal-800 hover:underline"
           >
             Coba lagi
           </button>

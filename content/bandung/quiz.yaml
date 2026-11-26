@@ -3,7 +3,7 @@
 # Soal untuk butir "Perlu verifikasi" (A6, B2, C4, D1) dan cadangan kujang (C3) SENGAJA tidak dimasukkan.
 # correct = indeks opsi yang benar, mulai dari 0. chunk = id chunk di knowledge/ yang menjadi sumbernya;
 # soal tampil di titik path milik lesson_id chunk tersebut.
-# Jawaban benar WAJIB diperiksa dua orang (KH) sebelum rilis.
+# Jawaban benar WAJIB diperiksa dua orang (KH) sebelum rilis. Soal intro diperiksa Tim KamiPemenang (2026-11-26).
 intro:
   # --- Titik 1: Pengenalan Bandung (sejarah kota, bangunan) ---
   - id: q1

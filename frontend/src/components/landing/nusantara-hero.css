@@ -1,0 +1,279 @@
+/* Hero "Nusantara" (NusantaraHero.tsx). Lapisan memakai cqw = persen lebar adegan. */
+
+.nh {
+  background: #f6efdf;
+}
+/* Lintasan gulir: hero menempel selama ±0.9 layar sementara maskot berjalan. */
+@media (prefers-reduced-motion: no-preference) {
+  .nh-trek {
+    height: calc(max(100svh, 620px) + 90svh);
+  }
+}
+
+.nh-wadah {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+/* Sedikit lebih besar dari layar agar paralaks kursor tidak memperlihatkan tepi. */
+.nh-geser {
+  position: absolute;
+  inset: -12px -28px;
+  container-type: size;
+  will-change: transform;
+}
+
+/*
+ * Adegan menjaga rasio gambar dan menutupi wadah. Pada layar lebar-pendek gambar lebih tinggi
+ * dari wadah; posisinya diatur agar kaki maskot (78.4% tinggi gambar) jatuh di ±88% tinggi
+ * wadah (jauh dari teks), tetapi tidak pernah memperlihatkan tepi atas/bawah gambar.
+ */
+.nh-adegan {
+  --lebar: max(100cqw, calc(100cqh * 1376 / 768));
+  --tinggi: calc(var(--lebar) * 768 / 1376);
+  position: absolute;
+  top: clamp(calc(100cqh - var(--tinggi)), calc(88cqh - var(--tinggi) * 0.784), 0px);
+  left: 50%;
+  width: var(--lebar);
+  aspect-ratio: 1376 / 768;
+  translate: -50% 0;
+  transform-origin: 50% 78%;
+  container-type: inline-size;
+  will-change: transform;
+}
+.nh-gambar {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  user-select: none;
+}
+.nh-adegan > span,
+.nh-adegan > div {
+  position: absolute;
+  display: block;
+}
+
+/* ---------- Awan & burung ---------- */
+.nh-awan {
+  left: 0;
+  height: 4cqw;
+  background:
+    radial-gradient(closest-side, #fffaf0 55%, rgb(255 250 240 / 0)) 0 40% / 45% 70% no-repeat,
+    radial-gradient(closest-side, #fffaf0 55%, rgb(255 250 240 / 0)) 30% 0 / 45% 90% no-repeat,
+    radial-gradient(closest-side, #fffaf0 55%, rgb(255 250 240 / 0)) 75% 30% / 50% 80% no-repeat;
+  will-change: translate;
+}
+.nh-burung {
+  left: 0;
+  width: 1.4cqw;
+}
+.nh-burung svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.nh-burung-1 { top: 22%; }
+.nh-burung-2 { top: 25%; width: 1.1cqw; }
+.nh-burung-3 { top: 19%; width: 1cqw; }
+
+/* ---------- Matahari (pusat gambar 688,512; cakrawala ±y 535) ---------- */
+.nh-langit-fx {
+  inset: 0 0 auto;
+  height: 70%;
+  overflow: hidden;
+}
+.nh-matahari {
+  position: absolute;
+  left: 50%;
+  top: 95.3%;
+  width: 0;
+  height: 0;
+}
+.nh-matahari > span {
+  position: absolute;
+  left: 0;
+  top: 0;
+  translate: -50% -50%;
+  border-radius: 50%;
+}
+.nh-pendar {
+  width: 34cqw;
+  height: 34cqw;
+  background: radial-gradient(circle, rgb(255 248 222 / 0.7) 0 22%, rgb(255 236 170 / 0.3) 38%, rgb(255 230 160 / 0) 68%);
+  will-change: transform, opacity;
+}
+.nh-sinar {
+  width: 90cqw;
+  height: 90cqw;
+  background: repeating-conic-gradient(from 0deg, rgb(255 236 180 / 0.55) 0deg 4deg, transparent 4deg 15deg);
+  -webkit-mask: radial-gradient(circle, #000 8%, transparent 62%);
+  mask: radial-gradient(circle, #000 8%, transparent 62%);
+  opacity: 0.35;
+  will-change: transform;
+}
+
+/* ---------- Kabut ---------- */
+.nh-kabut {
+  height: 4cqw;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(255 251 240 / 0.7), rgb(255 251 240 / 0));
+  will-change: translate;
+}
+.nh-kabut-1 { top: 64%; left: 10%; width: 40cqw; }
+.nh-kabut-2 { top: 67%; left: 52%; width: 34cqw; }
+.nh-kabut-3 { top: 61%; left: 30%; width: 28cqw; opacity: 0.6; }
+
+/* ---------- Air ---------- */
+.nh-air {
+  inset: 70% 0 0;
+  overflow: hidden;
+  -webkit-mask: linear-gradient(90deg, transparent, #000 15% 85%, transparent);
+  mask: linear-gradient(90deg, transparent, #000 15% 85%, transparent);
+}
+.nh-kilau {
+  position: absolute;
+  inset: 0 -18cqw 0 0;
+  background: repeating-linear-gradient(to bottom, transparent 0 0.9cqw, rgb(255 255 255 / 0.22) 0.9cqw 1.05cqw);
+  -webkit-mask: repeating-linear-gradient(90deg, #000 0 6cqw, transparent 6cqw 9cqw);
+  mask: repeating-linear-gradient(90deg, #000 0 6cqw, transparent 6cqw 9cqw);
+  will-change: transform;
+}
+.nh-pantul {
+  top: 69%;
+  left: 50%;
+  width: 24cqw;
+  height: 12cqw;
+  translate: -50% 0;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(255 242 200 / 0.45), rgb(255 242 200 / 0));
+  will-change: opacity;
+}
+
+/* ---------- Maskot (kaki di ±y 602 → 21.6% dari bawah) ---------- */
+.nh-maskot {
+  left: 50%;
+  bottom: 21.6%;
+  width: 8.4cqw;
+  margin-left: -4.2cqw;
+  transform-origin: 50% 100%;
+  will-change: transform;
+  pointer-events: auto;
+  z-index: 2;
+}
+.nh-ayun {
+  transform-origin: 50% 100%;
+}
+/* Gelembung sapaan HeroMascot di kanan atas kepala (tidak menutupi tombol), lebarnya tidak ikut maskot. */
+.nh-maskot .maskot-gelembung {
+  position: absolute;
+  bottom: 78%;
+  left: 78%;
+  width: max-content;
+  max-width: min(240px, 46vw);
+  margin: 0;
+  font-size: 14px;
+  text-align: left;
+  padding: 8px 12px;
+  pointer-events: none;
+}
+.nh-maskot[data-maju] .maskot-gelembung {
+  visibility: hidden;
+}
+.nh-maskot .maskot-gelembung > span {
+  left: 18px;
+}
+
+/* ---------- Kunang-kunang ---------- */
+.nh-kunang-lapis {
+  position: absolute;
+  inset: 0;
+}
+.nh-kunang {
+  position: absolute;
+  border-radius: 50%;
+  background: #ffe9a6;
+  box-shadow: 0 0 6px 2px rgb(255 214 110 / 0.75);
+  opacity: 0.7;
+}
+
+/* ---------- Gerak ---------- */
+@media (prefers-reduced-motion: no-preference) {
+  .nh-awan { animation: nh-ke-kanan 160s linear infinite; }
+  .nh-burung-1 { animation: nh-ke-kanan 26s linear infinite -6s, nh-kepak 0.6s steps(2) infinite; }
+  .nh-burung-2 { animation: nh-ke-kanan 26s linear infinite -7.5s, nh-kepak 0.55s steps(2) infinite; }
+  .nh-burung-3 { animation: nh-ke-kanan 34s linear infinite -20s, nh-kepak 0.5s steps(2) infinite; }
+
+  .nh-sinar { animation: nh-putar 80s linear infinite; }
+  .nh-pendar { animation: nh-denyut 5s ease-in-out infinite; }
+
+  .nh-kabut-1 { animation: nh-hanyut 22s ease-in-out infinite alternate; }
+  .nh-kabut-2 { animation: nh-hanyut 28s ease-in-out infinite alternate-reverse; }
+  .nh-kabut-3 { animation: nh-hanyut 18s ease-in-out infinite alternate; }
+
+  .nh-kilau { animation: nh-arus 9s linear infinite; }
+  .nh-pantul { animation: nh-kelip 2.4s ease-in-out infinite; }
+
+  .nh-kunang { animation: nh-kerlip 3.2s ease-in-out infinite, nh-melayang 7s ease-in-out infinite; }
+
+  .nh-maskot[data-jalan] .nh-ayun { animation: nh-langkah 0.42s ease-in-out infinite; }
+}
+
+@keyframes nh-ke-kanan {
+  from { translate: -25cqw 0; }
+  to { translate: 115cqw 0; }
+}
+@keyframes nh-kepak {
+  50% { transform: scaleY(-0.6); }
+}
+@keyframes nh-putar {
+  to { rotate: 360deg; }
+}
+@keyframes nh-denyut {
+  0%, 100% { opacity: 0.75; scale: 0.94; }
+  50% { opacity: 1; scale: 1.06; }
+}
+@keyframes nh-hanyut {
+  from { translate: -4cqw 0; }
+  to { translate: 4cqw 0; }
+}
+@keyframes nh-arus {
+  from { transform: translateX(-18cqw); }
+  to { transform: translateX(0); }
+}
+@keyframes nh-kelip {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 0.95; }
+}
+@keyframes nh-kerlip {
+  0%, 100% { opacity: 0.15; }
+  50% { opacity: 0.95; }
+}
+@keyframes nh-melayang {
+  0%, 100% { transform: translate(0, 0); }
+  33% { transform: translate(6px, -10px); }
+  66% { transform: translate(-5px, -4px); }
+}
+@keyframes nh-langkah {
+  0%, 100% { transform: rotate(-5deg) translateY(0); }
+  25% { transform: rotate(0deg) translateY(-6%); }
+  50% { transform: rotate(5deg) translateY(0); }
+  75% { transform: rotate(0deg) translateY(-6%); }
+}
+
+/* Judul emas: gradien gelap agar kontras cukup di langit krem. */
+.nh-emas {
+  background: linear-gradient(180deg, #d1a033 0%, #a8761a 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Layar lebar tapi pendek (mis. laptop 1366×650 di peramban): rapatkan teks agar tidak menyentuh maskot. */
+@media (min-width: 640px) and (max-height: 760px) {
+  .nh-teks { padding-top: 12px; }
+  .nh-teks h1 { margin-top: 12px; font-size: min(56px, 7.4vh); }
+  .nh-teks h1 + p { margin-top: 10px; font-size: 16px; }
+  .nh-teks [data-nh='masuk']:last-child { margin-top: 16px; }
+}

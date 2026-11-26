@@ -58,7 +58,7 @@ export default function CityCard({ city, onClose }: { city: City; onClose?: () =
           <dl className="mt-4 grid grid-cols-2 gap-2">
             <div className="rounded-2xl bg-teal-50 px-3 py-2">
               <dt className="text-[11px] font-semibold text-redup">Materi budaya</dt>
-              <dd className="text-lg font-extrabold text-teal">{count(city.lesson_count)}</dd>
+              <dd className="text-lg font-black text-teal-800">{count(city.lesson_count)}</dd>
             </div>
             <div className="rounded-2xl bg-amber-50 px-3 py-2">
               <dt className="text-[11px] font-semibold text-redup">Item koleksi</dt>

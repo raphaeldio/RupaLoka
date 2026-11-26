@@ -2,8 +2,10 @@ import type { CityDetail, LeaderboardEntry } from '../../lib/api.types'
 import { labelOr } from '../../lib/cities'
 import { useProgress } from '../../lib/store'
 import { SafeImage } from '../primitives'
+import LatarBudaya from './LatarBudaya'
 import { Chapter, CtaLink, PixelIcon } from './pixel'
-import { ICON_PETA, ICON_PIALA } from './pixelIcons'
+import { ICON_PIALA } from './pixelIcons'
+import JalanKota from './JalanKota'
 
 /** Bab koleksi + papan peringkat: item budaya kota (terbuka/terkunci di perangkat ini) dan 3 teratas. */
 export function CollectionPreview({
@@ -24,21 +26,28 @@ export function CollectionPreview({
   const have = useProgress((s) => s.collected[cityId]) ?? []
   const items = detail?.items ?? []
   return (
-    <section data-chapter="04 · Koleksi" aria-labelledby="judul-koleksi" className="px-4 py-16 sm:px-8 lg:px-12">
-      <div className="mx-auto max-w-[1200px]">
+    <section
+      data-chapter="04 · Koleksi"
+      data-warna="#0e4d4b"
+      aria-labelledby="judul-koleksi"
+      className="relative isolate overflow-clip px-4 pb-40 pt-40 sm:px-8 lg:px-12"
+    >
+      <LatarBudaya corak="truntum" />
+      <div className="relative z-10 mx-auto max-w-[1200px]">
         <Chapter
           id="judul-koleksi"
           no={no}
           tag="Kumpulkan & bersaing"
-          tone="emas"
-          title="Koleksi & papan peringkat"
+          tone="gelap"
+          title="Koleksi &"
+          accent="papan peringkat"
           lead={`Tiap item budaya yang kamu temukan di game masuk koleksimu, lengkap dengan kartu budaya dan sumbernya. Poin terbesar datang dari soal nilai dan refleksi, bukan dari lari tercepat.`}
         />
         <div className="mt-10 grid gap-6 lg:grid-cols-[1.4fr_1fr]">
-          <div data-anim="card" className="kotak p-5">
+          <div data-anim="card" data-angkat className="kartu-nuansa p-5 sm:p-6">
             <div className="flex items-baseline justify-between gap-3">
-              <h3 className="font-display text-xl font-bold uppercase">Item {cityName}</h3>
-              <span className="eyebrow text-amber">
+              <h3 className="text-[20px] font-black uppercase text-teal-800">Item {cityName}</h3>
+              <span className="rounded-full bg-amber-50 px-3 py-1 text-[12px] font-extrabold text-amber">
                 {have.length}/{items.length || '–'} ditemukan
               </span>
             </div>
@@ -47,11 +56,14 @@ export function CollectionPreview({
                 {items.map((it) => {
                   const owned = have.includes(it.id)
                   return (
-                    <li key={it.id} className="border-2 border-tinta bg-kertas p-2 text-center">
+                    <li key={it.id} className="rounded-2xl bg-[#fbf5e7] p-2 text-center ring-1 ring-emas/40">
                       {owned ? (
-                        <SafeImage image={it.image} className="aspect-square w-full" />
+                        <SafeImage image={it.image} className="aspect-square w-full rounded-xl" />
                       ) : (
-                        <div className="grid aspect-square place-items-center bg-pasir font-display text-3xl text-redup" aria-hidden="true">
+                        <div
+                          className="koleksi-terkunci grid aspect-square place-items-center rounded-xl text-3xl font-black text-teal-800/50"
+                          aria-hidden="true"
+                        >
                           ?
                         </div>
                       )}
@@ -72,12 +84,14 @@ export function CollectionPreview({
             </div>
           </div>
 
-          <div data-anim="card" className="kotak flex flex-col p-5">
+          <div data-anim="card" data-angkat className="kartu-nuansa flex flex-col p-5 sm:p-6">
             <div className="flex items-center gap-3">
-              <PixelIcon rows={ICON_PIALA} className="size-10" />
+              <span className="ikon-lompat grid size-14 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-emas-100 to-[#f1d38b]">
+                <PixelIcon rows={ICON_PIALA} className="size-9" />
+              </span>
               <div>
-                <h3 className="font-display text-xl font-bold uppercase">Papan peringkat</h3>
-                <p className="eyebrow text-redup">Peringkat 1 bergelar {board?.title ?? `Si Paling ${cityName}`}</p>
+                <h3 className="text-[20px] font-black uppercase text-teal-800">Papan peringkat</h3>
+                <p className="text-[12px] font-bold text-redup">Peringkat 1 bergelar {board?.title ?? `Si Paling ${cityName}`}</p>
               </div>
             </div>
             {board && board.entries.length > 0 ? (
@@ -85,9 +99,15 @@ export function CollectionPreview({
                 {board.entries.map((e) => (
                   <li
                     key={e.rank}
-                    className={`flex items-center gap-3 border-2 border-tinta px-3 py-2 ${e.rank === 1 ? 'bg-emas-100' : 'bg-white'}`}
+                    className={`flex items-center gap-3 rounded-full py-1.5 pl-1.5 pr-4 ${
+                      e.rank === 1 ? 'bg-gradient-to-r from-emas-100 to-[#f6dfa3] ring-1 ring-emas' : 'bg-[#f6f2e8]'
+                    }`}
                   >
-                    <span className="grid size-7 place-items-center border-2 border-tinta bg-white font-mono text-xs font-bold">
+                    <span
+                      className={`grid size-8 place-items-center rounded-full text-xs font-black ${
+                        e.rank === 1 ? 'bg-amber text-white' : 'bg-white text-teal-800'
+                      }`}
+                    >
                       {e.rank}
                     </span>
                     <span className="min-w-0 flex-1 truncate font-bold">{e.nickname}</span>
@@ -110,46 +130,48 @@ export function CollectionPreview({
   )
 }
 
-/** Bab titik-titik budaya kota aktif (judul materi dan nama lokasi dari konten bersumber). */
+/**
+ * Bab titik budaya kota aktif: judul bab, lalu perjalanan menyusuri jalan kota (JalanKota) dengan
+ * papan tiap titik (judul materi dan nama lokasi dari konten bersumber).
+ */
 export function CityStops({ no, cityId, cityName, detail }: { no: number; cityId: string; cityName: string; detail: CityDetail | null }) {
   const lessons = detail?.lessons ?? []
   return (
-    <section data-chapter="05 · Titik budaya" aria-labelledby="judul-titik" className="px-4 py-16 sm:px-8 lg:px-12">
-      <div className="mx-auto max-w-[1200px]">
+    <section
+      data-chapter="05 · Titik budaya"
+      data-warna="#b4e0f3"
+      aria-labelledby="judul-titik"
+      className="relative isolate bg-[linear-gradient(180deg,rgb(180_224_243/0)_0,#b4e0f3_150px)] pt-44"
+    >
+      <div className="relative z-10 mx-auto max-w-[1200px] px-4 sm:px-8 lg:px-12">
         <Chapter
           id="judul-titik"
           no={no}
-          tag={`Dari ${cityName} untuk Nusantara`}
-          tone="bata"
-          title={`Titik budaya ${cityName}`}
-          lead="Setiap titik di path belajar adalah satu kisah budaya. Selesaikan berurutan, lalu kunjungi tempat aslinya."
+          tag={`Path belajar ${cityName}`}
+          title="Titik budaya"
+          accent={cityName}
+          lead="Setiap titik di path belajar adalah satu kisah budaya. Gulir untuk menyusuri jalan kota: selesaikan berurutan, lalu kunjungi tempat aslinya."
         />
-        {lessons.length > 0 ? (
-          <ol className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {lessons.map((l, i) => (
-              <li key={l.id} data-anim="card" className="kotak flex items-start gap-3 p-4">
-                <span className="grid size-10 shrink-0 place-items-center border-2 border-tinta bg-teal font-display text-lg text-white">
-                  {i + 1}
-                </span>
-                <div className="min-w-0">
-                  <p className="font-display text-lg font-bold leading-tight">{labelOr(l.title, 'Materi budaya')}</p>
-                  {l.location && (
-                    <p className="mt-1 flex items-center gap-1 text-xs text-redup">
-                      <PixelIcon rows={ICON_PETA} className="size-4" />
-                      {labelOr(l.location.name, 'Lokasi')}
-                    </p>
-                  )}
-                </div>
+      </div>
+      {lessons.length > 0 ? (
+        <>
+          <ol className="sr-only">
+            {lessons.map((l) => (
+              <li key={l.id}>
+                {labelOr(l.title, 'Materi budaya')}
+                {l.location && `, ${labelOr(l.location.name, 'Lokasi')}`}
               </li>
             ))}
           </ol>
-        ) : (
-          <div className="mt-10 h-24 border-2 border-dashed border-tinta/30" aria-hidden="true" />
-        )}
-        <div className="mt-8">
-          <CtaLink to={`/kota/${cityId}`}>Mulai dari titik 1</CtaLink>
+          <div className="mt-10">
+            <JalanKota cityId={cityId} lessons={lessons} />
+          </div>
+        </>
+      ) : (
+        <div className="mx-auto mt-10 h-40 max-w-[1200px] px-4 sm:px-8 lg:px-12" aria-hidden="true">
+          <div className="h-full rounded-[22px] border-2 border-dashed border-teal/25" />
         </div>
-      </div>
+      )}
     </section>
   )
 }

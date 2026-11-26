@@ -43,46 +43,41 @@ export function useLandingMotion(
         })
       }
 
-      mm.add('(prefers-reduced-motion: no-preference)', () => {
-        /* ---------- Hero: masuk berurutan ---------- */
-        const hero = gsap.timeline({ defaults: { ease: 'power3.out' } })
-        hero
-          .from(q(root, '[data-anim="hero-eyebrow"]'), { y: -24, autoAlpha: 0, duration: 0.5 })
-          .from(
-            q(root, '[data-anim="hero-pita"]'),
-            {
-              scale: 1.5,
-              rotation: (i: number) => (i % 2 ? 9 : -9),
-              autoAlpha: 0,
-              duration: 0.7,
-              ease: 'back.out(2.2)',
-              stagger: 0.18,
-            },
-            '-=0.15',
-          )
-          .from(q(root, '[data-anim="hero-lead"]'), { y: 18, autoAlpha: 0, duration: 0.5 }, '-=0.25')
-          .from(
-            q(root, '[data-anim="hero-cta"]'),
-            { y: 24, scale: 0.85, autoAlpha: 0, duration: 0.5, ease: 'back.out(2)', stagger: 0.1 },
-            '-=0.2',
-          )
-          .from(q(root, '[data-anim="hero-step"]'), { x: -16, autoAlpha: 0, duration: 0.35, stagger: 0.08 }, '-=0.2')
-          .from(
-            q(root, '[data-anim="hero-mascot"]'),
-            { y: 80, rotation: 8, autoAlpha: 0, duration: 0.9, ease: 'elastic.out(1, 0.55)' },
-            0.35,
-          )
-
-        // Parallax halus saat hero digulir keluar: pita bergeser berlawanan arah.
-        const heroSec = root.querySelector('[data-anim-section="hero"]')
-        if (heroSec) {
-          const st = { trigger: heroSec, start: 'top top', end: 'bottom top', scrub: 0.6 }
-          q(root, '[data-anim="hero-pita"]').forEach((el, i) =>
-            gsap.to(el, { xPercent: i % 2 ? 6 : -6, ease: 'none', scrollTrigger: st }),
-          )
-          gsap.to(q(root, '[data-anim="hero-mascot"]'), { yPercent: 18, rotation: -4, ease: 'none', scrollTrigger: st })
+      /* ---------- Latar bersama: warna bergradasi antarbab (juga saat gerak dikurangi; bukan animasi) ---------- */
+      const latar = root.querySelector<HTMLElement>('[data-alur-latar]')
+      const bab = q(root, '[data-warna]')
+      if (latar && bab.length) {
+        let titik: { y: number; c: string }[] = []
+        let terakhir = ''
+        const ukur = () => {
+          titik = bab.map((b) => ({ y: b.getBoundingClientRect().top + window.scrollY, c: b.dataset.warna ?? '#f6efdf' }))
         }
+        const warnai = (scroll: number) => {
+          const tengah = scroll + window.innerHeight * 0.55
+          const zona = window.innerHeight * 0.4
+          let i = -1
+          for (let k = 0; k < titik.length; k++) if (titik[k].y <= tengah) i = k
+          let c: string
+          if (i < 0) c = titik[0].c
+          else {
+            const t = (tengah - titik[i].y) / zona
+            const dari = i > 0 ? titik[i - 1].c : titik[i].c
+            c = t >= 1 ? titik[i].c : (gsap.utils.interpolate(dari, titik[i].c, Math.max(0, t)) as string)
+          }
+          if (c !== terakhir) latar.style.backgroundColor = terakhir = c
+        }
+        ScrollTrigger.create({
+          start: 0,
+          end: 'max',
+          onRefresh: (self) => {
+            ukur()
+            warnai(self.scroll())
+          },
+          onUpdate: (self) => warnai(self.scroll()),
+        })
+      }
 
+      mm.add('(prefers-reduced-motion: no-preference)', () => {
         /* ---------- Pita berjalan: miring mengikuti kecepatan gulir ---------- */
         const marquee = root.querySelector<HTMLElement>('[data-anim="marquee"]')
         if (marquee) {
@@ -97,7 +92,7 @@ export function useLandingMotion(
           })
         }
 
-        /* ---------- Judul bab: nomor meletup, pita "dibanting", teks naik ---------- */
+        /* ---------- Judul bab: nomor meletup, judul naik, teks menyusul ---------- */
         for (const ch of q(root, '[data-anim="chapter"]')) {
           gsap
             .timeline({
@@ -107,7 +102,7 @@ export function useLandingMotion(
             .from(ch.querySelector('[data-anim-part="no"]'), { scale: 0, rotation: -90, duration: 0.45, ease: 'back.out(3)' })
             .from(
               ch.querySelector('[data-anim-part="pita"]'),
-              { xPercent: -12, rotation: -8, scale: 1.12, autoAlpha: 0, duration: 0.6, ease: 'back.out(1.8)' },
+              { y: 34, autoAlpha: 0, duration: 0.7, ease: 'power4.out' },
               '-=0.2',
             )
             .from(ch.querySelector('[data-anim-part="lead"]'), { y: 20, autoAlpha: 0, duration: 0.5 }, '-=0.3')
@@ -188,6 +183,8 @@ export function useLandingMotion(
               ease: 'back.out(1.6)',
               stagger: 0.12,
               overwrite: true,
+              // Lepas transform setelah masuk agar efek angkat saat hover (CSS) berfungsi.
+              clearProps: 'transform',
             }),
         })
       })

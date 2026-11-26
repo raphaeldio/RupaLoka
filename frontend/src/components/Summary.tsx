@@ -58,20 +58,20 @@ export default function Summary({
   return (
     <Card>
       <p className="eyebrow text-redup">Ringkasan perjalanan</p>
-      <h2 className="mt-1 text-2xl font-extrabold text-teal">Keliling {detail.city.name} selesai!</h2>
+      <h2 className="mt-1 text-2xl font-black text-teal-800">Keliling {detail.city.name} selesai!</h2>
 
       <dl className="mt-4 grid grid-cols-3 gap-2 text-center">
-        <div className="border-2 border-tinta bg-teal-50 p-3">
+        <div className="border border-emas/40 bg-teal-50 p-3 rounded-2xl">
           <dt className="text-[11px] font-semibold text-redup">Skor</dt>
           <dd className="text-2xl font-extrabold tabular-nums text-teal" aria-label={String(score)}>
             <CountUp to={score} duration={1.4} separator="." trigger="load" />
           </dd>
         </div>
-        <div className="border-2 border-tinta bg-kertas p-3">
+        <div className="border border-emas/40 bg-kertas p-3 rounded-2xl">
           <dt className="text-[11px] font-semibold text-redup">Rekor</dt>
           <dd className="text-2xl font-extrabold tabular-nums">{best}</dd>
         </div>
-        <div className="border-2 border-tinta bg-amber-50 p-3">
+        <div className="border border-emas/40 bg-amber-50 p-3 rounded-2xl">
           <dt className="text-[11px] font-semibold text-redup">Item baru</dt>
           <dd className="text-2xl font-extrabold tabular-nums text-amber" aria-label={String(unlocked.length)}>
             <CountUp to={unlocked.length} duration={1} trigger="load" />
@@ -80,12 +80,12 @@ export default function Summary({
       </dl>
 
       {pointsGained > 0 && (
-        <p className="mt-4 border-2 border-tinta bg-teal-50 p-3 text-sm font-bold text-teal">
+        <p className="mt-4 border border-emas/40 bg-teal-50 p-3 text-sm font-bold text-teal rounded-2xl">
           +{pointsGained} poin path (bonus titik game + skor terbaikmu)!
         </p>
       )}
       {badges.length > 0 && (
-        <div className="mt-3 border-2 border-tinta bg-emas-100 p-3" role="status">
+        <div className="mt-3 border border-emas/40 bg-emas-100 p-3 rounded-2xl" role="status">
           <p className="text-sm font-extrabold text-amber">Lencana baru!</p>
           <ul className="mt-2 flex flex-wrap gap-3">
             {badges.map((b) => (
@@ -99,7 +99,7 @@ export default function Summary({
       )}
 
       {allCollected && (
-        <p className="mt-4 border-2 border-tinta bg-emas-100 p-3 text-sm font-bold">
+        <p className="mt-4 border border-emas/40 bg-emas-100 p-3 text-sm font-bold rounded-2xl">
           Selamat! Semua item budaya {detail.city.name} sudah ada di koleksimu.
         </p>
       )}
@@ -113,7 +113,7 @@ export default function Summary({
         ) : (
           <ul className="mt-2 grid grid-cols-3 gap-2">
             {unlocked.map((i) => (
-              <li key={i.id} className="border-2 border-tinta bg-white p-2 text-center">
+              <li key={i.id} className="border border-emas/40 bg-white p-2 text-center rounded-2xl">
                 <Pop delay={0.3}>
                   <SafeImage image={i.image} className="aspect-square w-full rounded-xl" />
                 </Pop>
@@ -154,7 +154,7 @@ export default function Summary({
         <Button variant="secondary" onClick={onBack}>
           Kembali ke path
         </Button>
-        <Link to="/koleksi" className="inline-flex items-center rounded-2xl px-4 py-3 text-sm font-extrabold text-teal hover:underline">
+        <Link to="/koleksi" className="inline-flex items-center rounded-2xl px-4 py-3 text-sm font-black text-teal-800 hover:underline">
           Lihat koleksi
         </Link>
         <Link to="/" className="inline-flex items-center rounded-2xl px-4 py-3 text-sm font-extrabold text-redup hover:text-teal">

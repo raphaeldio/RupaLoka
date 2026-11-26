@@ -76,7 +76,8 @@ def test_in_scope_answer_has_valid_citations(root: Path) -> None:
             }
         ],
         "refusal_reason": None,
-        "suggestions": [],
+        "suggestions": ["Apa itu zorblat?", "Siapa pembuatnya?", "Apa ini?"],
+        "intent": "question",
     }
     system, turns = llm.calls[0]
     assert "Jawab HANYA dari KONTEKS" in system
@@ -171,6 +172,102 @@ def test_history_is_forwarded_and_starts_with_user(root: Path) -> None:
     _, turns = llm.calls[0]
     assert [t.role for t in turns] == ["user", "assistant", "user"]
     assert turns[0].text == "Apa itu zorblat?"
+
+
+# --- percakapan alami (ADR 41) ---------------------------------------------
+
+
+@pytest.mark.parametrize(
+    ("message", "answer"),
+    [
+        ("Halo Saloka!", "Halo dari pemandu uji."),
+        ("makasih ya kak", "Sama-sama dari pemandu uji."),
+        ("kamu siapa?", "Aku pemandu uji."),
+        ("aku bisa tanya apa aja?", "Tanya apa saja tentang materi uji."),
+        ("oke makasih, dadah", "Dadah dari pemandu uji."),
+    ],
+)
+def test_small_talk_uses_team_script_without_llm(root: Path, message: str, answer: str) -> None:
+    llm = FakeLLM("tidak boleh terpanggil [materi-a-001]")
+    with make_client(root, llm) as c:
+        body = ask(c, message).json()
+    assert body["answer"] == answer
+    assert body["intent"] == "small_talk"
+    assert body["grounded"] is False
+    assert body["refusal_reason"] is None
+    assert body["citations"] == []
+    assert body["suggestions"] == ["Apa itu zorblat?", "Siapa pembuatnya?", "Apa ini?"]
+    assert llm.calls == []
+
+
+def test_small_talk_works_without_llm(root: Path) -> None:
+    with make_client(root, None) as c:
+        assert ask(c, "halo").json()["intent"] == "small_talk"
+
+
+def test_greeting_with_real_question_goes_to_llm(root: Path) -> None:
+    llm = FakeLLM("Kayu jati [materi-a-001].")
+    with make_client(root, llm) as c:
+        body = ask(c, "Halo, zorblat dibuat dari apa?").json()
+    assert body["intent"] == "question"
+    assert body["grounded"] is True
+    assert len(llm.calls) == 1
+
+
+def test_grounded_answer_suggests_unasked_questions_from_cited_lesson_first(root: Path) -> None:
+    llm = FakeLLM("Kayu jati [materi-a-001].")
+    with make_client(root, llm) as c:
+        history = [{"role": "user", "content": "siapa pembuatnya"}]
+        body = ask(c, "apa itu zorblat", history=history).json()
+    # Sudah ditanyakan (ejaan/tanda baca boleh beda) → dilewati; sisanya dari materi lain.
+    assert body["suggestions"] == ["Apa ini?"]
+
+
+ZORBLAT_HISTORY = [
+    {"role": "user", "content": "Zorblat dibuat dari apa?"},
+    {"role": "assistant", "content": "Zorblat dibuat dari kayu jati [1]."},
+]
+
+
+def test_follow_up_uses_previous_question_for_retrieval(root: Path) -> None:
+    llm = FakeLLM("Kayunya tua [materi-a-001].")
+    with make_client(root, llm) as c:
+        alone = ask(c, "terus warnanya?").json()
+        assert alone["refusal_reason"] == "out_of_scope"  # tanpa riwayat: tidak ada konteks
+        body = ask(c, "terus warnanya?", history=ZORBLAT_HISTORY).json()
+    assert body["grounded"] is True
+    _, turns = llm.calls[0]
+    assert "[materi-a-001]" in turns[-1].text
+    assert "<<<\nterus warnanya?\n>>>" in turns[-1].text  # LLM tetap menerima pesan asli
+
+
+def test_follow_up_uses_active_lesson_title(root: Path) -> None:
+    # Judul materi fikstur memuat "materi" (istilah topik); ambang tinggi memaksa jalur topik.
+    llm = FakeLLM("Kayu jati [materi-a-001].")
+    with make_client(root, llm, min_score=1000.0) as c:
+        assert ask(c, "terus warnanya?").json()["refusal_reason"] == "out_of_scope"
+        body = ask(c, "terus warnanya?", context={"lesson_id": "materi-a"}).json()
+    assert body["refusal_reason"] != "out_of_scope"
+    assert len(llm.calls) == 1
+
+
+def test_question_about_other_region_is_refused_without_llm(root: Path) -> None:
+    # "Kota Nanti" (cities.yaml fikstur) tidak ada di korpus kota-uji → daerah lain.
+    llm = FakeLLM("tidak boleh terpanggil [materi-a-001]")
+    with make_client(root, llm) as c:
+        body = ask(c, "Zorblat di Kota Nanti dibuat dari apa?").json()
+        follow = ask(c, "terus kalau di Bali?", history=ZORBLAT_HISTORY).json()
+    assert body["refusal_reason"] == "out_of_scope"
+    assert follow["refusal_reason"] == "out_of_scope"
+    assert llm.calls == []
+
+
+def test_off_topic_follow_up_is_still_refused(root: Path) -> None:
+    llm = FakeLLM("tidak boleh terpanggil [materi-a-001]")
+    with make_client(root, llm) as c:
+        body = ask(c, "terus siapa presiden amerika?", history=ZORBLAT_HISTORY).json()
+    assert body["refusal_reason"] == "out_of_scope"
+    assert llm.calls == []
 
 
 # --- galat -----------------------------------------------------------------

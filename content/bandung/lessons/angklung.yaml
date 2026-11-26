@@ -26,12 +26,12 @@ videos:
     title: "Indonesian Angklung"
     channel: "UNESCO"
     note: "kanal resmi; ditautkan di halaman inskripsi UNESCO; berbahasa Inggris"
-    checked_by: null
+    checked_by: "Tim KamiPemenang"
   - url: https://www.youtube.com/watch?v=sQZHILO1Fqo
     title: "Bohemian Rhapsody & November Rain Cover by Saung Angklung Udjo"
     channel: "Saung Angklung Udjo"
     note: "contoh angklung diatonis; pastikan kanal resmi"
-    checked_by: null
+    checked_by: "Tim KamiPemenang"
 # Lokasi untuk tombol "Lihat lokasi asli" (F-032). Hapus blok ini (location: null) bila tidak ada.
 # Kaitan dengan Saung Angklung Udjo HARUS diverifikasi dulu (T-035).
 location:

@@ -47,7 +47,7 @@ export default function ReflectionCard({ detail, question }: { detail: CityDetai
 
   const id = `refleksi-${question.id}`
   return (
-    <section className="border-2 border-tinta bg-emas-100/60 p-4 shadow-melayang" aria-labelledby={`${id}-judul`}>
+    <section className="border border-emas/40 bg-emas-100/60 p-4 shadow-melayang rounded-2xl" aria-labelledby={`${id}-judul`}>
       <p className="eyebrow text-amber">Refleksi</p>
       <h3 id={`${id}-judul`} className="mt-1 text-lg font-extrabold">
         {question.prompt}
@@ -68,7 +68,7 @@ export default function ReflectionCard({ detail, question }: { detail: CityDetai
           onChange={(e) => setAnswer(e.target.value.slice(0, MAX_CHARS))}
           rows={3}
           maxLength={MAX_CHARS}
-          className="w-full border-2 border-tinta bg-white p-3 text-[15px] focus:outline-none focus-visible:ring-2 focus-visible:ring-teal"
+          className="w-full border border-emas/40 bg-white p-3 text-[15px] focus:outline-none focus-visible:ring-2 focus-visible:ring-teal rounded-2xl"
         />
         <div className="flex items-center justify-between gap-2">
           <span className="text-xs tabular-nums text-redup">
@@ -85,13 +85,13 @@ export default function ReflectionCard({ detail, question }: { detail: CityDetai
         </p>
       )}
       {result && (
-        <div role="status" className="mt-3 border-2 border-tinta bg-white p-3">
+        <div role="status" className="mt-3 border border-emas/40 bg-white p-3 rounded-2xl">
           <p className="text-[15px] font-bold">{result.feedback}</p>
           {result.matched.length > 0 && (
             <ul className="mt-2 grid gap-2">
               {result.matched.map((v) => (
                 <li key={v.id} className="rounded-xl bg-teal-50 p-2">
-                  <p className="text-sm font-extrabold text-teal">{v.label}</p>
+                  <p className="text-sm font-black text-teal-800">{v.label}</p>
                   {v.explanation && <p className="mt-1 text-sm">{v.explanation}</p>}
                   {v.chunk && (
                     <div className="mt-1">
@@ -104,7 +104,7 @@ export default function ReflectionCard({ detail, question }: { detail: CityDetai
           )}
           <p className="mt-2 flex flex-wrap items-center gap-2 text-xs text-redup">
             {result.method === 'ai' && (
-              <span className="border-2 border-tinta bg-pasir px-2 py-0.5 font-mono font-bold text-tinta">Dinilai dengan bantuan AI</span>
+              <span className="border border-emas/40 bg-pasir px-2 py-0.5 font-sans font-bold text-tinta rounded-full">Dinilai dengan bantuan AI</span>
             )}
             {gained && <span className="font-bold text-teal">+{detail.rewards.points_per_reflection} poin path!</span>}
           </p>

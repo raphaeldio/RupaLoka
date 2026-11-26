@@ -217,3 +217,38 @@ def test_passes_gate_two_paths() -> None:
     assert not passes_gate(low, topical=False, min_score=5.0)
     assert passes_gate(high, topical=False, min_score=5.0)  # jalur skor
     assert not passes_gate([], topical=True, min_score=0.0)  # tanpa kecocokan selalu ditolak
+
+
+# --- cek wilayah (ADR 43) ---------------------------------------------------
+
+
+def test_other_region_is_detected_unless_it_appears_in_the_corpus() -> None:
+    regions = ["Jawa Barat", "Jawa Tengah", "Banten", "Daerah Istimewa Yogyakarta", "Yogyakarta"]
+    index = CityIndex(
+        [chunk("a-001", "Alat musik bambu dari Jawa Barat dan Banten.", "a")],
+        {"a": "Angklung"},
+        regions=regions,
+    )
+    assert index.mentions_other_region("Apa makanan khas Yogyakarta?")
+    assert index.mentions_other_region("angklung di jawa tengah")  # topikal tetap daerah lain
+    assert not index.mentions_other_region("angklung dari Banten")  # ada di korpus
+    assert not index.mentions_other_region("alat musik jawa barat")
+    assert not index.mentions_other_region("jawa")  # hanya frasa utuh
+
+
+def test_passes_gate_rejects_other_region_even_when_topical() -> None:
+    c = chunk("a-001", "Teks.")
+    high = [Hit(chunk=c, score=9.0, raw_score=9.0)]
+    assert not passes_gate(high, topical=True, min_score=0.0, other_region=True)
+
+
+def test_provinces_match_geojson() -> None:
+    import json
+    from pathlib import Path
+
+    from app.regions import PROVINCES
+
+    geo = Path(__file__).resolve().parents[2] / "frontend/public/geo/indonesia-provinces.geojson"
+    features = json.loads(geo.read_text(encoding="utf-8"))["features"]
+    names = {f["properties"]["name"] for f in features}
+    assert set(PROVINCES) == names

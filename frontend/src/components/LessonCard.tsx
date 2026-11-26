@@ -61,7 +61,7 @@ export default function LessonCard({
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.08 }}
-                  className="border-2 border-tinta bg-kertas p-3 text-sm"
+                  className="border border-emas/40 bg-kertas p-3 text-sm rounded-2xl"
                 >
                   <ContentText text={f.text} fallback="Fakta sedang diverifikasi." />
                   <div className="mt-2">
@@ -84,7 +84,7 @@ export default function LessonCard({
                     whileTap={{ scale: 0.95 }}
                     type="button"
                     onClick={() => onAsk(q)}
-                    className="tekan border-2 border-tinta bg-white px-3 py-1.5 text-sm font-semibold text-teal shadow-tekan hover:bg-teal hover:text-white"
+                    className="tekan border border-emas/40 bg-white px-3 py-1.5 text-sm font-semibold text-teal shadow-tekan hover:bg-teal hover:text-white rounded-full"
                   >
                     {q}
                   </motion.button>
@@ -108,14 +108,14 @@ export default function LessonCard({
         )}
 
         {mustWatch && (
-          <div className="mt-6 border-2 border-tinta bg-kertas p-3" role="status" aria-live="polite">
+          <div className="mt-6 border border-emas/40 bg-kertas p-3 rounded-2xl" role="status" aria-live="polite">
             <p className="text-sm font-bold">
               {watched
                 ? 'Mantap, video sudah ditonton. Poin titik ini bisa kamu dapat!'
                 : `Tonton video minimal ${formatClock(watch.required)} pertama untuk mendapat poin.`}
             </p>
             <div
-              className="mt-2 h-3 overflow-hidden border-2 border-tinta bg-white"
+              className="mt-2 h-3 overflow-hidden border border-emas/40 bg-white rounded-2xl"
               role="progressbar"
               aria-label="Waktu tonton video"
               aria-valuemin={0}

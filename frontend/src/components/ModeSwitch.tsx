@@ -12,18 +12,18 @@ export default function ModeSwitch() {
   const back = encodeURIComponent(pathname)
   const to3d = galleryEnabled && cityId ? `/kota/${cityId}/galeri` : `/langganan?dari=${back}`
   return (
-    <div role="group" aria-label="Mode tampilan" className="inline-flex rounded-2xl border border-garis bg-white p-1 shadow-kartu">
+    <div role="group" aria-label="Mode tampilan" className="inline-flex rounded-full bg-white p-1 shadow-kartu ring-1 ring-emas/40">
       <button
         type="button"
         aria-pressed="true"
-        className="rounded-xl bg-teal px-4 py-2 text-sm font-extrabold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal"
+        className="rounded-full bg-teal-800 px-4 py-2 text-sm font-extrabold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal"
       >
         Mode 2D
       </button>
       <Link
         to={to3d}
         onMouseEnter={galleryEnabled ? () => void import('../gallery/GalleryPage') : undefined}
-        className="flex items-center gap-1.5 rounded-xl px-4 py-2 text-sm font-extrabold text-redup transition hover:bg-pasir/60 hover:text-tinta focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal"
+        className="flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-extrabold text-redup transition hover:bg-amber-50 hover:text-tinta focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal"
         aria-label={galleryEnabled ? 'Mode 3D: buka galeri museum 3D' : 'Mode 3D, khusus pelanggan: buka halaman langganan'}
       >
         <svg viewBox="0 0 24 24" className="size-4" aria-hidden="true">

@@ -76,63 +76,97 @@ assets:
   - path: ../frontend/src/assets/budaya/rumah-sunda.webp
     license: "[PERLU DIISI] konfirmasi lisensi/asal lembar aset (milik sendiri atau alat generatif)"
     author: "[PERLU DIISI] pembuat gambar"
-    note: "Hiasan path belajar (rumah-sunda); dekoratif saja, bukan rintangan. Perlu persetujuan KH."
+    note: "Hiasan path belajar (rumah-sunda); dekoratif saja, bukan rintangan. Disetujui Tim KamiPemenang (2026-11-26)."
   - path: ../frontend/src/assets/budaya/wayang-golek.webp
     license: "[PERLU DIISI] konfirmasi lisensi/asal lembar aset (milik sendiri atau alat generatif)"
     author: "[PERLU DIISI] pembuat gambar"
-    note: "Hiasan path belajar (wayang-golek); dekoratif saja, bukan rintangan. Perlu persetujuan KH."
+    note: "Hiasan path belajar (wayang-golek); dekoratif saja, bukan rintangan. Disetujui Tim KamiPemenang (2026-11-26)."
   - path: ../frontend/src/assets/budaya/pemain-angklung.webp
     license: "[PERLU DIISI] konfirmasi lisensi/asal lembar aset (milik sendiri atau alat generatif)"
     author: "[PERLU DIISI] pembuat gambar"
-    note: "Hiasan path belajar (pemain-angklung); dekoratif saja, bukan rintangan. Perlu persetujuan KH."
+    note: "Hiasan path belajar (pemain-angklung); dekoratif saja, bukan rintangan. Disetujui Tim KamiPemenang (2026-11-26)."
   - path: ../frontend/src/assets/budaya/gamelan.webp
     license: "[PERLU DIISI] konfirmasi lisensi/asal lembar aset (milik sendiri atau alat generatif)"
     author: "[PERLU DIISI] pembuat gambar"
-    note: "Hiasan path belajar (gamelan); dekoratif saja, bukan rintangan. Perlu persetujuan KH."
+    note: "Hiasan path belajar (gamelan); dekoratif saja, bukan rintangan. Disetujui Tim KamiPemenang (2026-11-26)."
   - path: ../frontend/src/assets/budaya/penari-1.webp
     license: "[PERLU DIISI] konfirmasi lisensi/asal lembar aset (milik sendiri atau alat generatif)"
     author: "[PERLU DIISI] pembuat gambar"
-    note: "Hiasan path belajar (penari-1); dekoratif saja, bukan rintangan. Perlu persetujuan KH."
+    note: "Hiasan path belajar (penari-1); dekoratif saja, bukan rintangan. Disetujui Tim KamiPemenang (2026-11-26)."
   - path: ../frontend/src/assets/budaya/penari-2.webp
     license: "[PERLU DIISI] konfirmasi lisensi/asal lembar aset (milik sendiri atau alat generatif)"
     author: "[PERLU DIISI] pembuat gambar"
-    note: "Hiasan path belajar (penari-2); dekoratif saja, bukan rintangan. Perlu persetujuan KH."
+    note: "Hiasan path belajar (penari-2); dekoratif saja, bukan rintangan. Disetujui Tim KamiPemenang (2026-11-26)."
   - path: ../frontend/src/assets/budaya/tanaman.webp
     license: "[PERLU DIISI] konfirmasi lisensi/asal lembar aset (milik sendiri atau alat generatif)"
     author: "[PERLU DIISI] pembuat gambar"
-    note: "Hiasan path belajar (tanaman); dekoratif saja, bukan rintangan. Perlu persetujuan KH."
+    note: "Hiasan path belajar (tanaman); dekoratif saja, bukan rintangan. Disetujui Tim KamiPemenang (2026-11-26)."
   - path: ../frontend/src/assets/budaya/batik-sudut-kiri-atas.webp
     license: "[PERLU DIISI] konfirmasi lisensi/asal lembar aset (milik sendiri atau alat generatif)"
     author: "[PERLU DIISI] pembuat gambar"
-    note: "Hiasan path belajar (batik-sudut-kiri-atas); dekoratif saja, bukan rintangan. Perlu persetujuan KH."
+    note: "Hiasan path belajar (batik-sudut-kiri-atas); dekoratif saja, bukan rintangan. Disetujui Tim KamiPemenang (2026-11-26)."
   - path: ../frontend/src/assets/budaya/batik-sudut-kanan-atas.webp
     license: "[PERLU DIISI] konfirmasi lisensi/asal lembar aset (milik sendiri atau alat generatif)"
     author: "[PERLU DIISI] pembuat gambar"
-    note: "Hiasan path belajar (batik-sudut-kanan-atas); dekoratif saja, bukan rintangan. Perlu persetujuan KH."
+    note: "Hiasan path belajar (batik-sudut-kanan-atas); dekoratif saja, bukan rintangan. Disetujui Tim KamiPemenang (2026-11-26)."
   - path: ../frontend/src/assets/budaya/batik-sudut-kiri-bawah.webp
     license: "[PERLU DIISI] konfirmasi lisensi/asal lembar aset (milik sendiri atau alat generatif)"
     author: "[PERLU DIISI] pembuat gambar"
-    note: "Hiasan path belajar (batik-sudut-kiri-bawah); dekoratif saja, bukan rintangan. Perlu persetujuan KH."
+    note: "Hiasan path belajar (batik-sudut-kiri-bawah); dekoratif saja, bukan rintangan. Disetujui Tim KamiPemenang (2026-11-26)."
   - path: ../frontend/src/assets/budaya/batik-sudut-kanan-bawah.webp
     license: "[PERLU DIISI] konfirmasi lisensi/asal lembar aset (milik sendiri atau alat generatif)"
     author: "[PERLU DIISI] pembuat gambar"
-    note: "Hiasan path belajar (batik-sudut-kanan-bawah); dekoratif saja, bukan rintangan. Perlu persetujuan KH."
+    note: "Hiasan path belajar (batik-sudut-kanan-bawah); dekoratif saja, bukan rintangan. Disetujui Tim KamiPemenang (2026-11-26)."
   - path: ../frontend/src/assets/budaya/batik-sisi-kiri.webp
     license: "[PERLU DIISI] konfirmasi lisensi/asal lembar aset (milik sendiri atau alat generatif)"
     author: "[PERLU DIISI] pembuat gambar"
-    note: "Hiasan path belajar (batik-sisi-kiri); dekoratif saja, bukan rintangan. Perlu persetujuan KH."
+    note: "Hiasan path belajar (batik-sisi-kiri); dekoratif saja, bukan rintangan. Disetujui Tim KamiPemenang (2026-11-26)."
   - path: ../frontend/src/assets/budaya/batik-sisi-kanan.webp
     license: "[PERLU DIISI] konfirmasi lisensi/asal lembar aset (milik sendiri atau alat generatif)"
     author: "[PERLU DIISI] pembuat gambar"
-    note: "Hiasan path belajar (batik-sisi-kanan); dekoratif saja, bukan rintangan. Perlu persetujuan KH."
+    note: "Hiasan path belajar (batik-sisi-kanan); dekoratif saja, bukan rintangan. Disetujui Tim KamiPemenang (2026-11-26)."
   - path: ../frontend/src/assets/budaya/batik-awan.webp
     license: "[PERLU DIISI] konfirmasi lisensi/asal lembar aset (milik sendiri atau alat generatif)"
     author: "[PERLU DIISI] pembuat gambar"
-    note: "Hiasan path belajar (batik-awan); dekoratif saja, bukan rintangan. Perlu persetujuan KH."
+    note: "Hiasan path belajar (batik-awan); dekoratif saja, bukan rintangan. Disetujui Tim KamiPemenang (2026-11-26)."
   - path: ../frontend/src/assets/budaya/batik-sulur.webp
     license: "[PERLU DIISI] konfirmasi lisensi/asal lembar aset (milik sendiri atau alat generatif)"
     author: "[PERLU DIISI] pembuat gambar"
-    note: "Hiasan path belajar (batik-sulur); dekoratif saja, bukan rintangan. Perlu persetujuan KH."
+    note: "Hiasan path belajar (batik-sulur); dekoratif saja, bukan rintangan. Disetujui Tim KamiPemenang (2026-11-26)."
+  - path: ../frontend/src/assets/hero/bandung-jalan.webp
+    license: "[PERLU DIISI] konfirmasi lisensi/asal (milik tim atau alat generatif)"
+    author: "[PERLU DIISI] pembuat gambar"
+    note: "Latar hero beranda dari lembar aset tim 'Bandung Pixel Street.png' (diterima 25 Nov 2026), dikompres ke WebP. Dekoratif saja; awan, burung, lampu, kendaraan, dan pejalan kaki di atasnya digambar di kode (HeroScene.tsx)."
+  - path: ../frontend/src/assets/hero/bandung-jalan-960.webp
+    license: "[PERLU DIISI] sama dengan bandung-jalan.webp"
+    author: "[PERLU DIISI] pembuat gambar"
+    note: "Versi 960 px dari bandung-jalan.webp untuk layar kecil."
+  - path: ../frontend/src/assets/hero/nusantara.webp
+    license: "[PERLU DIISI] konfirmasi lisensi/asal (milik tim atau alat generatif)"
+    author: "[PERLU DIISI] pembuat gambar"
+    note: "Latar hero beranda 'Nusantara' dari desain tim (diterima 26 Nov 2026). Teks, navigasi, dan maskot bawaan dihapus (inpainting) agar diganti teks HTML dan maskot asli; dekoratif saja. Bangunan/candi di latar adalah pemandangan, bukan rintangan. Disetujui Tim KamiPemenang (2026-11-26)."
+  - path: ../frontend/src/assets/hero/nusantara-960.webp
+    license: "[PERLU DIISI] sama dengan nusantara.webp"
+    author: "[PERLU DIISI] pembuat gambar"
+    note: "Versi 960 px dari nusantara.webp untuk layar kecil."
+  # Latar bab "Titik budaya" beranda (JalanKota.tsx), dari folder aset game tim
+  # ("ASSET GAME/ASSET", diterima 26 Nov 2026). Langit dibuang (transparan) dan diperkecil; dekoratif saja.
+  - path: ../frontend/src/assets/bandung/gerbang-bandung.webp
+    license: "[PERLU DIISI] konfirmasi lisensi/asal (milik tim atau alat generatif)"
+    author: "[PERLU DIISI] pembuat gambar"
+    note: "Dari 'Bandung Pixel Street.png' (dipotong di atas trotoar). Pemandangan, bukan rintangan."
+  - path: ../frontend/src/assets/bandung/gedung-sate.webp
+    license: "[PERLU DIISI] konfirmasi lisensi/asal (milik tim atau alat generatif)"
+    author: "[PERLU DIISI] pembuat gambar"
+    note: "Dari 'gedung sate.png' (rumput dan langit dibuang). Pemandangan, bukan rintangan."
+  - path: ../frontend/src/assets/bandung/rumah-adat.webp
+    license: "[PERLU DIISI] konfirmasi lisensi/asal (milik tim atau alat generatif)"
+    author: "[PERLU DIISI] pembuat gambar"
+    note: "Dari 'rumah adat.png' (rumput dan langit dibuang). Tanpa label/klaim jenis rumah adat. Pemandangan, bukan rintangan. Disetujui Tim KamiPemenang (2026-11-26)."
+  - path: ../frontend/src/assets/bandung/jalan.webp
+    license: "[PERLU DIISI] konfirmasi lisensi/asal (milik tim atau alat generatif)"
+    author: "[PERLU DIISI] pembuat gambar"
+    note: "Dari 'street pixel.png' (trotoar + aspal); setengah lebar + cerminannya agar ubin berulang mulus."
   - path: ../frontend/src/components/mascot/PixelMascot.tsx
     license: "milik sendiri (tim KamiPemenang)"
     author: "[PERLU DIISI] pembuat desain maskot"
@@ -172,16 +206,16 @@ objects:
   - id: batu
     name: Batu
     sensitive: false
-    approved_by: null             # [PERLU DIISI] nama penyetuju (KH)
+    approved_by: "Tim KamiPemenang"
   - id: pagar
     name: Pagar
     sensitive: false
-    approved_by: null
+    approved_by: "Tim KamiPemenang"
   - id: becak
     name: Becak
     sensitive: false
-    approved_by: null
-    note: "Kandidat dari SDD; KH memastikan tidak menyinggung pengemudi/komunitas"
+    approved_by: "Tim KamiPemenang"
+    note: "Disetujui Tim KamiPemenang (2026-11-26): tidak menyinggung pengemudi/komunitas"
   - id: angklung
     name: Angklung
     sensitive: true

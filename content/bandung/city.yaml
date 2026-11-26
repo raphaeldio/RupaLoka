@@ -4,7 +4,7 @@ phases: [quiz_intro, lessons, game, summary]
 
 # Titik path belajar, berurutan (titik ke-1 terbuka dulu, berikutnya terbuka setelah yang
 # sebelumnya selesai). Tiap titik = kuis (soal di quiz.yaml yang chunk-nya milik materi ini)
-# lalu kartu materi. Titik game ditambahkan otomatis di akhir. KANDIDAT, BELUM FINAL (T-002, KH).
+# lalu kartu materi. Titik game ditambahkan otomatis di akhir. Disetujui Tim KamiPemenang (2026-11-26).
 # Setiap id wajib punya lessons/<id>.yaml.
 lessons: [pengenalan-bandung, angklung, wayang-golek, museum-sri-baduga]
 
@@ -12,7 +12,7 @@ game:
   unlock_every: 10            # METER lari per item; tiap ambang pelari bertemu NPC (F-043; diubah 20 Nov 2026 dari 1000 poin)
   # Item ke-k terbuka di ambang ke-k (100, 200, 300 m). 1 m = 10 poin skor. Setelah habis, game lanjut tanpa jeda.
   items_order: [item-angklung, item-wayang, item-cepot]
-  # Rintangan: harus terdaftar di sources.yaml (objects) dan disetujui KH. [PERLU DIISI daftar final]
+  # Rintangan: harus terdaftar di sources.yaml (objects) dan disetujui KH. Disetujui Tim KamiPemenang (2026-11-26).
   obstacles: [batu, pagar, becak]
   background: bandung-day      # id latar di assets/sprites (T-054)
   speed: { start: 240, max: 520, ramp_per_100: 25 }   # piksel/detik; kalibrasi saat uji

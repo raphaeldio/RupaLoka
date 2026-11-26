@@ -59,17 +59,17 @@ export default function ItemModal({
         e.stopPropagation()
       }}
     >
-      <div className="w-full border-2 border-tinta bg-white p-5 shadow-kartu sm:max-h-full sm:max-w-sm sm:overflow-y-auto motion-safe:animate-[card-in_260ms_ease-out]">
+      <div className="w-full border border-emas/40 bg-white p-5 shadow-kartu sm:max-h-full sm:max-w-sm sm:overflow-y-auto motion-safe:animate-[card-in_260ms_ease-out] rounded-2xl">
         <p className="eyebrow text-amber">
           Item budaya {number} dari {total}
         </p>
-        <h2 id="item-judul" className="mt-1 text-2xl font-extrabold text-teal">
+        <h2 id="item-judul" className="mt-1 text-2xl font-black text-teal-800">
           {labelOr(item.name, 'Item budaya')}
         </h2>
         <ClickSpark sparkColor={['#e8b64c', '#146b68']} sparkCount={14} sparkRadius={40} className="mt-3 !h-auto !w-fit">
           <Pop delay={0.1}>
             <motion.div animate={{ rotate: [0, -4, 4, 0] }} transition={{ duration: 1.6, repeat: 2, delay: 0.5 }}>
-              <SafeImage image={item.image} className="aspect-square w-28 border-2 border-tinta" />
+              <SafeImage image={item.image} className="dither-masuk aspect-square w-28 border border-emas/40 rounded-2xl" />
             </motion.div>
           </Pop>
         </ClickSpark>
@@ -82,7 +82,7 @@ export default function ItemModal({
               onError={(e) => (e.currentTarget.style.display = 'none')}
             />
             <div className="relative rounded-2xl rounded-bl-sm bg-teal-50 px-3 py-2">
-              <p className="text-xs font-extrabold text-teal">{npc.label} bercerita:</p>
+              <p className="text-xs font-black text-teal-800">{npc.label} bercerita:</p>
               <p id="item-teks" className="mt-1 text-[15px] leading-relaxed">
                 {text}
               </p>
@@ -97,8 +97,8 @@ export default function ItemModal({
           <SourceChip source={source} label="Sumber" />
         </div>
         {cityId && sources && (
-          <details className="mt-3 border-2 border-tinta p-3">
-            <summary className="cursor-pointer text-sm font-extrabold text-teal">Kartu budaya lengkap</summary>
+          <details className="mt-3 border border-emas/40 p-3 rounded-2xl">
+            <summary className="cursor-pointer text-sm font-black text-teal-800">Kartu budaya lengkap</summary>
             <div className="mt-3">
               <CultureCard item={item} cityId={cityId} sources={sources} compact />
             </div>

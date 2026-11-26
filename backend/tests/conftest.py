@@ -88,6 +88,13 @@ def valid_content() -> dict[str, Any]:
             "game_start": "Siap berlari?",
             "item_unlocked": "Kamu menemukan {item}! {short_explanation}",
             "summary": "Kerja bagus.",
+            "small_talk": {
+                "greeting": "Halo dari pemandu uji.",
+                "thanks": "Sama-sama dari pemandu uji.",
+                "goodbye": "Dadah dari pemandu uji.",
+                "identity": "Aku pemandu uji.",
+                "help": "Tanya apa saja tentang materi uji.",
+            },
         },
         "kota-uji/quiz.yaml": {
             "intro": [

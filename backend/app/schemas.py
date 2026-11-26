@@ -144,12 +144,24 @@ class CityConfig(Strict):
 ITEM_UNLOCKED_FIELDS = {"item", "short_explanation"}
 
 
+class SmallTalkScript(Strict):
+    """Balasan basa-basi agen (salam, terima kasih, dsb.), ditulis tim; tanpa fakta budaya.
+    Dipakai `app/conversation.py` tanpa memanggil LLM (SDD ADR 41)."""
+
+    greeting: Text
+    thanks: Text
+    goodbye: Text
+    identity: Text
+    help: Text
+
+
 class AgentScript(Strict):
     quiz_intro: Text
     lessons_start: Text
     game_start: Text
     item_unlocked: Text
     summary: Text
+    small_talk: SmallTalkScript | None = None
 
     @model_validator(mode="after")
     def _known_placeholders(self) -> AgentScript:

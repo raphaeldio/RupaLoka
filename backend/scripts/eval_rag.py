@@ -145,6 +145,7 @@ class RetrievalRow:
     recall_hit: bool | None = None  # hanya dalam cakupan
     gate_expected: bool | None = None  # hanya luar cakupan
     topical: bool = False  # lolos lewat jalur istilah topik (judul materi), bukan skor
+    other_region: bool = False  # ditolak cek wilayah (ADR 43), apa pun skornya
 
 
 def retrieve_rows(
@@ -160,14 +161,16 @@ def retrieve_rows(
         top = hits[0].raw_score if hits else 0.0
         chunks = [h.chunk.id for h in hits]
         topical = bool(hits) and retriever.is_topical(city, q)
+        other_region = retriever.mentions_other_region(city, q)
         return RetrievalRow(
             case_id,
             set_name,
             q,
             round(top, 4),
             chunks,
-            passes_gate(hits, topical, min_score),
+            passes_gate(hits, topical, min_score, other_region=other_region),
             topical=topical,
+            other_region=other_region,
         )
 
     rows: list[RetrievalRow] = []
@@ -415,7 +418,8 @@ def build_report(
         )
     )
     pass_scores = [r.top_score for r in pass_rows if not r.topical]
-    block_scores = [r.top_score for r in gate_rows if not r.topical]
+    # Yang ditolak cek wilayah tidak bergantung ambang, jadi tidak ikut sapuan.
+    block_scores = [r.top_score for r in gate_rows if not r.topical and not r.other_region]
     report.sweep = sweep(pass_scores, block_scores, min_score)
     # Luar cakupan yang memuat istilah topik selalu lolos: tidak ada ambang yang memperbaikinya.
     topical_leak = any(r.topical for r in gate_rows)

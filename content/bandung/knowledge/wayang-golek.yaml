@@ -12,8 +12,8 @@
     url: https://ich.unesco.org/en/RL/wayang-puppet-theatre-00063?RL=00063
     type: web
     accessed: 2026-11-20
-  verified_by: null         # nama pemeriksa (KH)
-  verified_at: null
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
 
 - id: wayang-golek-002
   lesson_id: wayang-golek
@@ -23,8 +23,8 @@
     url: https://ich.unesco.org/en/RL/wayang-puppet-theatre-00063?RL=00063
     type: web
     accessed: 2026-11-20
-  verified_by: null         # nama pemeriksa (KH)
-  verified_at: null
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
 
 - id: wayang-golek-003
   lesson_id: wayang-golek
@@ -34,8 +34,8 @@
     url: https://ich.unesco.org/en/RL/wayang-puppet-theatre-00063
     type: web
     accessed: 2026-11-21
-  verified_by: null         # nama pemeriksa (KH)
-  verified_at: null
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
 
 - id: wayang-golek-004
   lesson_id: wayang-golek
@@ -56,8 +56,8 @@
     url: https://ich.unesco.org/en/RL/wayang-puppet-theatre-00063
     type: web
     accessed: 2026-11-21
-  verified_by: null         # nama pemeriksa (KH)
-  verified_at: null
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
 
 - id: wayang-golek-006
   lesson_id: wayang-golek
@@ -67,8 +67,8 @@
     url: https://ich.unesco.org/en/RL/wayang-puppet-theatre-00063
     type: web
     accessed: 2026-11-21
-  verified_by: null         # nama pemeriksa (KH)
-  verified_at: null
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
 
 - id: wayang-golek-007
   lesson_id: wayang-golek
@@ -78,8 +78,8 @@
     url: https://ich.unesco.org/en/RL/wayang-puppet-theatre-00063
     type: web
     accessed: 2026-11-21
-  verified_by: null         # nama pemeriksa (KH)
-  verified_at: null
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
 
 - id: wayang-golek-008
   lesson_id: wayang-golek
@@ -89,8 +89,8 @@
     url: https://ich.unesco.org/en/RL/wayang-puppet-theatre-00063
     type: web
     accessed: 2026-11-21
-  verified_by: null         # nama pemeriksa (KH)
-  verified_at: null
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
 
 - id: wayang-golek-009
   # UNESCO tidak menyebut nama tokoh; jangan dikaitkan ke Cepot tanpa sumber
@@ -101,8 +101,8 @@
     url: https://ich.unesco.org/en/RL/wayang-puppet-theatre-00063
     type: web
     accessed: 2026-11-21
-  verified_by: null         # nama pemeriksa (KH)
-  verified_at: null
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
 
 - id: wayang-golek-010
   lesson_id: wayang-golek
@@ -112,8 +112,8 @@
     url: https://ich.unesco.org/en/RL/wayang-puppet-theatre-00063
     type: web
     accessed: 2026-11-21
-  verified_by: null         # nama pemeriksa (KH)
-  verified_at: null
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
 
 - id: wayang-golek-011
   lesson_id: wayang-golek
@@ -123,5 +123,189 @@
     url: https://ich.unesco.org/en/RL/wayang-puppet-theatre-00063
     type: web
     accessed: 2026-11-21
+  verified_by: "Tim KamiPemenang"
+  verified_at: 2026-11-26
+
+# --- Tambahan 26 Nov 2026: riset Gemini (brief riset chunk). Hanya fakta yang kutipannya
+# DITEMUKAN di halaman sumber saat dicek Claude (web-fetch / ekstrak PDF) yang dimasukkan.
+# accessed = tanggal halaman dibuka untuk pengecekan. verified_by tetap null sampai KH memeriksa.
+
+- id: wayang-golek-012
+  # W1; sumber lemah: Wikipedia; cari sumber resmi/akademik (T-035); kaitan wayang golek-Bandung wajib diverifikasi (CLAUDE.md)
+  lesson_id: wayang-golek
+  text: "Di Jawa Barat, perkembangan wayang golek dipelopori oleh Bupati Bandung Wiranatakusumah III. Awalnya pertunjukannya dikhususkan untuk kaum menak (bangsawan), sebelum akhirnya menyebar luas di kalangan masyarakat Sunda."
+  source:
+    title: "Wikipedia bahasa Indonesia. Wayang golek"
+    url: https://id.wikipedia.org/wiki/Wayang_golek
+    type: web
+    accessed: 2026-11-26
+  verified_by: null         # nama pemeriksa (KH)
+  verified_at: null
+
+- id: wayang-golek-013
+  # W1; SENSITIF (ruwatan); sumber lemah: Wikipedia; cari sumber resmi/akademik (T-035)
+  lesson_id: wayang-golek
+  text: "Selain menjadi tontonan dan hiburan dalam perhelatan tertentu, pertunjukan wayang golek juga berfungsi sebagai pelengkap upacara selamatan atau ruwatan."
+  source:
+    title: "Wikipedia bahasa Indonesia. Wayang golek"
+    url: https://id.wikipedia.org/wiki/Wayang_golek
+    type: web
+    accessed: 2026-11-26
+  verified_by: null         # nama pemeriksa (KH)
+  verified_at: null
+
+- id: wayang-golek-014
+  # W3; sumber lemah: Wikipedia; cari sumber resmi/akademik (T-035)
+  lesson_id: wayang-golek
+  text: "Wayang golek dibuat dari kayu albasia atau kayu lame yang diraut dan diukir hingga menyerupai bentuk tokoh yang diinginkan. Mata, alis, bibir, dan motif di kepala wayang dilukis dengan cat duko."
+  source:
+    title: "Wikipedia bahasa Indonesia. Wayang golek"
+    url: https://id.wikipedia.org/wiki/Wayang_golek
+    type: web
+    accessed: 2026-11-26
+  verified_by: null         # nama pemeriksa (KH)
+  verified_at: null
+
+- id: wayang-golek-015
+  # W4; sumber lemah: Wikipedia; cari sumber resmi/akademik (T-035); Anoman dan Bima dari draf Gemini TIDAK ada di halaman, dibuang
+  lesson_id: wayang-golek
+  text: "Tokoh wayang golek yang lazim dijadikan cendera mata antara lain pasangan Rama dan Shinta, Arjuna, Srikandi, dan Kresna, serta punakawan seperti Semar dan Cepot."
+  source:
+    title: "Wikipedia bahasa Indonesia. Wayang golek"
+    url: https://id.wikipedia.org/wiki/Wayang_golek
+    type: web
+    accessed: 2026-11-26
+  verified_by: null         # nama pemeriksa (KH)
+  verified_at: null
+
+- id: wayang-golek-016
+  # W6; 'Giriharja III' dari draf Gemini tidak ada di halaman; bandingkan wayang-golek-018
+  lesson_id: wayang-golek
+  text: "Padepokan Giri Harja berada di Kampung Giri Harja, Desa Jelekong, Kecamatan Baleendah, Kabupaten Bandung. Padepokan ini dirintis mendiang Asep Sunandar Sunarya, maestro wayang golek, dan dijadikan pusat pertunjukan seni serta pengembangan wayang golek."
+  source:
+    title: "detikNews (2017, 31 Mei). Padepokan Giri Harja, Pelestari Wayang Golek di Jelekong Bandung"
+    url: https://news.detik.com/berita-jawa-barat/d-3516695/padepokan-giri-harja-pelestari-wayang-golek-di-jelekong-bandung
+    type: web
+    accessed: 2026-11-26
+  verified_by: null         # nama pemeriksa (KH)
+  verified_at: null
+
+- id: wayang-golek-017
+  # W8; 'Jelekong sebagai sentra' dari draf Gemini tidak ada di halaman
+  lesson_id: wayang-golek
+  text: "Pembuatan wayang golek meliputi pengukiran, pewarnaan, serta pembuatan baju dan aksesori, dan satu tokoh bisa butuh berbulan-bulan. Perajin wayang golek banyak tersebar di Kabupaten Bandung, antara lain di Kecamatan Ciparay, Majalaya, dan Banjaran."
+  source:
+    title: "detikNews (2017, 31 Mei). Padepokan Giri Harja, Pelestari Wayang Golek di Jelekong Bandung"
+    url: https://news.detik.com/berita-jawa-barat/d-3516695/padepokan-giri-harja-pelestari-wayang-golek-di-jelekong-bandung
+    type: web
+    accessed: 2026-11-26
+  verified_by: null         # nama pemeriksa (KH)
+  verified_at: null
+
+- id: wayang-golek-018
+  # N5-wayang; teks dicek dari PDF; detik 2017 menyebut padepokan Jelekong 'dirintis' Asep Sunandar Sunarya (Giri Harja 3?) - KH selaraskan
+  lesson_id: wayang-golek
+  text: "Padepokan Giri Harja adalah pusat pelestarian dan pengembangan wayang golek yang berpengaruh di Jawa Barat, didirikan atas inisiatif maestro dalang Abeng Sunarya. Putra-putranya, Ade Kosasih Sunarya dan Asep Sunandar Sunarya, meneruskannya dan mendirikan cabang Giri Harja 2 dan Giri Harja 3."
+  source:
+    title: "Negara, Teddiansyah Nata (2025). Giri Kawangi Pujaran Giri Harja 2 Sebagai Pelestari Wayang Golek di Kecamatan Ujungberung 1995-2025. Priangan 4(2), UIN Sunan Gunung Djati Bandung"
+    url: https://journal.uinsgd.ac.id/index.php/priangan/article/view/52171/16086
+    type: jurnal
+    accessed: 2026-11-26
+  verified_by: null         # nama pemeriksa (KH)
+  verified_at: null
+
+- id: wayang-golek-019
+  # N5-wayang; teks dicek dari PDF
+  lesson_id: wayang-golek
+  text: "Asep Sunandar Sunarya, dalang kondang dari keluarga Giri Harja, membawa wayang golek ke panggung nasional hingga internasional."
+  source:
+    title: "Negara, Teddiansyah Nata (2025). Giri Kawangi Pujaran Giri Harja 2 Sebagai Pelestari Wayang Golek di Kecamatan Ujungberung 1995-2025. Priangan 4(2), UIN Sunan Gunung Djati Bandung"
+    url: https://journal.uinsgd.ac.id/index.php/priangan/article/view/52171/16086
+    type: jurnal
+    accessed: 2026-11-26
+  verified_by: null         # nama pemeriksa (KH)
+  verified_at: null
+
+- id: wayang-golek-020
+  # W9/N1-cepot; bandingkan wayang-golek-004 (merah = kecerdikan, keberanian, kejujuran)
+  lesson_id: wayang-golek
+  text: "Cepot punya ciri khas warna merah di seluruh tubuhnya. Warna merah itu menjadi simbol keberanian dan hawa nafsu, dan Cepot digambarkan sebagai tokoh yang berani membela kebenaran."
+  source:
+    title: "detikJabar (2024, 7 November). Mengenal Cepot, Karakter Jenaka dalam Wayang Golek"
+    url: https://www.detik.com/jabar/budaya/d-7625533/mengenal-cepot-karakter-jenaka-dalam-wayang-golek
+    type: web
+    accessed: 2026-11-26
+  verified_by: null         # nama pemeriksa (KH)
+  verified_at: null
+
+- id: wayang-golek-021
+  # W9/N4-cepot
+  lesson_id: wayang-golek
+  text: "Cepot, yang juga dikenal sebagai Astrajingga, adalah anak angkat Sanghyang Ismaya (Semar). Dalang biasanya memunculkan Cepot di tengah pertunjukan sebagai penyampai pesan bagi para penonton."
+  source:
+    title: "detikJabar (2024, 7 November). Mengenal Cepot, Karakter Jenaka dalam Wayang Golek"
+    url: https://www.detik.com/jabar/budaya/d-7625533/mengenal-cepot-karakter-jenaka-dalam-wayang-golek
+    type: web
+    accessed: 2026-11-26
+  verified_by: null         # nama pemeriksa (KH)
+  verified_at: null
+
+- id: wayang-golek-022
+  # W9
+  lesson_id: wayang-golek
+  text: "Cepot selalu memakai pakaian tradisional Sunda berwarna hitam berupa iket (ikat kepala), pangsi (baju dan celana longgar), dan sarung."
+  source:
+    title: "detikJabar (2024, 7 November). Mengenal Cepot, Karakter Jenaka dalam Wayang Golek"
+    url: https://www.detik.com/jabar/budaya/d-7625533/mengenal-cepot-karakter-jenaka-dalam-wayang-golek
+    type: web
+    accessed: 2026-11-26
+  verified_by: null         # nama pemeriksa (KH)
+  verified_at: null
+
+- id: wayang-golek-023
+  # N2-wayang; teks dicek dari PDF
+  lesson_id: wayang-golek
+  text: "Wayang golek dipertunjukkan dengan boneka kayu tiga dimensi yang diberi busana. Di Jawa Barat, wajah-wajah wayang golek dibuat lebih distilasi atau digayakan."
+  source:
+    title: "Dewi, E., Mukarom, Z. & Ridwan, A. (2018). Wayang Golek sebagai Media Dakwah. Tabligh: Jurnal Komunikasi dan Penyiaran Islam 3(2), 190-207. DOI 10.15575/tabligh.v3i2.633"
+    url: https://digilib.uinsgd.ac.id/37463/2/Article_Wayang%20Golek%20sebagai%20Media%20Dakwah.pdf
+    type: jurnal
+    accessed: 2026-11-26
+  verified_by: null         # nama pemeriksa (KH)
+  verified_at: null
+
+- id: wayang-golek-024
+  # N3-wayang; teks dicek dari PDF
+  lesson_id: wayang-golek
+  text: "Dalam pertunjukan wayang golek, dalang didukung jurukawih yang bersuara indah dan wiraswara. Wiraswara menghidupkan percakapan saat berdialog dengan dalang, dan ikut menentukan berhasil atau tidaknya pertunjukan."
+  source:
+    title: "Dewi, E., Mukarom, Z. & Ridwan, A. (2018). Wayang Golek sebagai Media Dakwah. Tabligh: Jurnal Komunikasi dan Penyiaran Islam 3(2), 190-207. DOI 10.15575/tabligh.v3i2.633"
+    url: https://digilib.uinsgd.ac.id/37463/2/Article_Wayang%20Golek%20sebagai%20Media%20Dakwah.pdf
+    type: jurnal
+    accessed: 2026-11-26
+  verified_by: null         # nama pemeriksa (KH)
+  verified_at: null
+
+- id: wayang-golek-025
+  # N2-wayang; teks dicek dari PDF
+  lesson_id: wayang-golek
+  text: "Kata dalang disebut berasal dari Angudal Piwulang, yaitu membeberkan atau menerangkan petuah dan nasihat. Karena itu dalang dipandang sebagai pendidik atau pembimbing masyarakat."
+  source:
+    title: "Dewi, E., Mukarom, Z. & Ridwan, A. (2018). Wayang Golek sebagai Media Dakwah. Tabligh: Jurnal Komunikasi dan Penyiaran Islam 3(2), 190-207. DOI 10.15575/tabligh.v3i2.633"
+    url: https://digilib.uinsgd.ac.id/37463/2/Article_Wayang%20Golek%20sebagai%20Media%20Dakwah.pdf
+    type: jurnal
+    accessed: 2026-11-26
+  verified_by: null         # nama pemeriksa (KH)
+  verified_at: null
+
+- id: wayang-golek-026
+  # N4-wayang; teks dicek dari PDF
+  lesson_id: wayang-golek
+  text: "Wayang golek bisa tampil di berbagai acara masyarakat, seperti syukuran, khitanan, hajatan, dan pernikahan. Bahasa yang dipakai bahasa Sunda dan juga bahasa Indonesia, dan pertunjukannya menghibur lewat kelucuan tokoh punakawan."
+  source:
+    title: "Dewi, E., Mukarom, Z. & Ridwan, A. (2018). Wayang Golek sebagai Media Dakwah. Tabligh: Jurnal Komunikasi dan Penyiaran Islam 3(2), 190-207. DOI 10.15575/tabligh.v3i2.633"
+    url: https://digilib.uinsgd.ac.id/37463/2/Article_Wayang%20Golek%20sebagai%20Media%20Dakwah.pdf
+    type: jurnal
+    accessed: 2026-11-26
   verified_by: null         # nama pemeriksa (KH)
   verified_at: null

@@ -28,7 +28,7 @@ card:
 model:
   src: assets/models/item-wayang.glb
   poster: null
-  accuracy_check: null
+  accuracy_check: { by: "Tim KamiPemenang", checked_at: 2026-11-26 }
 # Hotspot: DIISI TIM BUDAYA setelah menetapkan bagian objek beserta sumbernya. Nama bagian juga
 # fakta, jadi jangan ditebak. Bentuk: - { id: <id>, label: "...", text: "...", chunk: <id chunk> }
 # dan Blender menaruh empty "hotspot_<id>" di model.

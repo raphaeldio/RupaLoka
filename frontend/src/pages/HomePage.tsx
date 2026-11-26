@@ -4,16 +4,18 @@ import kursorUrl from '../assets/figma-map/kursor.svg'
 import CityCard from '../components/CityCard'
 // Peta (Leaflet ±150 kB) dimuat terpisah; ada di bawah lipatan layar.
 const LeafletMap = lazy(() => import('../components/LeafletMap'))
-import CityRotator from '../components/landing/CityRotator'
 import { CityStops, CollectionPreview } from '../components/landing/CityPreview'
 import { useCityPreview } from '../components/landing/useCityPreview'
 import ChapterHud from '../components/landing/ChapterHud'
+import LatarBudaya from '../components/landing/LatarBudaya'
+import NusantaraHero from '../components/landing/NusantaraHero'
 import { useLandingMotion } from '../components/landing/useLandingMotion'
 import { Chapter, CtaLink, LevelCards, Marquee, PixelIcon, type Level } from '../components/landing/pixel'
 import { ICON_BUKU, ICON_KUIS, ICON_LARI, ICON_PETA, ICON_PIALA } from '../components/landing/pixelIcons'
-import HeroMascot from '../components/mascot/HeroMascot'
+import PixelLoader from '../components/PixelLoader'
 import { bundledCities, loadCities, placeCity, type City, type CitySource } from '../lib/cities'
 import { PROVINCES, REGIONS } from '../lib/provinces'
+import { gulirKe, useGulirHalus } from '../lib/gulirHalus'
 import { useReveal } from '../lib/useReveal'
 
 const legendUrls = import.meta.glob<string>('../assets/figma-map/legend-*.svg', {
@@ -21,12 +23,6 @@ const legendUrls = import.meta.glob<string>('../assets/figma-map/legend-*.svg', 
   import: 'default',
   eager: true,
 })
-
-/** Nama kota tambahan untuk rotator judul hero. */
-const EXTRA_CITIES = ['Jakarta', 'Yogyakarta', 'Surabaya', 'Medan', 'Makassar', 'Denpasar']
-
-/** Pengantar beranda (F-004): ≤60 kata, tiga langkah. */
-const STEPS = ['Pilih kota', 'Belajar bersama Saloka', 'Main game, kumpulkan item']
 
 /** Janji produk (bukan fakta budaya). */
 const PROMISES = [
@@ -38,6 +34,9 @@ const PROMISES = [
     icon: ICON_PETA,
   },
 ]
+
+/** Ubin ikon kartu bab 01 (hijau daun, emas, bata). */
+const TILE = ['from-daun-100 to-[#c3dfd0]', 'from-emas-100 to-[#f1d38b]', 'from-bata-50 to-[#efc3b2]']
 
 const Arrow = ({ className = 'size-4' }: { className?: string }) => (
   <svg viewBox="0 0 16 16" className={className} aria-hidden="true">
@@ -64,8 +63,6 @@ function useCountUp(target: number, run: boolean, ms = 900) {
   return instant ? target : n
 }
 
-const btn = 'tekan inline-flex items-center gap-2 border-2 border-tinta px-5 py-3 text-[15px] font-extrabold shadow-melayang'
-
 export default function HomePage() {
   const location = useLocation()
   const [cities, setCities] = useState<City[]>(bundledCities)
@@ -88,12 +85,14 @@ export default function HomePage() {
   // Tautan "/#peta" dari header: gulir ke bagian peta.
   useEffect(() => {
     if (!location.hash) return
-    document.getElementById(location.hash.slice(1))?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    const el = document.getElementById(location.hash.slice(1))
+    if (el) gulirKe(el)
   }, [location.hash])
 
   const scrollToMap = (e: MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault()
-    document.getElementById('peta')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    const peta = document.getElementById('peta')
+    if (peta) gulirKe(peta)
     window.history.pushState(null, '', '#peta')
   }
 
@@ -102,12 +101,6 @@ export default function HomePage() {
   const unplaced = cities.filter((c) => !placed.some((p) => p.city.id === c.id))
   const firstActive = cities.find((c) => c.status === 'active') ?? null
   const activeCount = cities.filter((c) => c.status === 'active').length
-  // Rotator judul: kota aktif dulu, lalu kota lain (hanya nama; tanpa klaim konten).
-  const rotatorWords = useMemo(() => {
-    const names = [firstActive?.name ?? 'Bandung', ...cities.map((c) => c.name), ...EXTRA_CITIES]
-    return [...new Set(names.filter(Boolean))]
-  }, [cities, firstActive])
-
   const preview = useCityPreview(firstActive?.id ?? null)
   const start = firstActive ? `/kota/${firstActive.id}` : '/'
   const levels: Level[] = [
@@ -118,7 +111,7 @@ export default function HomePage() {
       icon: ICON_KUIS,
       to: start,
       cta: 'Mulai path',
-      tone: 'bg-teal text-white',
+      tone: 'teal',
     },
     {
       tag: 'Main',
@@ -127,7 +120,7 @@ export default function HomePage() {
       icon: ICON_LARI,
       to: start,
       cta: 'Main game',
-      tone: 'bg-bata text-white',
+      tone: 'bata',
     },
     {
       tag: 'Bersaing',
@@ -136,10 +129,11 @@ export default function HomePage() {
       icon: ICON_PIALA,
       to: '/koleksi',
       cta: 'Lihat koleksi',
-      tone: 'bg-emas text-tinta',
+      tone: 'emas',
     },
   ]
 
+  useGulirHalus()
   const mainRef = useRef<HTMLElement>(null)
   const [chapter, setChapter] = useState('')
   useLandingMotion(mainRef, setChapter, [!!preview.detail])
@@ -151,97 +145,78 @@ export default function HomePage() {
 
   return (
     <main id="konten" ref={mainRef} className="relative overflow-x-clip">
+      {/* Latar halaman bersama: warnanya bergradasi mengikuti bab (useLandingMotion) agar alur menyambung. */}
+      <div data-alur-latar aria-hidden="true" className="pointer-events-none fixed inset-0 -z-10 bg-[#f6efdf]" />
       <ChapterHud label={chapter} />
-      {/* ---------------- Hero ---------------- */}
-      <section data-anim-section="hero" data-chapter="00 · Mulai" className="relative -mt-[76px] overflow-hidden pt-[76px]">
-        <div className="relative mx-auto grid max-w-[1360px] items-center gap-8 px-4 pb-12 pt-10 sm:px-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:px-12 lg:pb-16 lg:pt-14">
-          <div className="relative z-10">
-            <p data-anim="hero-eyebrow" className="eyebrow inline-flex items-center gap-2 border-2 border-tinta bg-white px-3 py-1.5 text-teal shadow-tekan">
-              <span className="size-2 bg-emas motion-safe:animate-pulse" aria-hidden="true" />
-              Ekspedisi budaya Nusantara
-            </p>
-            <h1
-              aria-label={`Jelajahi Budaya, Mulai dari ${firstActive?.name ?? 'Bandung'}`}
-              className="mt-6 flex flex-col items-start gap-4 text-[32px] font-bold sm:text-[52px] lg:text-[60px]"
-            >
-              <span data-anim="hero-pita" className="pita bg-teal text-white" aria-hidden="true">
-                Jelajahi budaya
-              </span>
-              <span data-anim="hero-pita" className="pita pita-2 bg-bata text-white" aria-hidden="true">
-                Mulai dari <CityRotator words={rotatorWords} />
-              </span>
-            </h1>
-            <p data-anim="hero-lead" className="mt-7 max-w-lg text-[17px] leading-relaxed text-tinta/80">
-              Kenali kekayaan budaya Indonesia melalui kuis interaktif, materi bersumber, dan permainan seru.
-            </p>
-
-            <div className="mt-7 flex flex-wrap items-center gap-3">
-              <a data-anim="hero-cta" href="#peta" onClick={scrollToMap} className={`group ${btn} bg-emas text-tinta`}>
-                Mulai Jelajah Sekarang
-                <Arrow className="size-4 transition-transform group-hover:translate-x-1" />
-              </a>
-              {firstActive && (
-                <Link data-anim="hero-cta" to={`/kota/${firstActive.id}`} className={`${btn} bg-white text-tinta`}>
-                  Langsung ke {firstActive.name}
-                </Link>
-              )}
-            </div>
-
-            <ol className="mt-8 flex flex-wrap gap-2" aria-label="Cara belajar">
-              {STEPS.map((s, i) => (
-                <li key={s} data-anim="hero-step" className="flex items-center gap-2 border-2 border-tinta bg-white py-1 pl-1 pr-3 text-[13px] font-semibold">
-                  <span className="grid size-6 place-items-center bg-teal font-mono text-[11px] font-bold text-white">
-                    {i + 1}
-                  </span>
-                  {s}
-                </li>
-              ))}
-            </ol>
-          </div>
-
-          <div data-anim="hero-mascot" className="relative -mx-4 sm:mx-0">
-            <HeroMascot className="mx-auto w-[min(72vw,340px)] lg:w-[380px]" />
-          </div>
-        </div>
-      </section>
+      <NusantaraHero startTo={start} onMap={scrollToMap} />
 
       <Marquee words={['Kuis', 'Materi bersumber', 'Game keliling kota', 'Koleksi budaya', 'Papan peringkat', 'Tanya Saloka']} />
 
-      {/* ---------------- Bab 01: Kenalan ---------------- */}
-      <section data-chapter="01 · Kenalan" aria-labelledby="judul-kenalan" className="px-4 py-16 sm:px-8 lg:px-12">
-        <div className="mx-auto grid max-w-[1200px] items-start gap-10 lg:grid-cols-[1.2fr_1fr]">
+      {/* ---------------- Bab 01: Apa itu Rupaloka ---------------- */}
+      <section
+        data-chapter="01 · Apa itu Rupaloka"
+        data-warna="#f8efdc"
+        aria-labelledby="judul-kenalan"
+        className="relative isolate overflow-clip px-4 pb-36 pt-16 sm:px-8 sm:pb-40 lg:px-12 lg:pb-60 xl:pb-72 lg:pt-24"
+      >
+        <LatarBudaya corak="kawung" />
+        <div className="relative z-10 mx-auto grid max-w-[1200px] items-center gap-12 lg:grid-cols-[1.12fr_1fr] lg:gap-16">
           <div>
             <Chapter
               id="judul-kenalan"
               no={1}
-              tag="Kenalan"
-              title="Kenalan dengan Rupaloka"
+              tag={
+                <>
+                  Apa itu <span className="text-amber">Rupaloka</span>
+                </>
+              }
+              title="Budaya dari"
+              accent="Sumbernya"
               lead="Rupaloka adalah ekspedisi belajar budaya Nusantara untuk pelajar: pilih kota, ikuti path belajar, lalu main game keliling kota untuk mengumpulkan item budaya."
             />
-            <blockquote className="mt-8 border-l-4 border-teal bg-white/80 py-4 pl-5 pr-4">
-              <p className="eyebrow text-teal">Misi kami</p>
-              <p className="mt-2 text-lg font-bold leading-relaxed">
+            <blockquote data-anim="card" className="kutipan-nuansa mt-8">
+              <p className="text-[12px] font-extrabold uppercase tracking-[0.12em] text-teal">Pegangan kami</p>
+              <p className="mt-2 text-[17px] font-extrabold leading-snug text-tinta sm:text-[20px]">
                 Membuat budaya terasa dekat: dipelajari dari sumber yang jelas, dimainkan dengan hormat, dan dikunjungi
                 langsung di tempat aslinya.
               </p>
             </blockquote>
             <div className="mt-8 flex flex-wrap gap-3">
-              <a href="#peta" onClick={scrollToMap} className={`${btn} bg-teal text-white`}>
-                Pilih kota <Arrow />
+              <a href="#peta" onClick={scrollToMap} className="pil pil-emas group">
+                Pilih kota <Arrow className="size-4 transition-transform group-hover:translate-x-1" />
               </a>
-              <Link to="/tentang" className={`${btn} bg-white text-tinta`}>
+              <Link to="/tentang" className="pil pil-putih">
                 Tentang Rupaloka
               </Link>
             </div>
           </div>
-          <ul className="grid gap-4">
-            {PROMISES.map((p) => (
-              <li key={p.title} data-anim="card" className="kotak flex gap-4 p-4">
-                <PixelIcon rows={p.icon} className="size-12 shrink-0" />
-                <div>
-                  <p className="font-display text-lg font-bold uppercase">{p.title}</p>
-                  <p className="mt-1 text-sm leading-relaxed text-tinta/80">{p.text}</p>
+          <ul className="relative grid gap-5">
+            <span
+              aria-hidden="true"
+              className="pointer-events-none absolute bottom-14 left-[52px] top-14 border-l-[3px] border-dotted border-emas/70 sm:left-[62px]"
+            />
+            {PROMISES.map((p, i) => (
+              <li
+                key={p.title}
+                data-anim="card"
+                data-angkat
+                className={`kartu-nuansa relative flex items-center gap-4 p-4 sm:gap-5 sm:p-6 ${i === 1 ? 'lg:translate-x-6' : ''}`}
+              >
+                <div
+                  className={`ikon-lompat grid size-[72px] shrink-0 place-items-center rounded-[20px] bg-gradient-to-br sm:size-[88px] ${TILE[i]}`}
+                >
+                  <PixelIcon rows={p.icon} className="size-11 sm:size-14" />
                 </div>
+                <div className="min-w-0">
+                  <p className="text-[16px] font-black uppercase tracking-[0.02em] text-teal-800 sm:text-[19px]">{p.title}</p>
+                  <p className="mt-1.5 text-[14px] leading-relaxed text-tinta/75 sm:text-[15px]">{p.text}</p>
+                </div>
+                <span
+                  aria-hidden="true"
+                  className="absolute right-4 top-3 text-[12px] font-black tracking-[0.1em] text-amber sm:right-5 sm:top-4"
+                >
+                  0{i + 1}
+                </span>
               </li>
             ))}
           </ul>
@@ -249,21 +224,30 @@ export default function HomePage() {
       </section>
 
       {/* ---------------- Bab 02: Peta ---------------- */}
-      <section id="peta" data-chapter="02 · Pilih kota" aria-labelledby="judul-peta" className="relative scroll-mt-24 px-4 py-16 sm:px-8 lg:px-12">
-        <div className="mx-auto max-w-[1360px]">
+      <section
+        id="peta"
+        data-chapter="02 · Pilih kota"
+        data-warna="#eef3ea"
+        aria-labelledby="judul-peta"
+        className="relative isolate scroll-mt-24 overflow-clip px-4 pb-44 pt-20 sm:px-8 lg:px-12"
+      >
+        <LatarBudaya corak="mega" />
+        <div className="relative z-10 mx-auto max-w-[1360px]">
           <Chapter
             id="judul-peta"
             no={2}
             tag="Dari Sabang sampai Merauke"
-            title="Pilih kota untuk dijelajahi"
+            title="Pilih kota untuk"
+            accent="dijelajahi"
+            align="center"
             lead="Ketuk provinsi di peta untuk melihat kotanya. Bandung sudah bisa dijelajahi; kota lain segera hadir."
           />
 
           <div className="relative mt-8">
             <Suspense
               fallback={
-                <div className="kotak grid h-[240px] place-items-center bg-laut text-sm font-bold text-redup sm:h-[420px] lg:h-[540px]">
-                  Memuat peta…
+                <div className="kotak grid h-[240px] place-items-center bg-laut sm:h-[420px] lg:h-[540px]">
+                  <PixelLoader label="Memuat peta…" />
                 </div>
               }
             >
@@ -274,7 +258,7 @@ export default function HomePage() {
               {selected ? (
                 <CityCard city={selected} onClose={() => setSelectedId(null)} />
               ) : (
-                <p className="border-2 border-dashed border-tinta/40 bg-white/80 p-5 text-sm text-redup">
+                <p className="rounded-[22px] border-2 border-dashed border-teal/30 bg-white/85 p-5 text-sm text-redup">
                   Pilih titik kota di peta untuk melihat kartunya.
                 </p>
               )}
@@ -305,8 +289,10 @@ export default function HomePage() {
                       type="button"
                       onClick={() => setSelectedId(c.id)}
                       aria-pressed={c.id === selectedId}
-                      className={`tekan border-2 border-tinta px-3.5 py-1.5 text-xs font-bold ${
-                        c.id === selectedId ? 'bg-teal text-white shadow-melayang' : 'bg-white text-tinta shadow-tekan'
+                      className={`rounded-full px-4 py-2 text-xs font-bold transition hover:-translate-y-0.5 ${
+                        c.id === selectedId
+                          ? 'bg-teal-800 text-white shadow-[0_8px_18px_-8px_rgb(14_77_75/0.6)]'
+                          : 'bg-white text-tinta ring-1 ring-tinta/10'
                       }`}
                     >
                       {c.status === 'coming_soon' && (
@@ -339,9 +325,9 @@ export default function HomePage() {
                 { label: 'kota terdaftar', value: kota },
                 { label: 'kota siap dijelajahi', value: siap },
               ].map((s) => (
-                <div key={s.label} data-anim="stat" className="kotak flex flex-col-reverse px-3 py-3 text-center">
-                  <dt className="eyebrow text-redup">{s.label}</dt>
-                  <dd className="font-display text-3xl font-bold tabular-nums text-teal sm:text-4xl">{s.value}</dd>
+                <div key={s.label} data-anim="stat" className="kartu-nuansa flex flex-col-reverse px-3 py-4 text-center">
+                  <dt className="text-[11px] font-bold uppercase tracking-[0.1em] text-redup sm:text-[12px]">{s.label}</dt>
+                  <dd className="text-3xl font-black tabular-nums text-teal-800 sm:text-[42px]">{s.value}</dd>
                 </div>
               ))}
             </dl>
@@ -349,17 +335,25 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ---------------- Bab 03: Pilih jalurmu ---------------- */}
-      <section data-chapter="03 · Pilih jalurmu" aria-labelledby="judul-jalur" className="px-4 py-16 sm:px-8 lg:px-12">
-        <div className="mx-auto max-w-[1200px]">
+      {/* ---------------- Bab 03: Cara menjelajah ---------------- */}
+      <section
+        data-chapter="03 · Cara menjelajah"
+        data-warna="#f7efdf"
+        aria-labelledby="judul-jalur"
+        className="relative isolate overflow-clip px-4 pb-28 pt-20 sm:px-8 lg:px-12"
+      >
+        <LatarBudaya corak="parang" />
+        <div className="relative z-10 mx-auto max-w-[1200px]">
           <Chapter
             id="judul-jalur"
             no={3}
-            tag="Pilih jalurmu"
-            title="Mau belajar, main, atau bersaing?"
-            lead="Tiga level dalam satu perjalanan kota. Mulai dari mana saja; poinmu terkumpul di path belajar."
+            tag="Cara menjelajah"
+            title="Belajar, main,"
+            accent="lalu bersaing"
+            align="center"
+            lead="Tiga mode dalam satu ekspedisi kota. Mulai dari mana saja; poinmu terkumpul di path belajar."
           />
-          <div className="mt-10">
+          <div className="mt-14">
             <LevelCards levels={levels} />
           </div>
         </div>
@@ -380,24 +374,32 @@ export default function HomePage() {
       )}
 
       {/* ---------------- CTA akhir ---------------- */}
-      <section data-chapter="06 · Siap?" aria-labelledby="judul-ajakan" className="px-4 pb-24 pt-8 sm:px-8 lg:px-12">
-        <div data-anim="cta-final" className="kotak mx-auto max-w-[1200px] !bg-teal px-6 py-12 text-center text-white sm:px-12">
-          <p className="eyebrow text-emas">Siap?</p>
-          <h2 id="judul-ajakan" className="mx-auto mt-3 max-w-2xl text-[30px] font-bold uppercase leading-tight sm:text-[44px]">
-            Siap mulai ekspedisimu?
-          </h2>
-          <p className="mx-auto mt-4 max-w-xl text-[17px] leading-relaxed text-white/85">
-            Jawab kuis, tonton materi, lari keliling kota, dan kumpulkan item budaya. Gratis, tanpa akun.
-          </p>
-          <div className="mt-8 flex flex-wrap justify-center gap-3">
-            {firstActive && (
-              <CtaLink to={`/kota/${firstActive.id}`} variant="emas" part="cta-btn">
-                Mulai di {firstActive.name}
-              </CtaLink>
-            )}
-            <a data-anim-part="cta-btn" href="#peta" onClick={scrollToMap} className={`${btn} bg-white text-tinta`}>
-              Lihat peta
-            </a>
+      <section data-chapter="06 · Berangkat" data-warna="#f6efdf" aria-labelledby="judul-ajakan" className="px-4 pb-24 pt-12 sm:px-8 lg:px-12">
+        <div
+          data-anim="cta-final"
+          className="relative isolate mx-auto max-w-[1200px] overflow-clip rounded-[32px] px-6 py-14 text-center text-white shadow-[0_30px_60px_-30px_rgb(14_77_75/0.7)] ring-1 ring-emas/50 sm:px-12 sm:py-16"
+        >
+          <LatarBudaya corak="senja" />
+          <div className="relative z-10">
+            <p className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-[12px] font-extrabold uppercase tracking-[0.1em] text-[#f6d98e] ring-1 ring-white/20">
+              Tiket sudah di tangan
+            </p>
+            <h2 id="judul-ajakan" className="mx-auto mt-5 max-w-2xl font-sans text-[32px] font-black leading-[1.08] sm:text-[48px]">
+              Ayo berangkat ke <span className="teks-emas teks-emas-terang">kota pertamamu</span>
+            </h2>
+            <p className="mx-auto mt-4 max-w-xl text-[17px] leading-relaxed text-white/85">
+              Jawab kuis, tonton materi, lari keliling kota, dan kumpulkan item budaya. Gratis, tanpa akun.
+            </p>
+            <div className="mt-8 flex flex-wrap justify-center gap-3">
+              {firstActive && (
+                <CtaLink to={`/kota/${firstActive.id}`} variant="emas" part="cta-btn">
+                  Mulai di {firstActive.name}
+                </CtaLink>
+              )}
+              <a data-anim-part="cta-btn" href="#peta" onClick={scrollToMap} className="pil pil-putih">
+                Lihat peta
+              </a>
+            </div>
           </div>
         </div>
       </section>

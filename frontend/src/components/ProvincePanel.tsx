@@ -36,7 +36,7 @@ export default function ProvincePanel({
         <SheetContent side="bottom" className="z-[1001] max-h-[70vh] rounded-t-3xl border-garis px-4 pb-6">
           <SheetHeader className="px-0 pb-0">
             <p className="eyebrow text-redup">Provinsi</p>
-            <SheetTitle className="text-lg font-extrabold text-teal">{name}</SheetTitle>
+            <SheetTitle className="text-lg font-black text-teal-800">{name}</SheetTitle>
             <SheetDescription>{sorted.length ? 'Kota yang bisa dijelajahi:' : 'Belum ada kota di provinsi ini.'}</SheetDescription>
           </SheetHeader>
           <CityList cities={sorted} onPick={onPick} />
