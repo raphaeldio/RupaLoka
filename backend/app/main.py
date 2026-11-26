@@ -27,6 +27,8 @@ from app.api_schemas import (
     ScoreSubmit,
     SourceRef,
     SourcesResponse,
+    TtsRequest,
+    TtsStatus,
     YourRank,
 )
 from app.chat import ChatRequest, ChatResponse, ChatService, RateLimiter, UnknownContext
@@ -46,6 +48,7 @@ from app.reflection import ReflectionRequest, ReflectionResult, assess
 from app.retrieval import Retriever
 from app.schemas import CARD_ASPECTS, City
 from app.security import add_security_headers, client_ip
+from app.tts import TtsService, TtsUnavailable
 
 logger = logging.getLogger("rupaloka")
 
@@ -83,11 +86,20 @@ def create_app(
     settings: Settings | None = None,
     llm: LLM | None = None,
     leaderboard: LeaderboardStore | None = None,
+    tts: TtsService | None = None,
 ) -> FastAPI:
     settings = settings or Settings.from_env()
     limiter = RateLimiter(settings.rate_limit_per_min)
     global_limiter = RateLimiter(settings.global_rate_limit_per_min)
     board_limiter = RateLimiter(settings.leaderboard_rate_limit_per_min)
+    tts_limiter = RateLimiter(settings.tts_rate_limit_per_min)
+    tts_global_limiter = RateLimiter(settings.tts_global_rate_limit_per_min)
+    tts_service = tts or TtsService(
+        settings.elevenlabs_api_key,
+        settings.elevenlabs_voice_id,
+        settings.elevenlabs_model,
+        daily_char_limit=settings.tts_daily_char_limit,
+    )
 
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
@@ -131,6 +143,32 @@ def create_app(
 
     def content(request: Request) -> Content:
         return request.app.state.content  # type: ignore[no-any-return]
+
+    @app.get("/api/tts/status", response_model=TtsStatus)
+    def tts_status() -> TtsStatus:
+        return TtsStatus(enabled=tts_service.enabled)
+
+    # Fungsi sinkron: FastAPI menjalankannya di threadpool (panggilan HTTP ke ElevenLabs).
+    @app.post("/api/tts", response_class=Response)
+    def tts_speak(req: TtsRequest, request: Request) -> Response:
+        if not tts_service.enabled:
+            raise HTTPException(status_code=503, detail="tts_not_configured")
+        if not tts_limiter.allow(client_ip(request, settings.trusted_proxy_hops)):
+            raise HTTPException(status_code=429, detail="rate_limited")
+        if not tts_global_limiter.allow("*"):
+            raise HTTPException(status_code=503, detail="tts_busy")
+        try:
+            audio = tts_service.synthesize(req.text)
+        except ValueError as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
+        except TtsUnavailable as exc:
+            logger.warning("TTS tidak tersedia: %s", exc.reason)
+            raise HTTPException(status_code=503, detail=exc.reason) from exc
+        return Response(
+            content=audio,
+            media_type="audio/mpeg",
+            headers={"Cache-Control": "private, max-age=86400"},
+        )
 
     @app.get("/api/health", response_model=Health)
     def health(request: Request) -> Health:

@@ -58,6 +58,15 @@ class Settings:
     supabase_service_role_key: str | None = None
     leaderboard_rate_limit_per_min: int = 10
 
+    # Suara Saloka (ElevenLabs TTS, SDD ADR 42). Tanpa kunci/voice: /api/tts menjawab 503 dan
+    # klien memakai suara peramban. Kuota karakter harian melindungi kredit ElevenLabs.
+    elevenlabs_api_key: str | None = None
+    elevenlabs_voice_id: str | None = None
+    elevenlabs_model: str = "eleven_multilingual_v2"
+    tts_rate_limit_per_min: int = 30
+    tts_global_rate_limit_per_min: int = 120
+    tts_daily_char_limit: int = 20_000
+
     @classmethod
     def from_env(cls) -> Settings:
         try:
@@ -84,4 +93,10 @@ class Settings:
             supabase_url=_str(env("SUPABASE_URL")),
             supabase_service_role_key=_str(env("SUPABASE_SERVICE_ROLE_KEY")),
             leaderboard_rate_limit_per_min=int(env("LEADERBOARD_RATE_LIMIT_PER_MIN") or 10),
+            elevenlabs_api_key=_str(env("ELEVENLABS_API_KEY")),
+            elevenlabs_voice_id=_str(env("ELEVENLABS_VOICE_ID")),
+            elevenlabs_model=_str(env("ELEVENLABS_MODEL")) or "eleven_multilingual_v2",
+            tts_rate_limit_per_min=int(env("TTS_RATE_LIMIT_PER_MIN") or 30),
+            tts_global_rate_limit_per_min=int(env("TTS_GLOBAL_RATE_LIMIT_PER_MIN") or 120),
+            tts_daily_char_limit=int(env("TTS_DAILY_CHAR_LIMIT") or 20_000),
         )

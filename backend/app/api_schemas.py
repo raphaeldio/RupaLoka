@@ -125,3 +125,14 @@ class ScoreSubmit(BaseModel):
     player_id: UUID  # dibuat acak di perangkat; bukan data pribadi
     nickname: str = Field(min_length=1, max_length=40)
     points: int = Field(ge=0)
+
+
+# --- suara Saloka (ElevenLabs TTS, ADR 42) ------------------------------------
+
+
+class TtsRequest(BaseModel):
+    text: str = Field(min_length=1, max_length=600)  # sama dengan app.tts.MAX_TTS_CHARS
+
+
+class TtsStatus(BaseModel):
+    enabled: bool

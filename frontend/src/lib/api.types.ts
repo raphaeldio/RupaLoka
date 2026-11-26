@@ -339,6 +339,14 @@ export interface Speed {
   ramp_per_100: number
 }
 
+export interface TtsRequest {
+  text: string
+}
+
+export interface TtsStatus {
+  enabled: boolean
+}
+
 /** Budayawan/anggota komunitas yang memvalidasi kartu budaya. */
 export interface Validator {
   name: string
