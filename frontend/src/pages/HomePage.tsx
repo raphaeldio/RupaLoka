@@ -148,7 +148,7 @@ export default function HomePage() {
       {/* Latar halaman bersama: warnanya bergradasi mengikuti bab (useLandingMotion) agar alur menyambung. */}
       <div data-alur-latar aria-hidden="true" className="pointer-events-none fixed inset-0 -z-10 bg-[#f6efdf]" />
       <ChapterHud label={chapter} />
-      <NusantaraHero startTo={start} onMap={scrollToMap} />
+      <NusantaraHero onMap={scrollToMap} />
 
       <Marquee words={['Kuis', 'Materi bersumber', 'Game keliling kota', 'Koleksi budaya', 'Papan peringkat', 'Tanya Saloka']} />
 

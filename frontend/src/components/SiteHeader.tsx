@@ -1,9 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
-import { bundledCities } from '../lib/cities'
+import { gulirKe } from '../lib/gulirHalus'
 import { LogoMark } from './landing/Logo'
-
-const START = bundledCities.find((c) => c.status === 'active')
 
 const icon = (d: string): ReactNode => (
   <svg viewBox="0 0 20 20" className="size-4" aria-hidden="true">
@@ -102,7 +100,15 @@ export default function SiteHeader() {
 
         <div className="flex items-center gap-2">
           <Link
-            to={START ? `/kota/${START.id}` : '/#peta'}
+            to="/#peta"
+            onClick={(e) => {
+              // Sudah di beranda: gulir langsung (hash yang sama tidak memicu efek gulir).
+              const peta = location.pathname === '/' ? document.getElementById('peta') : null
+              if (!peta) return
+              e.preventDefault()
+              gulirKe(peta)
+              window.history.pushState(null, '', '#peta')
+            }}
             className="pil pil-emas group hidden !px-5 !py-2.5 !text-sm sm:inline-flex"
           >
             Mulai belajar
