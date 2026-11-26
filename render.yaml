@@ -48,7 +48,7 @@ services:
       - key: ELEVENLABS_API_KEY
         sync: false                 # RAHASIA: isi manual di dashboard Render
       - key: ELEVENLABS_VOICE_ID
-        sync: false                 # ID voice "Finn - Expressive & Ads Indonesian" dari ElevenLabs
+        value: JBFqnCBsd6RMkjVDRZzb   # voice bawaan "George" (akun gratis tidak bisa voice Library via API)
       - key: ELEVENLABS_MODEL
         value: eleven_multilingual_v2
       - key: TTS_RATE_LIMIT_PER_MIN
