@@ -8,14 +8,14 @@ import {
   damp,
   exhibitPos,
   exhibitYaw,
-  HALF_W,
   poseFor,
-  ringCenter,
   type CamState,
   type Exhibit,
   type Layout,
 } from './cameraFlow'
 import { PENDING_TEXT, wrapLines } from './labelText'
+import MuseumRoom, { ROOM_H, TrackLight } from './MuseumRoom'
+import { MUSEUM } from './museumTextures'
 
 const C = {
   kertas: '#f5f1e8',
@@ -26,9 +26,16 @@ const C = {
   bata: '#b5523b',
 }
 
-/** Ukuran kotak putih pedestal (m) dan ruang tampil model di atasnya. */
-const BOX = { w: 1.0, h: 1.0, d: 0.6 }
+/**
+ * Pedestal bergaya museum (m): plinth gelap, badan kayu, pita putih berlabel (nama +
+ * penjelasan singkat), tutup marun. Model dipaskan ke ruang FIT di atas TOP.
+ */
+const PED = { w: 0.82, d: 0.66, plinth: 0.1, body: 0.55, band: 0.33, top: 0.06 }
+const BAND_Y = PED.plinth + PED.body + PED.band / 2
+const TOP = PED.plinth + PED.body + PED.band + PED.top
 const FIT = { w: 0.85, h: 0.85 }
+/** Lampu sorot plafon: 1,4 m ke arah lorong dari pedestal. */
+const LAMP: [number, number, number] = [0, ROOM_H - 0.12, 1.4]
 
 export interface SceneProps {
   layout: Layout
@@ -55,13 +62,13 @@ export default function GalleryScene(props: SceneProps) {
       }}
       aria-hidden="true"
     >
-      <color attach="background" args={[C.teal800]} />
-      <fog attach="fog" args={[C.teal800, 9, 22]} />
-      <ambientLight intensity={0.55} />
-      <hemisphereLight args={['#fff3dc', C.tinta, 0.55]} />
-      <directionalLight position={[-6, 8, 4]} intensity={0.6} />
+      <color attach="background" args={[MUSEUM.background]} />
+      <fog attach="fog" args={[MUSEUM.background, 10, 24]} />
+      <ambientLight intensity={0.6} color="#ffe9d0" />
+      <hemisphereLight args={['#fff1dc', '#3a2016', 0.55]} />
+      <directionalLight position={[-6, 8, 4]} intensity={0.35} color="#fff1dc" />
       <CameraRig layout={props.layout} state={props.state} reducedMotion={props.reducedMotion} />
-      <RingRoom layout={props.layout} />
+      <MuseumRoom layout={props.layout} />
       {props.layout.exhibits.map((e, i) => (
         <Pedestal key={e.id} index={i} e={e} data={e.source === null ? null : props.exhibits[e.source]} {...props} />
       ))}
@@ -102,54 +109,12 @@ function CameraRig({ layout, state, reducedMotion }: Pick<SceneProps, 'layout' |
   return null
 }
 
-/** Lorong cincin dari primitif (pengganti sampai GLB ruangan dibuat di Blender, T-121). */
-function RingRoom({ layout }: { layout: Layout }) {
-  const c = ringCenter(layout)
-  const R = layout.radius
-  const H = 4.2
-  const rin = R - HALF_W
-  const rout = R + HALF_W
-  return (
-    <group position={c}>
-      <mesh position={[0, H / 2, 0]}>
-        <cylinderGeometry args={[rin, rin, H, 96, 1, true]} />
-        <meshStandardMaterial color={C.kertas} roughness={0.95} />
-      </mesh>
-      <mesh position={[0, H / 2, 0]}>
-        <cylinderGeometry args={[rout, rout, H, 128, 1, true]} />
-        <meshStandardMaterial color={C.kertas} side={THREE.BackSide} roughness={0.95} />
-      </mesh>
-      <mesh position={[0, 0.12, 0]}>
-        <cylinderGeometry args={[rin + 0.02, rin + 0.02, 0.24, 96, 1, true]} />
-        <meshStandardMaterial color={C.bata} />
-      </mesh>
-      <mesh position={[0, 0.12, 0]}>
-        <cylinderGeometry args={[rout - 0.02, rout - 0.02, 0.24, 128, 1, true]} />
-        <meshStandardMaterial color={C.bata} side={THREE.BackSide} />
-      </mesh>
-      <mesh rotation={[-Math.PI / 2, 0, 0]}>
-        <ringGeometry args={[rin, rout, 128]} />
-        <meshStandardMaterial color={C.tinta} roughness={0.55} metalness={0.1} />
-      </mesh>
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.005, 0]}>
-        <ringGeometry args={[R - 0.25, R + 0.25, 128]} />
-        <meshStandardMaterial color="#24413f" roughness={0.7} />
-      </mesh>
-      <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, H, 0]}>
-        <ringGeometry args={[rin, rout, 128]} />
-        <meshStandardMaterial color={C.teal800} roughness={1} side={THREE.DoubleSide} />
-      </mesh>
-    </group>
-  )
-}
-
-/** Tekstur kotak putih: nama pameran + penjelasan singkat (atau keterangan pending). */
+/** Tekstur pita putih pedestal: plakat emas bernama + penjelasan singkat (atau pending). */
 function useLabelTexture(title: string, body: string | null, empty: boolean): THREE.CanvasTexture {
   const tex = useMemo(() => {
-    const size = 512
     const canvas = document.createElement('canvas')
-    canvas.width = size
-    canvas.height = size
+    canvas.width = 1024
+    canvas.height = Math.round((1024 * PED.band) / PED.w)
     const t = new THREE.CanvasTexture(canvas)
     t.colorSpace = THREE.SRGBColorSpace
     t.anisotropy = 4
@@ -161,31 +126,37 @@ function useLabelTexture(title: string, body: string | null, empty: boolean): TH
       const canvas = tex.image as HTMLCanvasElement
       const ctx = canvas.getContext('2d')
       if (!ctx || !alive) return
-      const s = canvas.width
+      const w = canvas.width
+      const h = canvas.height
       const font = '"Nunito Sans Variable", "Nunito Sans", system-ui, sans-serif'
-      ctx.fillStyle = '#ffffff'
-      ctx.fillRect(0, 0, s, s)
-      ctx.strokeStyle = C.tinta
-      ctx.lineWidth = 6
-      ctx.strokeRect(14, 14, s - 28, s - 28)
-      ctx.fillStyle = C.tinta
+      ctx.fillStyle = '#f6f2e8'
+      ctx.fillRect(0, 0, w, h)
+      // plakat emas bernama
+      ctx.font = `800 54px ${font}`
+      const name = wrapLines(title, w - 200, 1, (x) => ctx.measureText(x).width)[0]
+      const pw = Math.min(w - 80, ctx.measureText(name).width + 80)
+      const px = (w - pw) / 2
+      ctx.fillStyle = '#8a6a2a'
+      ctx.fillRect(px - 4, 22, pw + 8, 84)
+      ctx.fillStyle = MUSEUM.plaque
+      ctx.fillRect(px, 26, pw, 76)
+      ctx.fillStyle = '#2a1a0e'
+      ctx.textBaseline = 'middle'
+      ctx.textAlign = 'center'
+      ctx.fillText(name, w / 2, 66)
+      // penjelasan singkat
+      ctx.textAlign = 'left'
       ctx.textBaseline = 'top'
-      ctx.font = `800 52px ${font}`
-      const titleLines = wrapLines(title, s - 80, 2, (x) => ctx.measureText(x).width)
-      titleLines.forEach((l, i) => ctx.fillText(l, 40, 40 + i * 58))
-      let y = 40 + titleLines.length * 58 + 12
-      ctx.fillStyle = C.emas
-      ctx.fillRect(40, y, 90, 8)
-      y += 28
-      ctx.fillStyle = empty ? '#6b7a78' : C.tinta
-      ctx.font = `500 28px ${font}`
+      ctx.fillStyle = empty ? '#7a6f64' : '#2a1a0e'
+      ctx.font = `600 30px ${font}`
       const text = empty ? 'Koleksi berikutnya segera hadir.' : body ?? PENDING_TEXT
-      const lines = wrapLines(text, s - 80, 9, (x) => ctx.measureText(x).width)
-      lines.forEach((l, i) => ctx.fillText(l, 40, y + i * 36))
+      const lines = wrapLines(text, w - 100, 5, (x) => ctx.measureText(x).width)
+      lines.forEach((l, i) => ctx.fillText(l, 50, 128 + i * 38))
       if (!empty) {
-        ctx.fillStyle = C.teal
+        ctx.fillStyle = '#6b1e1e'
         ctx.font = `800 26px ${font}`
-        ctx.fillText('Klik kotak ini untuk kartu lengkap ›', 40, s - 66)
+        ctx.textAlign = 'right'
+        ctx.fillText('Klik untuk kartu lengkap ›', w - 40, h - 46)
       }
       tex.needsUpdate = true
     }
@@ -235,15 +206,29 @@ function Pedestal({
 
   return (
     <group position={pos} rotation={[0, yaw, 0]}>
-      <mesh position={[0, BOX.h / 2, 0]} onClick={click(onCard)}>
-        <boxGeometry args={[BOX.w, BOX.h, BOX.d]} />
-        <meshStandardMaterial color={focused ? '#ffffff' : '#f3efe6'} roughness={0.9} />
-      </mesh>
-      <mesh position={[0, BOX.h / 2, BOX.d / 2 + 0.002]} onClick={click(onCard)}>
-        <planeGeometry args={[BOX.w * 0.94, BOX.h * 0.94]} />
-        <meshBasicMaterial map={label} toneMapped={false} />
-      </mesh>
-      <group ref={model} position={[0, BOX.h, 0]} onClick={click(onExhibit)}>
+      <group onClick={click(onCard)}>
+        <mesh position={[0, PED.plinth / 2, 0]}>
+          <boxGeometry args={[PED.w + 0.14, PED.plinth, PED.d + 0.14]} />
+          <meshStandardMaterial color={MUSEUM.pedestalPlinth} roughness={0.8} />
+        </mesh>
+        <mesh position={[0, PED.plinth + PED.body / 2, 0]}>
+          <boxGeometry args={[PED.w, PED.body, PED.d]} />
+          <meshStandardMaterial color={MUSEUM.pedestalBody} roughness={0.75} />
+        </mesh>
+        <mesh position={[0, BAND_Y, 0]}>
+          <boxGeometry args={[PED.w + 0.02, PED.band, PED.d + 0.02]} />
+          <meshStandardMaterial color={focused ? '#ffffff' : '#f3efe6'} roughness={0.9} />
+        </mesh>
+        <mesh position={[0, BAND_Y, PED.d / 2 + 0.012]}>
+          <planeGeometry args={[PED.w, PED.band]} />
+          <meshBasicMaterial map={label} toneMapped={false} />
+        </mesh>
+        <mesh position={[0, TOP - PED.top / 2, 0]}>
+          <boxGeometry args={[PED.w + 0.06, PED.top, PED.d + 0.06]} />
+          <meshStandardMaterial color={MUSEUM.pedestalTop} roughness={0.7} />
+        </mesh>
+      </group>
+      <group ref={model} position={[0, TOP, 0]} onClick={click(onExhibit)}>
         {data && (
           <ModelBoundary key={data.id} fallback={<FallbackModel id={data.id} />}>
             <Suspense fallback={<FallbackModel id={data.id} />}>
@@ -257,9 +242,10 @@ function Pedestal({
         )}
       </group>
       <object3D ref={aim} position={[0, 1.3, 0]} />
+      <TrackLight position={LAMP} />
       <spotLight
         ref={light}
-        position={[0, 3.9, 1.4]}
+        position={[LAMP[0], LAMP[1] - 0.2, LAMP[2]]}
         angle={0.45}
         penumbra={0.7}
         intensity={focused ? 70 : 40}
@@ -378,7 +364,7 @@ function Mascot({ guideModel, guideLine, reducedMotion, wasDrag, onMascot, state
       {guideLine && (
         <Html position={[0, 0.62, 0]} center distanceFactor={1.6} zIndexRange={[20, 0]}>
           {/* aria-hidden: kalimat yang sama sudah diumumkan lewat wilayah aria-live */}
-          <div aria-hidden="true" className="pointer-events-none w-56 rounded-md border-2 border-tinta bg-white px-3 py-2 text-xs font-semibold leading-snug text-tinta shadow-kartu">
+          <div aria-hidden="true" className="pointer-events-none w-56 rounded-xl border border-emas/40 bg-white px-3 py-2 text-xs font-semibold leading-snug text-tinta shadow-kartu">
             {guideLine}
           </div>
         </Html>
