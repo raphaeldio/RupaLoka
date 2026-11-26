@@ -2,7 +2,6 @@ import { useGSAP } from '@gsap/react'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useRef, type MouseEvent } from 'react'
-import { Link } from 'react-router-dom'
 import latarUrl from '../../assets/hero/nusantara.webp'
 import latar960Url from '../../assets/hero/nusantara-960.webp'
 import HeroMascot from '../mascot/HeroMascot'
@@ -82,10 +81,8 @@ const Panah = () => (
 )
 
 export default function NusantaraHero({
-  startTo,
   onMap,
 }: {
-  startTo: string
   onMap: (e: MouseEvent<HTMLAnchorElement>) => void
 }) {
   // Lintasan gulir: pembungkus tinggi; <section> di dalamnya menempel (sticky) di atas layar.
@@ -294,15 +291,16 @@ export default function NusantaraHero({
             </p>
 
             <div data-nh="masuk" className="mt-6 flex flex-wrap items-center justify-center gap-3">
-              <Link
-                to={startTo}
+              <a
+                href="#peta"
+                onClick={onMap}
                 className="group inline-flex items-center gap-2 rounded-full bg-emas px-6 py-3 text-[15px] font-bold text-tinta shadow-[0_8px_20px_rgb(168_118_26/0.35)] transition hover:-translate-y-0.5 hover:shadow-[0_12px_26px_rgb(168_118_26/0.4)] focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-teal"
               >
                 Mulai Jelajah Sekarang
                 <span className="transition-transform group-hover:translate-x-1">
                   <Panah />
                 </span>
-              </Link>
+              </a>
               <a
                 href="#peta"
                 onClick={onMap}
